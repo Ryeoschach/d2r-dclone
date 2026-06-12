@@ -1,0 +1,16 @@
+name = "d2r-dclone-notifier"
+main = "src/index.js"
+compatibility_date = "2026-06-12"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[[kv_namespaces]]
+binding = "DCLONE_STATE"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[vars]
+API_URL = "https://d2runewizard.com/api/trackers/diablo-clone"
+BASE_VERSION_NAME = "毁灭之王"
+TIME_ZONE = "Asia/Shanghai"
+NOTIFY_ON_FIRST_RUN = "false"
