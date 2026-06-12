@@ -115,6 +115,10 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /当前恐怖区域/);
   assert.match(html, /下一阶段恐怖区域/);
   assert.match(html, /terror-countdown/);
+  assert.match(html, /区域每 30 分钟切换/);
+  assert.match(html, /nextBoundary/);
+  assert.match(html, /storedAutoRefresh === null/);
+  assert.match(html, /updateSyncAge/);
   assert.match(html, /data-auto-minutes="5"/);
   assert.match(html, /\/api\/settings/);
   assert.match(html, /\/api\/status/);
@@ -142,9 +146,20 @@ test("后台拉取间隔默认 5 分钟并可写入 KV", async () => {
 });
 
 test("按照最后同步时间判断后台拉取是否到期", () => {
-  const now = Date.parse("2026-06-13T00:10:00.000Z");
-  const state = { checkedAt: "2026-06-13T00:08:30.000Z" };
-  assert.equal(isPullDue(state, 1, now), true);
-  assert.equal(isPullDue(state, 2, now), false);
-  assert.equal(isPullDue(null, 5, now), true);
+  const sameMinute = Date.parse("2026-06-13T00:10:59.000Z");
+  const state = { checkedAt: "2026-06-13T00:10:01.000Z" };
+  assert.equal(isPullDue(state, 1, sameMinute), false);
+  assert.equal(
+    isPullDue(state, 1, Date.parse("2026-06-13T00:11:00.000Z")),
+    true
+  );
+  assert.equal(
+    isPullDue(
+      { checkedAt: "2026-06-13T00:09:30.000Z" },
+      2,
+      Date.parse("2026-06-13T00:10:00.000Z")
+    ),
+    true
+  );
+  assert.equal(isPullDue(null, 5, sameMinute), true);
 });

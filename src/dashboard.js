@@ -298,7 +298,7 @@ export function renderDashboard() {
         <div class="terror-label">下一阶段恐怖区域</div>
         <div class="terror-name" id="terror-next">正在读取…</div>
         <div class="terror-original" id="terror-next-original"></div>
-        <div class="terror-meta"><span>由 D2RuneWizard 数据源提供</span><span>整点切换</span></div>
+        <div class="terror-meta"><span>整点、半点同步数据</span><span>区域每 30 分钟切换</span></div>
       </article>
     </section>
 
@@ -380,7 +380,9 @@ export function renderDashboard() {
     let minProgress = 1;
     let autoRefreshTimer = null;
     let terrorCountdownTimer = null;
-    let autoRefreshEnabled = localStorage.getItem("dclone-auto-refresh-enabled") === "true";
+    let syncAgeTimer = null;
+    const storedAutoRefresh = localStorage.getItem("dclone-auto-refresh-enabled");
+    let autoRefreshEnabled = storedAutoRefresh === null || storedAutoRefresh === "true";
     let autoRefreshMinutes = Number(localStorage.getItem("dclone-auto-refresh-minutes")) || 1;
 
     function escapeHtml(value) {
@@ -446,10 +448,24 @@ export function renderDashboard() {
       document.getElementById("content").innerHTML =
         renderDlc(data.servers, false, "毁灭之王") +
         renderDlc(data.servers, true, "术士君临");
-      const checked = new Date(data.checkedAt);
-      document.getElementById("checked-at").textContent =
-        "后台同步：" + checked.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false });
+      updateSyncAge();
+      if (syncAgeTimer) clearInterval(syncAgeTimer);
+      syncAgeTimer = setInterval(updateSyncAge, 1000);
       document.getElementById("live-dot").classList.add("live");
+    }
+
+    function updateSyncAge() {
+      const checkedAt = window.dashboardData?.checkedAt;
+      if (!checkedAt) return;
+      const checked = new Date(checkedAt);
+      const ageSeconds = Math.max(0, Math.floor((Date.now() - checked.getTime()) / 1000));
+      const ageText = ageSeconds < 60
+        ? ageSeconds + " 秒前"
+        : Math.floor(ageSeconds / 60) + " 分钟前";
+      document.getElementById("checked-at").textContent =
+        "后台同步：" + checked.toLocaleString("zh-CN", {
+          timeZone: "Asia/Shanghai", hour12: false
+        }) + "（" + ageText + "）";
     }
 
     function renderTerrorZone(terrorZone) {
@@ -478,8 +494,9 @@ export function renderDashboard() {
 
     function updateTerrorCountdown() {
       const now = Date.now();
-      const nextHour = (Math.floor(now / 3600000) + 1) * 3600000;
-      const remaining = Math.max(0, nextHour - now);
+      const halfHour = 30 * 60 * 1000;
+      const nextBoundary = (Math.floor(now / halfHour) + 1) * halfHour;
+      const remaining = Math.max(0, nextBoundary - now);
       const minutes = Math.floor(remaining / 60000);
       const seconds = Math.floor((remaining % 60000) / 1000);
       document.getElementById("terror-countdown").textContent =

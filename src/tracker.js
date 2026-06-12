@@ -154,7 +154,26 @@ export function isPullDue(state, pullIntervalMinutes, now = Date.now()) {
     return true;
   }
 
-  return now - checkedAt >= pullIntervalMinutes * 60 * 1000;
+  const interval = pullIntervalMinutes * 60 * 1000;
+  return Math.floor(now / interval) > Math.floor(checkedAt / interval);
+}
+
+export async function syncTerrorZone(
+  env,
+  fetchImpl = fetch,
+  fetchedTerrorZone = null
+) {
+  const state = await getStoredState(env);
+  if (!state) {
+    throw new Error("尚无 DC 状态，无法单独保存恐怖区域");
+  }
+
+  const terrorZone = fetchedTerrorZone ?? await fetchTerrorZone(env, fetchImpl);
+  await env.DCLONE_STATE.put(
+    STATE_KEY,
+    JSON.stringify({ ...state, terrorZone })
+  );
+  return terrorZone;
 }
 
 export function formatServerName(server, baseVersionName = "毁灭之王") {
@@ -268,7 +287,7 @@ async function sendFeishu(webhook, secret, message, fetchImpl) {
   }
 }
 
-export async function checkForUpdates(env, fetchImpl = fetch) {
+export async function checkForUpdates(env, fetchImpl = fetch, options = {}) {
   if (!env.DCLONE_STATE) {
     throw new Error("缺少 DCLONE_STATE KV 绑定");
   }
@@ -287,12 +306,6 @@ export async function checkForUpdates(env, fetchImpl = fetch) {
   const currentServers = normalizeServers(await apiResponse.json());
   validateServerCombinations(currentServers);
   const previousState = await getStoredState(env);
-  let terrorZone = previousState?.terrorZone ?? null;
-  try {
-    terrorZone = await fetchTerrorZone(env, fetchImpl);
-  } catch (error) {
-    console.warn("同步恐怖区域失败，继续使用上次数据", error);
-  }
   const isFirstRun = !previousState;
   const changes = findChanges(previousState?.servers, currentServers);
   const shouldNotify =
@@ -317,7 +330,7 @@ export async function checkForUpdates(env, fetchImpl = fetch) {
     JSON.stringify({
       checkedAt: new Date().toISOString(),
       servers: currentServers,
-      terrorZone
+      terrorZone: options.terrorZone ?? previousState?.terrorZone ?? null
     })
   );
 

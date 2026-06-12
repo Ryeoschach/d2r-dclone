@@ -4,13 +4,18 @@ import {
   getStoredState,
   getTrackerSettings,
   isPullDue,
-  setPullInterval
+  setPullInterval,
+  syncTerrorZone
 } from "./tracker.js";
+import { fetchTerrorZone, isTerrorZonePullDue } from "./terror-zone.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "content-type": "application/json; charset=utf-8" }
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "no-store"
+    }
   });
 }
 
@@ -25,9 +30,9 @@ function html(content) {
   });
 }
 
-async function run(env) {
+async function run(env, options = {}) {
   try {
-    return await checkForUpdates(env);
+    return await checkForUpdates(env, fetch, options);
   } catch (error) {
     console.error("检查 Diablo Clone 状态失败", error);
     throw error;
@@ -46,14 +51,40 @@ async function runScheduled(env) {
     getTrackerSettings(env)
   ]);
 
-  if (!isPullDue(state, settings.pullIntervalMinutes)) {
-    return {
-      skipped: true,
-      pullIntervalMinutes: settings.pullIntervalMinutes
-    };
+  const cloneDue = isPullDue(state, settings.pullIntervalMinutes);
+  const terrorZoneDue = isTerrorZonePullDue(state?.terrorZone);
+  const result = {
+    cloneSkipped: !cloneDue,
+    terrorZoneSkipped: !terrorZoneDue,
+    pullIntervalMinutes: settings.pullIntervalMinutes
+  };
+
+  let terrorZone;
+  if (terrorZoneDue) {
+    try {
+      terrorZone = await fetchTerrorZone(env);
+    } catch (error) {
+      console.error("同步恐怖区域失败", error);
+      result.terrorZoneError = error.message;
+    }
   }
 
-  return run(env);
+  if (cloneDue) {
+    result.clone = await run(env, { terrorZone });
+  }
+
+  if (!cloneDue && terrorZone) {
+    try {
+      result.terrorZone = await syncTerrorZone(env, fetch, terrorZone);
+    } catch (error) {
+      console.error("同步恐怖区域失败", error);
+      result.terrorZoneError = error.message;
+    }
+  } else if (terrorZone) {
+    result.terrorZone = terrorZone;
+  }
+
+  return result;
 }
 
 export default {
@@ -112,7 +143,14 @@ export default {
       }
 
       try {
-        return json({ ok: true, ...(await run(env)) });
+        let terrorZone = null;
+        try {
+          terrorZone = await fetchTerrorZone(env);
+        } catch (error) {
+          console.error("手动同步恐怖区域失败", error);
+        }
+        const clone = await run(env, { terrorZone });
+        return json({ ok: true, ...clone, terrorZone });
       } catch (error) {
         return json({ ok: false, error: error.message }, 502);
       }

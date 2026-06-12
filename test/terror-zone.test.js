@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  isTerrorZonePullDue,
   normalizeTerrorZone,
   translateTerrorZone
 } from "../src/terror-zone.js";
@@ -35,4 +36,23 @@ test("缺少当前或下一阶段时拒绝无效响应", () => {
     () => normalizeTerrorZone({ current: "Travincal" }),
     /返回格式不正确/
   );
+});
+
+test("恐怖区域仅跨整点或半点后重新拉取", () => {
+  const terrorZone = { checkedAt: "2026-06-13T07:04:57.000Z" };
+  assert.equal(
+    isTerrorZonePullDue(
+      terrorZone,
+      Date.parse("2026-06-13T07:29:59.000Z")
+    ),
+    false
+  );
+  assert.equal(
+    isTerrorZonePullDue(
+      terrorZone,
+      Date.parse("2026-06-13T07:30:00.000Z")
+    ),
+    true
+  );
+  assert.equal(isTerrorZonePullDue(null, Date.now()), true);
 });

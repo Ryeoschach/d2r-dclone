@@ -68,3 +68,17 @@ export async function fetchTerrorZone(env, fetchImpl = fetch) {
   }
   return normalizeTerrorZone(await response.json());
 }
+
+export function isTerrorZonePullDue(terrorZone, now = Date.now()) {
+  if (!terrorZone?.checkedAt) {
+    return true;
+  }
+
+  const checkedAt = Date.parse(terrorZone.checkedAt);
+  if (!Number.isFinite(checkedAt)) {
+    return true;
+  }
+
+  const halfHour = 30 * 60 * 1000;
+  return Math.floor(now / halfHour) > Math.floor(checkedAt / halfHour);
+}
