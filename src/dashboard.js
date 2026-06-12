@@ -85,6 +85,72 @@ export function renderDashboard() {
     .filter:hover, .refresh:hover { color: var(--text); border-color: #75532d; }
     .filter.active { color: #171006; border-color: var(--gold); background: var(--gold); font-weight: 800; }
     .refresh[disabled] { opacity: .55; cursor: wait; }
+    .settings-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--line);
+    }
+    .setting-group { padding: 16px; background: rgba(25, 20, 15, .96); }
+    .setting-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .setting-title { margin: 0; font-size: 15px; }
+    .setting-description { margin: 4px 0 13px; color: var(--muted); font-size: 12px; }
+    .setting-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .interval-button, .save-setting {
+      min-width: 38px;
+      height: 34px;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #15110d;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .interval-button.active { border-color: var(--gold); color: var(--gold); }
+    .save-setting { color: #171006; border-color: var(--gold); background: var(--gold); font-weight: 800; }
+    .setting-input {
+      width: 90px;
+      height: 34px;
+      padding: 5px 9px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      outline: none;
+      background: #100d0a;
+      color: var(--text);
+    }
+    .setting-input:focus { border-color: var(--gold); }
+    .token-input { width: min(240px, 100%); }
+    .switch { position: relative; width: 44px; height: 24px; flex: 0 0 auto; }
+    .switch input { position: absolute; opacity: 0; pointer-events: none; }
+    .switch-track {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 99px;
+      background: #4a4035;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #d8ccbb;
+      transition: transform .2s;
+    }
+    .switch input:checked + .switch-track { background: var(--gold); }
+    .switch input:checked + .switch-track::after { transform: translateX(20px); background: #171006; }
+    .setting-status { min-height: 18px; margin-top: 9px; color: var(--muted); font-size: 12px; }
+    .setting-status.success { color: var(--success); }
+    .setting-status.failure { color: #ff9f8e; }
     .legend { display: flex; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: 13px; }
     .legend span::before {
       content: "";
@@ -173,6 +239,7 @@ export function renderDashboard() {
       .status-line { text-align: left; }
       .toolbar { align-items: stretch; flex-direction: column; }
       .refresh { width: 100%; }
+      .settings-panel { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -204,8 +271,45 @@ export function renderDashboard() {
       <button class="refresh" id="refresh">刷新页面数据</button>
     </section>
 
+    <section class="settings-panel" aria-label="刷新设置">
+      <div class="setting-group">
+        <div class="setting-head">
+          <h2 class="setting-title">页面自动刷新</h2>
+          <label class="switch" aria-label="页面自动刷新开关">
+            <input type="checkbox" id="auto-refresh-toggle">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <p class="setting-description">只刷新当前网页显示，不会额外请求上游接口。</p>
+        <div class="setting-row" id="auto-quick-buttons">
+          <button class="interval-button" data-auto-minutes="1">1 分</button>
+          <button class="interval-button" data-auto-minutes="2">2 分</button>
+          <button class="interval-button" data-auto-minutes="3">3 分</button>
+          <button class="interval-button" data-auto-minutes="4">4 分</button>
+          <button class="interval-button" data-auto-minutes="5">5 分</button>
+          <input class="setting-input" id="auto-custom" type="number" min="1" max="1440" step="1" aria-label="自定义页面刷新分钟数" placeholder="分钟">
+          <button class="interval-button" id="apply-auto-custom">应用</button>
+        </div>
+        <div class="setting-status" id="auto-status">自动刷新已关闭</div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-head">
+          <h2 class="setting-title">后台接口拉取</h2>
+          <span class="mode" id="pull-current">读取中…</span>
+        </div>
+        <p class="setting-description">Cloudflare 最快每 1 分钟检查一次；修改需要管理令牌。</p>
+        <div class="setting-row">
+          <input class="setting-input" id="pull-interval" type="number" min="1" max="1440" step="1" aria-label="后台拉取间隔分钟数" placeholder="分钟">
+          <input class="setting-input token-input" id="admin-token" type="password" autocomplete="off" aria-label="管理令牌" placeholder="MANUAL_TRIGGER_TOKEN">
+          <button class="save-setting" id="save-pull-interval">保存</button>
+        </div>
+        <div class="setting-status" id="pull-status"></div>
+      </div>
+    </section>
+
     <div id="content"><div class="empty">正在加载 24 种服务器状态…</div></div>
-    <footer>数据来源 d2runewizard.com · 后台每 5 分钟自动同步 · 页面只读取 Cloudflare KV 缓存</footer>
+    <footer>数据来源 d2runewizard.com · 后台每 <span id="footer-pull-interval">5</span> 分钟同步 · 页面只读取 Cloudflare KV 缓存</footer>
   </main>
 
   <script>
@@ -226,6 +330,9 @@ export function renderDashboard() {
     ];
     const regions = ["Asia", "Americas", "Europe"];
     let minProgress = 1;
+    let autoRefreshTimer = null;
+    let autoRefreshEnabled = localStorage.getItem("dclone-auto-refresh-enabled") === "true";
+    let autoRefreshMinutes = Number(localStorage.getItem("dclone-auto-refresh-minutes")) || 1;
 
     function escapeHtml(value) {
       return String(value).replace(/[&<>"']/g, char => ({
@@ -309,6 +416,96 @@ export function renderDashboard() {
         document.getElementById("checked-at").textContent = "状态不可用";
       } finally {
         button.disabled = false;
+        scheduleAutoRefresh();
+      }
+    }
+
+    function updateAutoRefreshControls() {
+      document.getElementById("auto-refresh-toggle").checked = autoRefreshEnabled;
+      document.querySelectorAll("[data-auto-minutes]").forEach(button => {
+        button.classList.toggle("active", Number(button.dataset.autoMinutes) === autoRefreshMinutes);
+      });
+      const status = document.getElementById("auto-status");
+      status.textContent = autoRefreshEnabled
+        ? "已开启，每 " + autoRefreshMinutes + " 分钟刷新页面"
+        : "自动刷新已关闭";
+    }
+
+    function saveAutoRefreshSettings(enabled, minutes) {
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) {
+        document.getElementById("auto-status").textContent = "请输入 1 至 1440 的整数分钟";
+        return;
+      }
+      autoRefreshEnabled = enabled;
+      autoRefreshMinutes = minutes;
+      localStorage.setItem("dclone-auto-refresh-enabled", String(enabled));
+      localStorage.setItem("dclone-auto-refresh-minutes", String(minutes));
+      updateAutoRefreshControls();
+      scheduleAutoRefresh();
+    }
+
+    function scheduleAutoRefresh() {
+      if (autoRefreshTimer) clearTimeout(autoRefreshTimer);
+      if (autoRefreshEnabled) {
+        autoRefreshTimer = setTimeout(load, autoRefreshMinutes * 60 * 1000);
+      }
+    }
+
+    async function loadPullSettings() {
+      const status = document.getElementById("pull-status");
+      try {
+        const response = await fetch("/api/settings", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "设置读取失败");
+        document.getElementById("pull-interval").value = data.pullIntervalMinutes;
+        document.getElementById("pull-current").textContent = "当前 " + data.pullIntervalMinutes + " 分钟";
+        document.getElementById("footer-pull-interval").textContent = data.pullIntervalMinutes;
+        status.textContent = "后台按此间隔请求状态接口";
+      } catch (error) {
+        status.textContent = error.message;
+        status.className = "setting-status failure";
+      }
+    }
+
+    async function savePullSettings() {
+      const button = document.getElementById("save-pull-interval");
+      const status = document.getElementById("pull-status");
+      const minutes = Number(document.getElementById("pull-interval").value);
+      const token = document.getElementById("admin-token").value;
+      status.className = "setting-status";
+      if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) {
+        status.textContent = "请输入 1 至 1440 的整数分钟";
+        status.classList.add("failure");
+        return;
+      }
+      if (!token) {
+        status.textContent = "请输入 MANUAL_TRIGGER_TOKEN";
+        status.classList.add("failure");
+        return;
+      }
+
+      button.disabled = true;
+      try {
+        const response = await fetch("/api/settings", {
+          method: "POST",
+          headers: {
+            "authorization": "Bearer " + token,
+            "content-type": "application/json"
+          },
+          body: JSON.stringify({ pullIntervalMinutes: minutes })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "保存失败");
+        document.getElementById("admin-token").value = "";
+        document.getElementById("pull-current").textContent = "当前 " + data.pullIntervalMinutes + " 分钟";
+        document.getElementById("footer-pull-interval").textContent = data.pullIntervalMinutes;
+        status.textContent = "已保存，下一次分钟级 Cron 开始生效";
+        status.classList.add("success");
+      } catch (error) {
+        status.textContent = error.message;
+        status.classList.add("failure");
+      } finally {
+        button.disabled = false;
       }
     }
 
@@ -321,6 +518,20 @@ export function renderDashboard() {
       });
     });
     document.getElementById("refresh").addEventListener("click", load);
+    document.getElementById("auto-refresh-toggle").addEventListener("change", event => {
+      saveAutoRefreshSettings(event.target.checked, autoRefreshMinutes);
+    });
+    document.querySelectorAll("[data-auto-minutes]").forEach(button => {
+      button.addEventListener("click", () => {
+        saveAutoRefreshSettings(true, Number(button.dataset.autoMinutes));
+      });
+    });
+    document.getElementById("apply-auto-custom").addEventListener("click", () => {
+      saveAutoRefreshSettings(true, Number(document.getElementById("auto-custom").value));
+    });
+    document.getElementById("save-pull-interval").addEventListener("click", savePullSettings);
+    updateAutoRefreshControls();
+    loadPullSettings();
     load();
   </script>
 </body>

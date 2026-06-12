@@ -1,4 +1,7 @@
 const STATE_KEY = "diablo-clone-state-v1";
+const SETTINGS_KEY = "diablo-clone-settings-v1";
+const DEFAULT_PULL_INTERVAL_MINUTES = 5;
+const MAX_PULL_INTERVAL_MINUTES = 1440;
 
 const PROGRESS_LABELS = {
   1: "恐怖凝视着庇护之地",
@@ -105,6 +108,53 @@ export async function getStoredState(env) {
   return env.DCLONE_STATE.get(STATE_KEY, "json");
 }
 
+export async function getTrackerSettings(env) {
+  if (!env.DCLONE_STATE) {
+    throw new Error("缺少 DCLONE_STATE KV 绑定");
+  }
+
+  const stored = await env.DCLONE_STATE.get(SETTINGS_KEY, "json");
+  const pullIntervalMinutes = Number(stored?.pullIntervalMinutes);
+  return {
+    pullIntervalMinutes:
+      Number.isInteger(pullIntervalMinutes) &&
+      pullIntervalMinutes >= 1 &&
+      pullIntervalMinutes <= MAX_PULL_INTERVAL_MINUTES
+        ? pullIntervalMinutes
+        : DEFAULT_PULL_INTERVAL_MINUTES
+  };
+}
+
+export async function setPullInterval(env, value) {
+  const pullIntervalMinutes = Number(value);
+  if (
+    !Number.isInteger(pullIntervalMinutes) ||
+    pullIntervalMinutes < 1 ||
+    pullIntervalMinutes > MAX_PULL_INTERVAL_MINUTES
+  ) {
+    throw new Error("后台拉取间隔必须是 1 至 1440 之间的整数分钟");
+  }
+
+  await env.DCLONE_STATE.put(
+    SETTINGS_KEY,
+    JSON.stringify({ pullIntervalMinutes })
+  );
+  return { pullIntervalMinutes };
+}
+
+export function isPullDue(state, pullIntervalMinutes, now = Date.now()) {
+  if (!state?.checkedAt) {
+    return true;
+  }
+
+  const checkedAt = Date.parse(state.checkedAt);
+  if (!Number.isFinite(checkedAt)) {
+    return true;
+  }
+
+  return now - checkedAt >= pullIntervalMinutes * 60 * 1000;
+}
+
 export function formatServerName(server, baseVersionName = "毁灭之王") {
   const rawRegion = server.region.replace(/Rotw$/i, "");
   const region = REGION_LABELS[rawRegion] ?? rawRegion;
@@ -170,7 +220,7 @@ export function buildFeishuMessage(changes, options = {}) {
           elements: [
             {
               tag: "plain_text",
-              content: "数据来源：d2runewizard.com，每 5 分钟检查一次"
+              content: "数据来源：d2runewizard.com，按仪表盘配置定时检查"
             }
           ]
         }

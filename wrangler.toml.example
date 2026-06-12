@@ -3,7 +3,7 @@ main = "src/index.js"
 compatibility_date = "2026-06-12"
 
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["* * * * *"]
 
 [[kv_namespaces]]
 binding = "DCLONE_STATE"

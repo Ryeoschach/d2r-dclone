@@ -5,7 +5,10 @@ import {
   buildFeishuMessage,
   findChanges,
   formatServerName,
+  getTrackerSettings,
+  isPullDue,
   normalizeServers,
+  setPullInterval,
   validateServerCombinations
 } from "../src/tracker.js";
 import { renderDashboard } from "../src/dashboard.js";
@@ -107,5 +110,38 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /非天梯 SC/);
   assert.match(html, /天梯 HC/);
   assert.match(html, /4 阶以上/);
+  assert.match(html, /页面自动刷新/);
+  assert.match(html, /后台接口拉取/);
+  assert.match(html, /data-auto-minutes="5"/);
+  assert.match(html, /\/api\/settings/);
   assert.match(html, /\/api\/status/);
+});
+
+test("后台拉取间隔默认 5 分钟并可写入 KV", async () => {
+  const values = new Map();
+  const env = {
+    DCLONE_STATE: {
+      async get(key, type) {
+        const value = values.get(key);
+        return type === "json" && value ? JSON.parse(value) : value ?? null;
+      },
+      async put(key, value) {
+        values.set(key, value);
+      }
+    }
+  };
+
+  assert.deepEqual(await getTrackerSettings(env), { pullIntervalMinutes: 5 });
+  assert.deepEqual(await setPullInterval(env, 2), { pullIntervalMinutes: 2 });
+  assert.deepEqual(await getTrackerSettings(env), { pullIntervalMinutes: 2 });
+  await assert.rejects(() => setPullInterval(env, 0), /1 至 1440/);
+  await assert.rejects(() => setPullInterval(env, 1.5), /1 至 1440/);
+});
+
+test("按照最后同步时间判断后台拉取是否到期", () => {
+  const now = Date.parse("2026-06-13T00:10:00.000Z");
+  const state = { checkedAt: "2026-06-13T00:08:30.000Z" };
+  assert.equal(isPullDue(state, 1, now), true);
+  assert.equal(isPullDue(state, 2, now), false);
+  assert.equal(isPullDue(null, 5, now), true);
 });
