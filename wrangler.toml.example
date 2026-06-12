@@ -11,6 +11,7 @@ id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
 
 [vars]
 API_URL = "https://d2runewizard.com/api/trackers/diablo-clone"
+TERROR_ZONE_API_URL = "https://d2runewizard.com/api/trackers/terror-zone"
 BASE_VERSION_NAME = "毁灭之王"
 TIME_ZONE = "Asia/Shanghai"
 NOTIFY_ON_FIRST_RUN = "false"

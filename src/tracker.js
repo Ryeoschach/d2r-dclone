@@ -1,3 +1,5 @@
+import { fetchTerrorZone } from "./terror-zone.js";
+
 const STATE_KEY = "diablo-clone-state-v1";
 const SETTINGS_KEY = "diablo-clone-settings-v1";
 const DEFAULT_PULL_INTERVAL_MINUTES = 5;
@@ -285,6 +287,12 @@ export async function checkForUpdates(env, fetchImpl = fetch) {
   const currentServers = normalizeServers(await apiResponse.json());
   validateServerCombinations(currentServers);
   const previousState = await getStoredState(env);
+  let terrorZone = previousState?.terrorZone ?? null;
+  try {
+    terrorZone = await fetchTerrorZone(env, fetchImpl);
+  } catch (error) {
+    console.warn("同步恐怖区域失败，继续使用上次数据", error);
+  }
   const isFirstRun = !previousState;
   const changes = findChanges(previousState?.servers, currentServers);
   const shouldNotify =
@@ -308,7 +316,8 @@ export async function checkForUpdates(env, fetchImpl = fetch) {
     STATE_KEY,
     JSON.stringify({
       checkedAt: new Date().toISOString(),
-      servers: currentServers
+      servers: currentServers,
+      terrorZone
     })
   );
 

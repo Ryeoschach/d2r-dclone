@@ -60,6 +60,38 @@ export function renderDashboard() {
     }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
     .dot.live { background: var(--success); box-shadow: 0 0 12px #9fbd60; }
+    .terror-overview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .terror-card {
+      position: relative;
+      min-height: 148px;
+      padding: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(63, 28, 18, .92), rgba(25, 20, 15, .96));
+    }
+    .terror-card.next { background: linear-gradient(135deg, rgba(47, 37, 22, .9), rgba(25, 20, 15, .96)); }
+    .terror-card::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      bottom: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(218, 75, 56, .18), transparent 68%);
+      pointer-events: none;
+    }
+    .terror-label { color: var(--gold); font-size: 12px; font-weight: 900; letter-spacing: .12em; }
+    .terror-name { margin: 8px 0 2px; font: 700 clamp(20px, 2.5vw, 29px) Georgia, "Songti SC", serif; }
+    .terror-original { color: var(--muted); font-size: 12px; }
+    .terror-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 12px; }
+    .terror-countdown { color: var(--text); font-weight: 800; }
     .toolbar {
       display: flex;
       align-items: center;
@@ -240,6 +272,7 @@ export function renderDashboard() {
       .toolbar { align-items: stretch; flex-direction: column; }
       .refresh { width: 100%; }
       .settings-panel { grid-template-columns: 1fr; }
+      .terror-overview { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -253,6 +286,21 @@ export function renderDashboard() {
       </div>
       <div class="status-line"><span class="dot" id="live-dot"></span><span id="checked-at">正在读取状态…</span></div>
     </header>
+
+    <section class="terror-overview" aria-label="恐怖区域">
+      <article class="terror-card">
+        <div class="terror-label">当前恐怖区域</div>
+        <div class="terror-name" id="terror-current">正在读取…</div>
+        <div class="terror-original" id="terror-current-original"></div>
+        <div class="terror-meta"><span id="terror-updated"></span><span class="terror-countdown" id="terror-countdown"></span></div>
+      </article>
+      <article class="terror-card next">
+        <div class="terror-label">下一阶段恐怖区域</div>
+        <div class="terror-name" id="terror-next">正在读取…</div>
+        <div class="terror-original" id="terror-next-original"></div>
+        <div class="terror-meta"><span>由 D2RuneWizard 数据源提供</span><span>整点切换</span></div>
+      </article>
+    </section>
 
     <section class="toolbar" aria-label="状态筛选">
       <div>
@@ -331,6 +379,7 @@ export function renderDashboard() {
     const regions = ["Asia", "Americas", "Europe"];
     let minProgress = 1;
     let autoRefreshTimer = null;
+    let terrorCountdownTimer = null;
     let autoRefreshEnabled = localStorage.getItem("dclone-auto-refresh-enabled") === "true";
     let autoRefreshMinutes = Number(localStorage.getItem("dclone-auto-refresh-minutes")) || 1;
 
@@ -393,6 +442,7 @@ export function renderDashboard() {
 
     function render(data) {
       window.dashboardData = data;
+      renderTerrorZone(data.terrorZone);
       document.getElementById("content").innerHTML =
         renderDlc(data.servers, false, "毁灭之王") +
         renderDlc(data.servers, true, "术士君临");
@@ -400,6 +450,40 @@ export function renderDashboard() {
       document.getElementById("checked-at").textContent =
         "后台同步：" + checked.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai", hour12: false });
       document.getElementById("live-dot").classList.add("live");
+    }
+
+    function renderTerrorZone(terrorZone) {
+      const current = document.getElementById("terror-current");
+      const next = document.getElementById("terror-next");
+      if (!terrorZone) {
+        current.textContent = "暂无数据";
+        next.textContent = "暂无数据";
+        document.getElementById("terror-current-original").textContent = "等待后台完成下一次同步";
+        document.getElementById("terror-next-original").textContent = "";
+        return;
+      }
+
+      current.textContent = terrorZone.currentZh || terrorZone.current;
+      next.textContent = terrorZone.nextZh || terrorZone.next;
+      document.getElementById("terror-current-original").textContent = terrorZone.current;
+      document.getElementById("terror-next-original").textContent = terrorZone.next;
+      document.getElementById("terror-updated").textContent = "同步 " +
+        new Date(terrorZone.checkedAt).toLocaleTimeString("zh-CN", {
+          timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit", hour12: false
+        });
+      updateTerrorCountdown();
+      if (terrorCountdownTimer) clearInterval(terrorCountdownTimer);
+      terrorCountdownTimer = setInterval(updateTerrorCountdown, 1000);
+    }
+
+    function updateTerrorCountdown() {
+      const now = Date.now();
+      const nextHour = (Math.floor(now / 3600000) + 1) * 3600000;
+      const remaining = Math.max(0, nextHour - now);
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      document.getElementById("terror-countdown").textContent =
+        "距切换 " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
     }
 
     async function load() {

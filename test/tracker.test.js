@@ -112,6 +112,9 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /4 阶以上/);
   assert.match(html, /页面自动刷新/);
   assert.match(html, /后台接口拉取/);
+  assert.match(html, /当前恐怖区域/);
+  assert.match(html, /下一阶段恐怖区域/);
+  assert.match(html, /terror-countdown/);
   assert.match(html, /data-auto-minutes="5"/);
   assert.match(html, /\/api\/settings/);
   assert.match(html, /\/api\/status/);
