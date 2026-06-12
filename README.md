@@ -124,6 +124,3 @@ curl -X POST "https://你的-worker域名/run" \
 npm test
 npm run dev
 ```
-
-`wrangler.toml` 包含部署环境配置，已被 Git 忽略；仓库只提交
-`wrangler.toml.example`。
