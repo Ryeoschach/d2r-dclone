@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   buildFeishuMessage,
+  checkForUpdates,
   findChanges,
   formatServerName,
   getTrackerSettings,
@@ -117,6 +118,8 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /terror-countdown/);
   assert.match(html, /区域每 30 分钟切换/);
   assert.match(html, /nextBoundary/);
+  assert.match(html, /根据上一轮预测即时切换/);
+  assert.match(html, /正在获取下一阶段/);
   assert.match(html, /storedAutoRefresh === null/);
   assert.match(html, /updateSyncAge/);
   assert.match(html, /data-auto-minutes="5"/);
@@ -147,19 +150,65 @@ test("后台拉取间隔默认 5 分钟并可写入 KV", async () => {
 
 test("按照最后同步时间判断后台拉取是否到期", () => {
   const sameMinute = Date.parse("2026-06-13T00:10:59.000Z");
-  const state = { checkedAt: "2026-06-13T00:10:01.000Z" };
-  assert.equal(isPullDue(state, 1, sameMinute), false);
+  assert.equal(isPullDue(1, sameMinute), true);
+  assert.equal(isPullDue(2, sameMinute), true);
   assert.equal(
-    isPullDue(state, 1, Date.parse("2026-06-13T00:11:00.000Z")),
-    true
+    isPullDue(2, Date.parse("2026-06-13T00:11:00.000Z")),
+    false
   );
   assert.equal(
-    isPullDue(
-      { checkedAt: "2026-06-13T00:09:30.000Z" },
-      2,
-      Date.parse("2026-06-13T00:10:00.000Z")
-    ),
+    isPullDue(5, Date.parse("2026-06-13T00:15:00.000Z")),
     true
   );
-  assert.equal(isPullDue(null, 5, sameMinute), true);
+});
+
+test("每分钟轮询但状态无变化时不重复写 KV", async () => {
+  const apiServers = [];
+  for (const rotw of [false, true]) {
+    for (const ladder of [false, true]) {
+      for (const hardcore of [false, true]) {
+        for (const region of ["Asia", "Americas", "Europe"]) {
+          apiServers.push({
+            server: `${ladder ? "ladder" : "nonLadder"}${hardcore ? "Hardcore" : "Softcore"}${region}${rotw ? "Rotw" : ""}`,
+            progress: 1,
+            message: "Terror gazes upon Sanctuary",
+            ladder,
+            hardcore,
+            rotw,
+            region: `${region}${rotw ? "Rotw" : ""}`,
+            lastUpdate: { seconds: 100 },
+            lastWalk: { seconds: 0 }
+          });
+        }
+      }
+    }
+  }
+
+  const values = new Map();
+  let putCount = 0;
+  const env = {
+    FEISHU_WEBHOOK: "https://example.com/webhook",
+    NOTIFY_ON_FIRST_RUN: "false",
+    DCLONE_STATE: {
+      async get(key, type) {
+        const value = values.get(key);
+        return type === "json" && value ? JSON.parse(value) : value ?? null;
+      },
+      async put(key, value) {
+        putCount += 1;
+        values.set(key, value);
+      }
+    }
+  };
+  const fetchImpl = async () => new Response(
+    JSON.stringify({ servers: apiServers }),
+    { headers: { "content-type": "application/json" } }
+  );
+
+  const first = await checkForUpdates(env, fetchImpl);
+  const second = await checkForUpdates(env, fetchImpl);
+
+  assert.equal(first.stateWritten, true);
+  assert.equal(second.stateWritten, false);
+  assert.equal(putCount, 1);
 });

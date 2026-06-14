@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   isTerrorZonePullDue,
   normalizeTerrorZone,
+  shouldPromoteNextTerrorZone,
   translateTerrorZone
 } from "../src/terror-zone.js";
 
@@ -38,7 +39,25 @@ test("缺少当前或下一阶段时拒绝无效响应", () => {
   );
 });
 
-test("恐怖区域仅跨整点或半点后重新拉取", () => {
+test("半小时边界后即时晋升预测区域", () => {
+  const terrorZone = { checkedAt: "2026-06-13T07:04:57.000Z" };
+  assert.equal(
+    shouldPromoteNextTerrorZone(
+      terrorZone,
+      Date.parse("2026-06-13T07:29:59.000Z")
+    ),
+    false
+  );
+  assert.equal(
+    shouldPromoteNextTerrorZone(
+      terrorZone,
+      Date.parse("2026-06-13T07:30:00.000Z")
+    ),
+    true
+  );
+});
+
+test("恐怖区域仅在边界后三分钟内重试", () => {
   const terrorZone = { checkedAt: "2026-06-13T07:04:57.000Z" };
   assert.equal(
     isTerrorZonePullDue(
@@ -54,5 +73,18 @@ test("恐怖区域仅跨整点或半点后重新拉取", () => {
     ),
     true
   );
-  assert.equal(isTerrorZonePullDue(null, Date.now()), true);
+  assert.equal(
+    isTerrorZonePullDue(
+      terrorZone,
+      Date.parse("2026-06-13T07:32:59.000Z")
+    ),
+    true
+  );
+  assert.equal(
+    isTerrorZonePullDue(
+      terrorZone,
+      Date.parse("2026-06-13T07:33:00.000Z")
+    ),
+    false
+  );
 });

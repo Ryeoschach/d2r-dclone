@@ -69,16 +69,26 @@ export async function fetchTerrorZone(env, fetchImpl = fetch) {
   return normalizeTerrorZone(await response.json());
 }
 
+export function halfHourBucket(timestamp) {
+  return Math.floor(timestamp / (30 * 60 * 1000));
+}
+
+export function shouldPromoteNextTerrorZone(terrorZone, now = Date.now()) {
+  const checkedAt = Date.parse(terrorZone?.checkedAt);
+  return Number.isFinite(checkedAt) &&
+    halfHourBucket(now) > halfHourBucket(checkedAt);
+}
+
 export function isTerrorZonePullDue(terrorZone, now = Date.now()) {
   if (!terrorZone?.checkedAt) {
     return true;
   }
 
-  const checkedAt = Date.parse(terrorZone.checkedAt);
-  if (!Number.isFinite(checkedAt)) {
-    return true;
+  if (!shouldPromoteNextTerrorZone(terrorZone, now)) {
+    return false;
   }
 
-  const halfHour = 30 * 60 * 1000;
-  return Math.floor(now / halfHour) > Math.floor(checkedAt / halfHour);
+  // Retry briefly when the upstream has not confirmed the new pair yet.
+  // Unchanged responses do not consume a KV put.
+  return new Date(now).getUTCMinutes() % 30 <= 2;
 }

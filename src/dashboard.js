@@ -463,7 +463,7 @@ export function renderDashboard() {
         ? ageSeconds + " 秒前"
         : Math.floor(ageSeconds / 60) + " 分钟前";
       document.getElementById("checked-at").textContent =
-        "后台同步：" + checked.toLocaleString("zh-CN", {
+        "状态数据更新：" + checked.toLocaleString("zh-CN", {
           timeZone: "Asia/Shanghai", hour12: false
         }) + "（" + ageText + "）";
     }
@@ -479,10 +479,23 @@ export function renderDashboard() {
         return;
       }
 
-      current.textContent = terrorZone.currentZh || terrorZone.current;
-      next.textContent = terrorZone.nextZh || terrorZone.next;
-      document.getElementById("terror-current-original").textContent = terrorZone.current;
-      document.getElementById("terror-next-original").textContent = terrorZone.next;
+      const checkedAt = new Date(terrorZone.checkedAt).getTime();
+      const halfHour = 30 * 60 * 1000;
+      const awaitingConfirmation =
+        Math.floor(Date.now() / halfHour) > Math.floor(checkedAt / halfHour);
+      if (awaitingConfirmation) {
+        current.textContent = terrorZone.nextZh || terrorZone.next;
+        next.textContent = "正在获取下一阶段…";
+        document.getElementById("terror-current-original").textContent =
+          terrorZone.next + " · 根据上一轮预测即时切换";
+        document.getElementById("terror-next-original").textContent =
+          "等待 D2RuneWizard 确认新一轮数据";
+      } else {
+        current.textContent = terrorZone.currentZh || terrorZone.current;
+        next.textContent = terrorZone.nextZh || terrorZone.next;
+        document.getElementById("terror-current-original").textContent = terrorZone.current;
+        document.getElementById("terror-next-original").textContent = terrorZone.next;
+      }
       document.getElementById("terror-updated").textContent = "同步 " +
         new Date(terrorZone.checkedAt).toLocaleTimeString("zh-CN", {
           timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit", hour12: false

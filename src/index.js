@@ -51,7 +51,7 @@ async function runScheduled(env) {
     getTrackerSettings(env)
   ]);
 
-  const cloneDue = isPullDue(state, settings.pullIntervalMinutes);
+  const cloneDue = isPullDue(settings.pullIntervalMinutes);
   const terrorZoneDue = isTerrorZonePullDue(state?.terrorZone);
   const result = {
     cloneSkipped: !cloneDue,

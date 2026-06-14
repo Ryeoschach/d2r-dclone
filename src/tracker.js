@@ -144,18 +144,15 @@ export async function setPullInterval(env, value) {
   return { pullIntervalMinutes };
 }
 
-export function isPullDue(state, pullIntervalMinutes, now = Date.now()) {
-  if (!state?.checkedAt) {
-    return true;
-  }
+export function isPullDue(pullIntervalMinutes, now = Date.now()) {
+  const currentMinute = Math.floor(now / 60000);
+  return currentMinute % pullIntervalMinutes === 0;
+}
 
-  const checkedAt = Date.parse(state.checkedAt);
-  if (!Number.isFinite(checkedAt)) {
-    return true;
-  }
-
-  const interval = pullIntervalMinutes * 60 * 1000;
-  return Math.floor(now / interval) > Math.floor(checkedAt / interval);
+function terrorZoneChanged(previous, current) {
+  return Boolean(current) && (
+    previous?.current !== current.current || previous?.next !== current.next
+  );
 }
 
 export async function syncTerrorZone(
@@ -169,10 +166,16 @@ export async function syncTerrorZone(
   }
 
   const terrorZone = fetchedTerrorZone ?? await fetchTerrorZone(env, fetchImpl);
-  await env.DCLONE_STATE.put(
-    STATE_KEY,
-    JSON.stringify({ ...state, terrorZone })
-  );
+  if (terrorZoneChanged(state.terrorZone, terrorZone)) {
+    await env.DCLONE_STATE.put(
+      STATE_KEY,
+      JSON.stringify({
+        ...state,
+        checkedAt: new Date().toISOString(),
+        terrorZone
+      })
+    );
+  }
   return terrorZone;
 }
 
@@ -308,6 +311,11 @@ export async function checkForUpdates(env, fetchImpl = fetch, options = {}) {
   const previousState = await getStoredState(env);
   const isFirstRun = !previousState;
   const changes = findChanges(previousState?.servers, currentServers);
+  const nextTerrorZone = options.terrorZone ?? previousState?.terrorZone ?? null;
+  const shouldWrite =
+    isFirstRun ||
+    changes.length > 0 ||
+    terrorZoneChanged(previousState?.terrorZone, options.terrorZone);
   const shouldNotify =
     changes.length > 0 &&
     (!isFirstRun || String(env.NOTIFY_ON_FIRST_RUN).toLowerCase() === "true");
@@ -325,18 +333,21 @@ export async function checkForUpdates(env, fetchImpl = fetch, options = {}) {
     );
   }
 
-  await env.DCLONE_STATE.put(
-    STATE_KEY,
-    JSON.stringify({
-      checkedAt: new Date().toISOString(),
-      servers: currentServers,
-      terrorZone: options.terrorZone ?? previousState?.terrorZone ?? null
-    })
-  );
+  if (shouldWrite) {
+    await env.DCLONE_STATE.put(
+      STATE_KEY,
+      JSON.stringify({
+        checkedAt: new Date().toISOString(),
+        servers: currentServers,
+        terrorZone: nextTerrorZone
+      })
+    );
+  }
 
   return {
     initialized: isFirstRun,
     notified: shouldNotify,
-    changeCount: changes.length
+    changeCount: changes.length,
+    stateWritten: shouldWrite
   };
 }
