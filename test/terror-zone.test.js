@@ -19,6 +19,11 @@ test("规范化当前和下一阶段恐怖区域", () => {
 
   assert.equal(result.currentZh, "库拉斯特商场、残破神殿与废弃圣堂");
   assert.equal(result.nextZh, "亚瑞特高原与亚巴顿深坑");
+  assert.deepEqual(
+    result.currentDetails.immunities.map((item) => item.name),
+    ["火焰", "冰冷", "闪电", "毒素"]
+  );
+  assert.equal(result.nextDetails.ratingText, "未评级");
   assert.equal(result.checkedAt, "2026-06-13T00:00:00.000Z");
 });
 

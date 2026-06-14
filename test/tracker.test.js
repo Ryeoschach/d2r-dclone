@@ -6,6 +6,7 @@ import {
   checkForUpdates,
   findChanges,
   formatServerName,
+  getStoredState,
   getTrackerSettings,
   isPullDue,
   normalizeServers,
@@ -120,6 +121,13 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /nextBoundary/);
   assert.match(html, /根据上一轮预测即时切换/);
   assert.match(html, /正在获取下一阶段/);
+  assert.match(html, /terror-current-details/);
+  assert.match(html, /常见免疫/);
+  assert.match(html, /mobile-region-grid/);
+  assert.ok(
+    html.indexOf('renderDlc(data.servers, true, "术士君临")') <
+      html.indexOf('renderDlc(data.servers, false, "毁灭之王")')
+  );
   assert.match(html, /storedAutoRefresh === null/);
   assert.match(html, /updateSyncAge/);
   assert.match(html, /data-auto-minutes="5"/);
@@ -146,6 +154,27 @@ test("后台拉取间隔默认 5 分钟并可写入 KV", async () => {
   assert.deepEqual(await getTrackerSettings(env), { pullIntervalMinutes: 2 });
   await assert.rejects(() => setPullInterval(env, 0), /1 至 1440/);
   await assert.rejects(() => setPullInterval(env, 1.5), /1 至 1440/);
+});
+
+test("读取旧 KV 状态时即时补充恐怖区域资料", async () => {
+  const env = {
+    DCLONE_STATE: {
+      async get() {
+        return {
+          servers: [],
+          terrorZone: {
+            current: "Durance of Hate",
+            next: "Moo Moo Farm",
+            checkedAt: "2026-06-15T00:00:00.000Z"
+          }
+        };
+      }
+    }
+  };
+
+  const state = await getStoredState(env);
+  assert.equal(state.terrorZone.currentDetails.rating, "A");
+  assert.equal(state.terrorZone.nextDetails.rating, "S");
 });
 
 test("按照最后同步时间判断后台拉取是否到期", () => {

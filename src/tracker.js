@@ -1,4 +1,4 @@
-import { fetchTerrorZone } from "./terror-zone.js";
+import { enrichTerrorZone, fetchTerrorZone } from "./terror-zone.js";
 
 const STATE_KEY = "diablo-clone-state-v1";
 const SETTINGS_KEY = "diablo-clone-settings-v1";
@@ -107,7 +107,10 @@ export async function getStoredState(env) {
   if (!env.DCLONE_STATE) {
     throw new Error("缺少 DCLONE_STATE KV 绑定");
   }
-  return env.DCLONE_STATE.get(STATE_KEY, "json");
+  const state = await env.DCLONE_STATE.get(STATE_KEY, "json");
+  return state
+    ? { ...state, terrorZone: enrichTerrorZone(state.terrorZone) }
+    : state;
 }
 
 export async function getTrackerSettings(env) {

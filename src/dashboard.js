@@ -90,6 +90,21 @@ export function renderDashboard() {
     .terror-label { color: var(--gold); font-size: 12px; font-weight: 900; letter-spacing: .12em; }
     .terror-name { margin: 8px 0 2px; font: 700 clamp(20px, 2.5vw, 29px) Georgia, "Songti SC", serif; }
     .terror-original { color: var(--muted); font-size: 12px; }
+    .terror-details { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; min-height: 27px; margin-top: 12px; }
+    .terror-detail-label { color: var(--muted); font-size: 12px; }
+    .terror-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 3px 8px;
+      border: 1px solid #5c4630;
+      border-radius: 999px;
+      background: rgba(16, 13, 10, .62);
+      color: #d8ccbb;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .terror-rating { border-color: color-mix(in srgb, var(--gold) 68%, #5c4630); color: #f3cf7b; }
     .terror-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; color: var(--muted); font-size: 12px; }
     .terror-countdown { color: var(--text); font-weight: 800; }
     .toolbar {
@@ -213,6 +228,7 @@ export function renderDashboard() {
     .dlc h2 { margin: 0; font: 700 24px Georgia, "Songti SC", serif; }
     .dlc-count { color: var(--muted); }
     .matrix-wrap { overflow-x: auto; }
+    .mobile-matrix { display: none; }
     .matrix {
       display: grid;
       grid-template-columns: 92px repeat(4, minmax(230px, 1fr));
@@ -273,6 +289,34 @@ export function renderDashboard() {
       .refresh { width: 100%; }
       .settings-panel { grid-template-columns: 1fr; }
       .terror-overview { grid-template-columns: 1fr; }
+      .terror-card { min-height: 0; padding: 17px; }
+      .terror-meta { align-items: flex-start; flex-direction: column; gap: 3px; }
+      .matrix-wrap { display: none; }
+      .mobile-matrix { display: block; }
+      .mobile-region + .mobile-region { border-top: 1px solid var(--line); }
+      .mobile-region-title {
+        margin: 0;
+        padding: 10px 13px;
+        background: #15110d;
+        color: var(--text);
+        font-size: 14px;
+        letter-spacing: .04em;
+      }
+      .mobile-region-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mobile-region-grid .cell { min-width: 0; min-height: 142px; padding: 12px; border-bottom: 1px solid var(--line); }
+      .mobile-region-grid .cell:nth-child(odd) { border-right: 1px solid var(--line); }
+      .mobile-region-grid .cell:nth-last-child(-n + 2) { border-bottom: 0; }
+      .mobile-region-grid .mode { font-size: 11px; }
+      .mobile-region-grid .message { min-height: 40px; font-size: 13px; }
+      .mobile-region-grid .times { font-size: 11px; }
+      .dlc-head { padding: 15px 13px; }
+      .dlc h2 { font-size: 21px; }
+      .dlc-count { font-size: 12px; }
+    }
+    @media (max-width: 390px) {
+      .mobile-region-grid .cell { padding: 10px; }
+      .mobile-region-grid .card-top { align-items: flex-start; flex-direction: column; }
+      .mobile-region-grid .progress { margin-top: 11px; }
     }
   </style>
 </head>
@@ -292,12 +336,14 @@ export function renderDashboard() {
         <div class="terror-label">当前恐怖区域</div>
         <div class="terror-name" id="terror-current">正在读取…</div>
         <div class="terror-original" id="terror-current-original"></div>
+        <div class="terror-details" id="terror-current-details"></div>
         <div class="terror-meta"><span id="terror-updated"></span><span class="terror-countdown" id="terror-countdown"></span></div>
       </article>
       <article class="terror-card next">
         <div class="terror-label">下一阶段恐怖区域</div>
         <div class="terror-name" id="terror-next">正在读取…</div>
         <div class="terror-original" id="terror-next-original"></div>
+        <div class="terror-details" id="terror-next-details"></div>
         <div class="terror-meta"><span>整点、半点同步数据</span><span>区域每 30 分钟切换</span></div>
       </article>
     </section>
@@ -425,8 +471,10 @@ export function renderDashboard() {
       const subset = servers.filter(server => server.rotw === rotw);
       let grid = '<div class="corner">区域</div>' +
         modes.map(mode => '<div class="col-head">' + mode.label + '</div>').join("");
+      let mobile = "";
       for (const region of regions) {
         grid += '<div class="region">' + regionNames[region] + '</div>';
+        let mobileCells = "";
         for (const mode of modes) {
           const server = subset.find(item =>
             item.region.replace(/Rotw$/i, "") === region &&
@@ -434,20 +482,25 @@ export function renderDashboard() {
             item.hardcore === mode.hardcore
           );
           grid += serverCell(server, mode);
+          mobileCells += serverCell(server, mode);
         }
+        mobile += '<section class="mobile-region"><h3 class="mobile-region-title">' +
+          regionNames[region] + '</h3><div class="mobile-region-grid">' +
+          mobileCells + '</div></section>';
       }
       const visible = subset.filter(server => server.progress >= minProgress).length;
       return '<section class="dlc"><header class="dlc-head"><h2>' + title +
         '</h2><span class="dlc-count">' + visible + ' / 12 项显示</span></header>' +
-        '<div class="matrix-wrap"><div class="matrix">' + grid + '</div></div></section>';
+        '<div class="matrix-wrap"><div class="matrix">' + grid + '</div></div>' +
+        '<div class="mobile-matrix">' + mobile + '</div></section>';
     }
 
     function render(data) {
       window.dashboardData = data;
       renderTerrorZone(data.terrorZone);
       document.getElementById("content").innerHTML =
-        renderDlc(data.servers, false, "毁灭之王") +
-        renderDlc(data.servers, true, "术士君临");
+        renderDlc(data.servers, true, "术士君临") +
+        renderDlc(data.servers, false, "毁灭之王");
       updateSyncAge();
       if (syncAgeTimer) clearInterval(syncAgeTimer);
       syncAgeTimer = setInterval(updateSyncAge, 1000);
@@ -476,6 +529,8 @@ export function renderDashboard() {
         next.textContent = "暂无数据";
         document.getElementById("terror-current-original").textContent = "等待后台完成下一次同步";
         document.getElementById("terror-next-original").textContent = "";
+        renderTerrorDetails("terror-current-details", null);
+        renderTerrorDetails("terror-next-details", null);
         return;
       }
 
@@ -490,11 +545,15 @@ export function renderDashboard() {
           terrorZone.next + " · 根据上一轮预测即时切换";
         document.getElementById("terror-next-original").textContent =
           "等待 D2RuneWizard 确认新一轮数据";
+        renderTerrorDetails("terror-current-details", terrorZone.nextDetails);
+        renderTerrorDetails("terror-next-details", null, "等待新一轮资料");
       } else {
         current.textContent = terrorZone.currentZh || terrorZone.current;
         next.textContent = terrorZone.nextZh || terrorZone.next;
         document.getElementById("terror-current-original").textContent = terrorZone.current;
         document.getElementById("terror-next-original").textContent = terrorZone.next;
+        renderTerrorDetails("terror-current-details", terrorZone.currentDetails);
+        renderTerrorDetails("terror-next-details", terrorZone.nextDetails);
       }
       document.getElementById("terror-updated").textContent = "同步 " +
         new Date(terrorZone.checkedAt).toLocaleTimeString("zh-CN", {
@@ -503,6 +562,26 @@ export function renderDashboard() {
       updateTerrorCountdown();
       if (terrorCountdownTimer) clearInterval(terrorCountdownTimer);
       terrorCountdownTimer = setInterval(updateTerrorCountdown, 1000);
+    }
+
+    function renderTerrorDetails(elementId, details, fallback = "暂无资料") {
+      const element = document.getElementById(elementId);
+      if (!details) {
+        element.innerHTML = '<span class="terror-detail-label">' + fallback + '</span>';
+        return;
+      }
+
+      const immunityBadges = details.immunities?.length
+        ? details.immunities.map(item =>
+            '<span class="terror-badge">' + escapeHtml(item.name) + '免疫</span>'
+          ).join("")
+        : '<span class="terror-detail-label">未标注常见免疫</span>';
+      const rating = details.rating
+        ? '<span class="terror-badge terror-rating">评级 ' +
+          escapeHtml(details.rating) + ' · ' + escapeHtml(details.ratingText) + '</span>'
+        : '<span class="terror-badge terror-rating">未评级</span>';
+      element.innerHTML =
+        '<span class="terror-detail-label">常见免疫</span>' + immunityBadges + rating;
     }
 
     function updateTerrorCountdown() {

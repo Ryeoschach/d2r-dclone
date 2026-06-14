@@ -1,3 +1,5 @@
+import { getTerrorZoneMetadata } from "./terror-zone-metadata.js";
+
 const ZONE_NAMES = {
   "Blood Moor and Den of Evil": "鲜血荒地与邪恶洞窟",
   "Cold Plains and The Cave": "冰冷之原与洞窟",
@@ -51,9 +53,22 @@ export function normalizeTerrorZone(payload, checkedAt = new Date().toISOString(
   return {
     current,
     currentZh: translateTerrorZone(current),
+    currentDetails: getTerrorZoneMetadata(current),
     next,
     nextZh: translateTerrorZone(next),
+    nextDetails: getTerrorZoneMetadata(next),
     checkedAt
+  };
+}
+
+export function enrichTerrorZone(terrorZone) {
+  if (!terrorZone) {
+    return terrorZone;
+  }
+  return {
+    ...terrorZone,
+    currentDetails: getTerrorZoneMetadata(terrorZone.current),
+    nextDetails: getTerrorZoneMetadata(terrorZone.next)
   };
 }
 
