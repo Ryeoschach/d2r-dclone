@@ -112,8 +112,11 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /非天梯 SC/);
   assert.match(html, /天梯 HC/);
   assert.match(html, /4 阶以上/);
-  assert.match(html, /页面自动刷新/);
-  assert.match(html, /后台接口拉取/);
+  assert.match(html, /页面数据自动刷新/);
+  assert.match(html, /DC 后台接口拉取/);
+  assert.match(html, /展示数据最近变更/);
+  assert.match(html, /不会整页重载/);
+  assert.match(html, /恐怖区域仍按整点、半点独立同步/);
   assert.match(html, /当前恐怖区域/);
   assert.match(html, /下一阶段恐怖区域/);
   assert.match(html, /terror-countdown/);

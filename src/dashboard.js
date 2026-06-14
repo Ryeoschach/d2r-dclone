@@ -368,13 +368,13 @@ export function renderDashboard() {
     <section class="settings-panel" aria-label="刷新设置">
       <div class="setting-group">
         <div class="setting-head">
-          <h2 class="setting-title">页面自动刷新</h2>
-          <label class="switch" aria-label="页面自动刷新开关">
+          <h2 class="setting-title">页面数据自动刷新</h2>
+          <label class="switch" aria-label="页面数据自动刷新开关">
             <input type="checkbox" id="auto-refresh-toggle">
             <span class="switch-track"></span>
           </label>
         </div>
-        <p class="setting-description">只刷新当前网页显示，不会额外请求上游接口。</p>
+        <p class="setting-description">按设定间隔重新读取 KV，并更新全部状态卡片与恐怖区域；不会直接请求 D2RuneWizard，也不会整页重载。</p>
         <div class="setting-row" id="auto-quick-buttons">
           <button class="interval-button" data-auto-minutes="1">1 分</button>
           <button class="interval-button" data-auto-minutes="2">2 分</button>
@@ -389,10 +389,10 @@ export function renderDashboard() {
 
       <div class="setting-group">
         <div class="setting-head">
-          <h2 class="setting-title">后台接口拉取</h2>
+          <h2 class="setting-title">DC 后台接口拉取</h2>
           <span class="mode" id="pull-current">读取中…</span>
         </div>
-        <p class="setting-description">Cloudflare 最快每 1 分钟检查一次；修改需要管理令牌。</p>
+        <p class="setting-description">控制 Worker 拉取 24 组地表暗黑进度的频率；恐怖区域仍按整点、半点独立同步。修改需要管理令牌。</p>
         <div class="setting-row">
           <input class="setting-input" id="pull-interval" type="number" min="1" max="1440" step="1" aria-label="后台拉取间隔分钟数" placeholder="分钟">
           <input class="setting-input token-input" id="admin-token" type="password" autocomplete="off" aria-label="管理令牌" placeholder="MANUAL_TRIGGER_TOKEN">
@@ -403,7 +403,7 @@ export function renderDashboard() {
     </section>
 
     <div id="content"><div class="empty">正在加载 24 种服务器状态…</div></div>
-    <footer>数据来源 d2runewizard.com · 后台每 <span id="footer-pull-interval">5</span> 分钟同步 · 页面只读取 Cloudflare KV 缓存</footer>
+    <footer>数据来源 d2runewizard.com · DC 后台每 <span id="footer-pull-interval">5</span> 分钟拉取 · 恐怖区域整点、半点同步 · 页面读取 Cloudflare KV 缓存</footer>
   </main>
 
   <script>
@@ -516,7 +516,7 @@ export function renderDashboard() {
         ? ageSeconds + " 秒前"
         : Math.floor(ageSeconds / 60) + " 分钟前";
       document.getElementById("checked-at").textContent =
-        "状态数据更新：" + checked.toLocaleString("zh-CN", {
+        "展示数据最近变更：" + checked.toLocaleString("zh-CN", {
           timeZone: "Asia/Shanghai", hour12: false
         }) + "（" + ageText + "）";
     }
@@ -620,7 +620,7 @@ export function renderDashboard() {
       });
       const status = document.getElementById("auto-status");
       status.textContent = autoRefreshEnabled
-        ? "已开启，每 " + autoRefreshMinutes + " 分钟刷新页面"
+        ? "已开启，每 " + autoRefreshMinutes + " 分钟重新读取并更新页面数据"
         : "自动刷新已关闭";
     }
 
@@ -653,7 +653,7 @@ export function renderDashboard() {
         document.getElementById("pull-interval").value = data.pullIntervalMinutes;
         document.getElementById("pull-current").textContent = "当前 " + data.pullIntervalMinutes + " 分钟";
         document.getElementById("footer-pull-interval").textContent = data.pullIntervalMinutes;
-        status.textContent = "后台按此间隔请求状态接口";
+        status.textContent = "DC 后台按此间隔请求 24 组地表暗黑状态";
       } catch (error) {
         status.textContent = error.message;
         status.className = "setting-status failure";
