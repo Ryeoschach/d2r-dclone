@@ -12,6 +12,8 @@ import { getAllTerrorZones } from "./terror-zone-metadata.js";
 import { getRunewordsCatalog } from "./runewords-metadata.js";
 import { getAffixesCatalog } from "./affixes-metadata.js";
 import { getItemsCatalog } from "./items-metadata.js";
+import { getSkillsCatalog } from "./skills-catalog.js";
+import { getDropCalculatorData } from "./drop-calculator.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -117,6 +119,14 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/items") {
       return json({ ok: true, ...getItemsCatalog() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/skills") {
+      return json({ ok: true, ...getSkillsCatalog() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/drops") {
+      return json({ ok: true, ...getDropCalculatorData() });
     }
 
     if (request.method === "GET" && url.pathname === "/api/status") {

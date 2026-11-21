@@ -5,6 +5,7 @@ import { ALL_SET_ITEMS, ALL_UNIQUE_ITEMS } from "./items-sets-uniques-data.js";
 import { SET_DETAILS } from "./items-set-details.js";
 import { ITEM_ICON_MAP } from "./items-icons-map.js";
 import { BASE_OFFICIAL_STATS, ITEM_I18N_MAP, SET_PIECE_BASE_INFO, UNIQUE_BASE_INFO } from "./items-i18n-data.js";
+import { BASE_UPGRADE_TIERS, SUNDER_COMMON_POOLS, SUNDER_CRAFTS_34, UNIQUE_UPGRADE_META } from "./cube-upgrader.js";
 
 export const BASE_ITEMS = ALL_BASE_ITEMS.map((item) => ({
   ...item,
@@ -68,6 +69,7 @@ export const CUBE_RECIPES = [
   { title: "重铸蓝色护身符 / 权冠", formula: "蓝色护身符(或任意权冠) + 3 颗完美宝石", detail: "洗 91+ 级巴尔/TZ 超大护身符 (GC) 出 45 生命技能板 | 用 6 颗完美骷髅重铸黄权冠（权冠 ilvl 虽降但 magic_lvl=18 仍能出 +2 技能）" },
   { title: "装备快速维修与充能", formula: "非无形武器/防具 + 符文 (+ 碎裂宝石)", detail: "武器回耐久: #9 欧特 | 武器回耐久+满充能: #9 欧特 + 任意碎裂宝石 | 防具回耐久: #8 拉尔 | 防具回耐久+满充能: #8 拉尔 + 任意裂开宝石" },
   { title: "破免护身符升级（潜能 Latent → 焕新 Renewed）", formula: "潜能破免板 + 对应完美宝石 + 对应符文 + 世界石碎片(Worldstone Shard)", detail: "破电(天堂之裂): 完美黄宝石 + #19 法尔 + 南部碎片 | 破火(火焰裂隙): 完美红宝石 + #16 艾欧 + 深层碎片 | 破冰(寒冰裂隙): 完美蓝宝石 + #17 卢姆 + 东部碎片 | 破毒(腐朽裂隙): 完美绿宝石 + #18 科 + 西部碎片 | 破物(裂骨): 完美紫宝石 + #21 普尔 + 北部碎片 | 破魔(黑裂): 完美钻石 + #23 玛尔 + 南/深/北三枚碎片（焕新版会随机新增元素/技能/降抗等强力词缀）" },
+  { title: "巨像先祖红门开启（3.4 亚瑞特巨峰 Colossal Summit）", formula: "塔力克的痛苦 + 科里克的痛楚 + 马道克的愤怒 + 布尔凯索的噩梦 + 沃鲁斯克的终结", detail: "集齐 96 级恐怖地带五大首领（安达利尔、都瑞尔、墨菲斯托、迪亚波罗、巴尔）掉落的 5 尊远古雕像，在地狱难度第五幕哈洛加斯放入赫拉迪克方块即可开启 lv137 亚瑞特巨峰红门挑战超级巨像先祖" },
   { title: "巨像先祖暗金珠宝掉落规则（术士 DLC）", formula: "挑战巨像先祖(Colossal Ancients) — 最后击杀决定掉落池", detail: "限装备 1 颗，需求 75 级，共享 +3–5% 经验 / +15–35% MF / +25–50% EG | 最后击杀塔力克(Talic): 守御者之火(火伤)/之胆(毒伤) | 最后击杀科力克(Korlic): 护卫者之霜(冰伤)/之石(50% ED/-10%敌物抗) | 最后击杀马道克(Madawc): 守护者之雷(电伤)/之光(魔伤)" }
 ];
 
@@ -77,6 +79,10 @@ export function getItemsCatalog() {
     magicRareGems: MAGIC_RARE_GEMS_WITH_ICONS,
     setItems: SET_ITEMS,
     uniqueItems: UNIQUE_ITEMS,
-    cubeRecipes: CUBE_RECIPES
+    cubeRecipes: CUBE_RECIPES,
+    baseUpgradeTiers: BASE_UPGRADE_TIERS,
+    uniqueUpgradeMeta: UNIQUE_UPGRADE_META,
+    sunderCrafts34: SUNDER_CRAFTS_34,
+    sunderCommonPools: SUNDER_COMMON_POOLS
   };
 }

@@ -103,10 +103,13 @@ test("公开读取魔法亮金手工物品词缀范围与配方", async () => {
   assert.equal(data.ok, true);
   assert.equal(data.qualityRules.length, 3);
   assert.equal(data.craftRecipes.length, 4);
-  assert.equal(data.slots.length, 9);
-  assert.equal(data.simulatorBases.length, 12);
-  assert.ok(data.totalAffixes > 50);
+  assert.equal(data.slots.length, 12);
+  assert.equal(data.simulatorBases.length, 15);
+  assert.ok(data.totalAffixes > 140);
   assert.ok(data.affixes.some((item) => item.slot === "amulet" && item.range.includes("FCR")));
+  assert.ok(data.affixes.some((item) => item.slot === "charm_sc" && item.nameEn.includes("Steel") && item.range.includes("25–36")));
+  assert.ok(data.affixes.some((item) => item.slot === "charm_sc" && item.nameEn.includes("of Balance") && item.range.includes("5%")));
+  assert.ok(data.affixes.some((item) => item.slot === "jewel" && item.nameEn.includes("of Fervor")));
 });
 
 test("公开读取物品资讯百科数据（基础/蓝黄/绿装/暗金/方块）", async () => {
@@ -135,5 +138,40 @@ test("公开读取物品资讯百科数据（基础/蓝黄/绿装/暗金/方块�
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "Crack of the Heavens"));
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "Defender's Fire"));
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "Guardian's Light"));
-  assert.ok(data.cubeRecipes.length >= 7);
+  assert.ok(data.cubeRecipes.length >= 8);
+  assert.ok(data.uniqueUpgradeMeta && data.uniqueUpgradeMeta["Titan's Revenge"]);
+  assert.ok(Array.isArray(data.sunderCrafts34) && data.sunderCrafts34.length === 6);
+});
+
+test("公开读取八大职业技能树与加点模拟器数据（含 3.4 术士 Warlock）", async () => {
+  const response = await worker.fetch(
+    new Request("https://example.com/api/skills"),
+    createEnv()
+  );
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.ok, true);
+  assert.equal(data.totalClasses, 8);
+  assert.equal(data.totalSkills, 240);
+  const warlock = data.classes.find((c) => c.id === "war");
+  assert.ok(warlock, "应包含 3.4 新职业术士 Warlock");
+  assert.equal(warlock.skills.length, 30);
+  assert.ok(warlock.skills.some((s) => s.key === "Apocalypse" && s.nameZh === "末日"));
+  assert.ok(warlock.skills.some((s) => s.key === "Abyss" && s.nameZh === "深渊"));
+  assert.ok(warlock.skills.some((s) => s.key === "Bind Demon" && s.nameZh === "束缚恶魔"));
+});
+
+test("公开读取恐怖地带与首领掉率计算器数据（含 3.4 远古雕像与 96 级 TZ 首领）", async () => {
+  const response = await worker.fetch(
+    new Request("https://example.com/api/drops"),
+    createEnv()
+  );
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.ok, true);
+  assert.ok(Array.isArray(data.sources) && data.sources.length >= 16);
+  const andyTz = data.sources.find((s) => s.id === "andariel-tz");
+  assert.ok(andyTz && andyTz.mlvl === 96 && andyTz.leaves.ci3 > 0 && andyTz.leaves.ua1 > 0);
+  assert.ok(Array.isArray(data.uniquePools.ci3) && data.uniquePools.ci3.some((u) => u.nameEn === "Griffon's Eye"));
+  assert.ok(Array.isArray(data.specialDrops) && data.specialDrops.some((sp) => sp.code === "ua1"));
 });

@@ -329,7 +329,7 @@ export function renderDashboard() {
       top: 10px;
       z-index: 40;
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 22px;
       padding: 8px;
@@ -415,6 +415,12 @@ export function renderDashboard() {
       background: linear-gradient(135deg, rgba(72, 40, 18, 0.9), rgba(24, 16, 12, 0.98));
       box-shadow: 0 0 18px var(--it-glow);
     }
+    .main-nav-tab.tab-skills.active {
+      color: #fff;
+      border-color: #ef6b5b;
+      background: linear-gradient(135deg, rgba(84, 24, 24, 0.92), rgba(28, 13, 16, 0.98));
+      box-shadow: 0 0 18px rgba(239, 107, 91, 0.28);
+    }
     .main-nav-tab .tab-svg {
       width: 18px;
       height: 18px;
@@ -431,6 +437,7 @@ export function renderDashboard() {
     .main-nav-tab.tab-runewords .tab-svg { color: #5ec48e; }
     .main-nav-tab.tab-affixes .tab-svg { color: #75b1ff; }
     .main-nav-tab.tab-items .tab-svg { color: #e59352; }
+    .main-nav-tab.tab-skills .tab-svg { color: #ff7f6e; }
     .main-nav-tab.active::after {
       content: "";
       position: absolute;
@@ -478,6 +485,7 @@ export function renderDashboard() {
     .runewords-module::before { background: linear-gradient(90deg, transparent, var(--rw-accent), transparent); }
     .affixes-module::before { background: linear-gradient(90deg, transparent, var(--af-accent), transparent); }
     .items-module::before { background: linear-gradient(90deg, transparent, var(--it-accent), transparent); }
+    .skills-module::before { background: linear-gradient(90deg, transparent, #ef6b5b, #b653e8, transparent); }
     .module-header {
       padding-bottom: 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
@@ -2220,6 +2228,28 @@ export function renderDashboard() {
     .it-set-bonus-title { margin: 0 0 8px; font-size: 12px; font-weight: 800; color: #e3bc6d; }
     .it-set-bonus-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #f5cf7b; }
     .it-card.it-unique { border-color: rgba(213, 167, 72, 0.35); }
+    .it-card.it-unique.grail-done {
+      border-color: rgba(87, 219, 112, 0.65);
+      background: linear-gradient(135deg, rgba(16, 40, 24, 0.85), rgba(14, 18, 14, 0.96));
+      box-shadow: inset 0 0 12px rgba(87, 219, 112, 0.12);
+    }
+    .it-card.it-set.grail-done {
+      border-color: rgba(87, 219, 112, 0.82);
+      background: linear-gradient(135deg, rgba(14, 46, 24, 0.9), rgba(12, 18, 14, 0.96));
+      box-shadow: 0 0 14px rgba(87, 219, 112, 0.18), inset 0 0 12px rgba(87, 219, 112, 0.14);
+    }
+    .it-set-piece.grail-done {
+      border-color: rgba(87, 219, 112, 0.72);
+      background: linear-gradient(135deg, rgba(16, 38, 22, 0.92), rgba(12, 20, 14, 0.96));
+      box-shadow: inset 0 0 10px rgba(87, 219, 112, 0.14);
+    }
+    .grail-summary-card {
+      margin-bottom: 16px;
+      padding: 13px 16px;
+      border: 1px solid rgba(229, 147, 82, 0.32);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(30, 22, 15, 0.92), rgba(18, 14, 11, 0.96));
+    }
     .it-card.it-magic { border-color: rgba(104, 164, 255, 0.32); }
     .it-card.it-rare { border-color: rgba(247, 223, 116, 0.32); }
     .it-card-head {
@@ -2306,6 +2336,358 @@ export function renderDashboard() {
     .it-card-note { font-size: 11px; color: var(--muted); line-height: 1.45; }
     @media (max-width: 720px) {
       .it-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Skill Planner Module Specific */
+    .skills-module {
+      border-color: rgba(239, 107, 91, 0.45);
+      background:
+        radial-gradient(circle at 95% 0%, rgba(190, 58, 72, 0.14) 0, transparent 420px),
+        radial-gradient(circle at 5% 100%, rgba(92, 28, 78, 0.18) 0, transparent 360px),
+        rgba(18, 13, 15, 0.96);
+    }
+    .skills-tag {
+      background: rgba(239, 107, 91, 0.18);
+      color: #ff9c8f;
+      border: 1px solid rgba(239, 107, 91, 0.45);
+    }
+    .sk-class-tabs {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .sk-class-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(239, 107, 91, 0.25);
+      background: rgba(24, 16, 18, 0.85);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .18s ease;
+      text-align: left;
+      min-width: 0;
+    }
+    .sk-class-btn:hover {
+      color: var(--text);
+      border-color: rgba(239, 107, 91, 0.55);
+      background: rgba(36, 22, 24, 0.92);
+    }
+    .sk-class-btn.active {
+      color: #fff;
+      border-color: #ff7f6e;
+      background: linear-gradient(135deg, rgba(88, 26, 26, 0.94), rgba(32, 16, 22, 0.98));
+      box-shadow: 0 0 14px rgba(239, 107, 91, 0.28);
+    }
+    .sk-class-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: rgba(10, 8, 8, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      flex-shrink: 0;
+    }
+    .sk-class-meta {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sk-class-name {
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sk-class-pts {
+      font-size: 11px;
+      color: #f5cf7b;
+      font-variant-numeric: tabular-nums;
+    }
+    .sk-planner-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 107, 91, 0.28);
+      background: rgba(12, 10, 12, 0.86);
+    }
+    .sk-metrics {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 13px;
+    }
+    .sk-bonus-ctrl {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .sk-bonus-input {
+      width: 58px;
+      height: 30px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(239, 107, 91, 0.4);
+      background: #120e10;
+      color: #ffd584;
+      font-weight: 800;
+      text-align: center;
+    }
+    .sk-workspace {
+      display: grid;
+      grid-template-columns: 2.35fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .sk-trees-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .sk-tree-col {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 107, 91, 0.24);
+      background: linear-gradient(180deg, rgba(24, 17, 19, 0.92), rgba(14, 11, 13, 0.96));
+    }
+    .sk-tree-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(239, 107, 91, 0.2);
+    }
+    .sk-tree-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffb3a7;
+    }
+    .sk-tree-pts {
+      font-size: 12px;
+      font-weight: 800;
+      color: #f5cf7b;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(245, 207, 123, 0.14);
+      border: 1px solid rgba(245, 207, 123, 0.35);
+    }
+    .sk-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(6, auto);
+      gap: 8px;
+    }
+    .sk-cell-empty {
+      min-height: 76px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255, 255, 255, 0.04);
+      background: rgba(0, 0, 0, 0.14);
+    }
+    .sk-node {
+      position: relative;
+      min-height: 76px;
+      padding: 7px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: linear-gradient(145deg, rgba(28, 22, 24, 0.94), rgba(16, 13, 15, 0.98));
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 4px;
+      transition: all .14s ease;
+    }
+    .sk-node:hover {
+      border-color: rgba(245, 207, 123, 0.65);
+      transform: translateY(-1px);
+    }
+    .sk-node.allocated {
+      border-color: rgba(87, 219, 112, 0.72);
+      background: linear-gradient(145deg, rgba(16, 44, 26, 0.92), rgba(12, 20, 15, 0.98));
+      box-shadow: inset 0 0 12px rgba(87, 219, 112, 0.14);
+    }
+    .sk-node.maxed {
+      border-color: #f3c868;
+      background: linear-gradient(145deg, rgba(58, 40, 14, 0.94), rgba(22, 16, 10, 0.98));
+      box-shadow: 0 0 12px rgba(243, 200, 104, 0.25), inset 0 0 12px rgba(243, 200, 104, 0.16);
+    }
+    .sk-node.selected {
+      outline: 2px solid #ff8a75;
+      outline-offset: 1px;
+    }
+    .sk-node-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .sk-node-lvlreq {
+      padding: 1px 4px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      font-weight: 700;
+    }
+    .sk-node-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .sk-node.allocated .sk-node-title { color: #8af49f; }
+    .sk-node.maxed .sk-node-title { color: #ffe08c; }
+    .sk-node-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .sk-node-rank {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .sk-node.allocated .sk-node-rank { color: #67e87a; }
+    .sk-node.maxed .sk-node-rank { color: #ffd573; }
+    .sk-node-step-btns {
+      display: inline-flex;
+      gap: 3px;
+    }
+    .sk-step-btn {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.45);
+      color: #e6d7c3;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .sk-step-btn:hover {
+      border-color: #f5cf7b;
+      color: #fff;
+      background: rgba(213, 167, 72, 0.28);
+    }
+    .sk-inspector {
+      position: sticky;
+      top: 72px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 107, 91, 0.4);
+      background: rgba(14, 11, 13, 0.96);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sk-insp-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffd573;
+    }
+    .sk-insp-sub {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bp-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .bp-card {
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 107, 91, 0.28);
+      background: rgba(16, 13, 15, 0.94);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bp-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(239, 107, 91, 0.2);
+    }
+    .bp-card-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffb3a7;
+    }
+    .bp-status-pill {
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(87, 219, 112, 0.12);
+      border: 1px solid rgba(87, 219, 112, 0.35);
+      color: #8af49f;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+    .bp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .bp-table th, .bp-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+    }
+    .bp-table th {
+      color: var(--muted);
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .bp-table tr.bp-active {
+      background: linear-gradient(90deg, rgba(24, 72, 42, 0.65), rgba(48, 36, 14, 0.65));
+      color: #ffe08c;
+      font-weight: 800;
+    }
+    .bp-table tr.bp-active td {
+      border-bottom-color: rgba(87, 219, 112, 0.5);
+    }
+    @media (max-width: 1160px) {
+      .sk-class-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .sk-workspace { grid-template-columns: 1fr; }
+      .sk-inspector { position: static; }
+      .bp-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      .sk-trees-wrap { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .sk-class-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     /* Settings Module Specific */
@@ -2548,7 +2930,7 @@ export function renderDashboard() {
       </button>
       <div class="hud-shortcuts" aria-hidden="true">
         <span data-i18n="shortcutPrefix">快捷:</span>
-        <span class="kbd-mini">1</span>–<span class="kbd-mini">5</span><span data-i18n="shortcutTabs">切页</span>
+        <span class="kbd-mini">1</span>–<span class="kbd-mini">6</span><span data-i18n="shortcutTabs">切页</span>
         <span class="kbd-mini">/</span><span data-i18n="shortcutSearch">搜词条</span>
       </div>
     </section>
@@ -2580,6 +2962,11 @@ export function renderDashboard() {
         <span data-i18n="tabItems">物品资讯</span>
         <span class="tab-kbd">5</span>
       </button>
+      <button class="main-nav-tab tab-skills" id="main-tab-skills" role="tab" aria-selected="false" aria-controls="main-panel-skills" type="button">
+        <svg class="tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l3 6 6 1-4.5 4.2 1.1 6.3L12 17.5 6.4 20.5l1.1-6.3L3 10l6-1z"/></svg>
+        <span data-i18n="tabSkills">技能模拟</span>
+        <span class="tab-kbd">6</span>
+      </button>
     </nav>
 
     <!-- Tab 面板 1：恐怖地带 (Terror Zone) -->
@@ -2601,6 +2988,9 @@ export function renderDashboard() {
             <div class="terror-original" id="terror-current-original"></div>
             <div class="terror-details" id="terror-current-details"></div>
             <div class="terror-meta"><span id="terror-updated"></span><span class="terror-countdown" id="terror-countdown"></span></div>
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+              <button type="button" class="rw-btn" id="tz-jump-drops-btn"><img class="ui-chip-icon" src="/images/items/misc/shard/mote_of_anguish.webp" alt="">当前 TZ 首领 / 金怪掉率速查</button>
+            </div>
           </article>
           <article class="terror-card next">
             <div class="terror-label"><img class="ui-chip-icon" src="/images/ui/icon_desecrated.webp" alt=""><span data-i18n="tzNextLabel">下一阶段恐怖区域</span></div>
@@ -2983,12 +3373,36 @@ export function renderDashboard() {
           </div>
         </div>
 
+        <div class="grail-summary-card" id="it-grail-summary">
+          <div class="rw-summary-top">
+            <div class="rw-stats">
+              <span class="rw-stat-item"><img class="ui-chip-icon" src="/images/items/misc/quest/mephisto_soul_stone.webp" alt="">圣杯总进度 <strong class="rw-accent" id="grail-total-done">0</strong> / <span id="grail-total-all">534</span> (<span id="grail-total-pct">0%</span>)</span>
+              <span class="rw-stat-sep">|</span>
+              <span class="rw-stat-item">暗金装备 <strong class="rw-gold" id="grail-unique-done">0</strong> / <span id="grail-unique-all">399</span></span>
+              <span class="rw-stat-sep">|</span>
+              <span class="rw-stat-item">套装部件 <strong style="color:#67e87a" id="grail-set-done">0</strong> / <span id="grail-set-all">135</span>（整套 <strong style="color:#67e87a" id="grail-fullset-done">0</strong> / <span id="grail-fullset-all">34</span>）</span>
+              <span class="rw-stat-sep">|</span>
+              <span class="rw-stat-item">TC87 毕业稀有 <strong style="color:#a7d8ff" id="grail-tc87-done">0</strong> / <span id="grail-tc87-all">0</span></span>
+            </div>
+            <div class="rw-actions">
+              <button class="rw-btn" id="grail-export-btn" type="button">导出圣杯存档</button>
+              <button class="rw-btn" id="grail-import-btn" type="button">导入圣杯存档</button>
+              <input type="file" id="grail-import-file" accept=".json,application/json" style="display:none" />
+              <button class="rw-btn rw-btn-danger" id="grail-reset-btn" type="button">重置圣杯</button>
+            </div>
+          </div>
+          <div class="rw-progress-track">
+            <div class="rw-progress-fill" id="grail-progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
         <div class="it-subtabs" id="it-subtabs" role="tablist" aria-label="物品资讯分类">
           <button class="it-subtab active" data-it-tab="base" type="button"><img class="ui-tab-icon" src="/images/ui/gemsocket.webp" alt=""><span data-i18n="itTabBase">基础底材</span></button>
           <button class="it-subtab" data-it-tab="magicRare" type="button"><img class="ui-tab-icon" src="/images/items/armor/circlet/diadem.webp" alt=""><span data-i18n="itTabMagicRare">蓝/黄极品</span></button>
           <button class="it-subtab" data-it-tab="set" type="button"><img class="ui-tab-icon" src="/images/items/armor/helmet/horazons_countenance.webp" alt=""><span data-i18n="itTabSet">绿色套装</span></button>
           <button class="it-subtab" data-it-tab="unique" type="button"><img class="ui-tab-icon" src="/images/items/misc/quest/mephisto_soul_stone.webp" alt=""><span data-i18n="itTabUnique">暗金装备</span></button>
           <button class="it-subtab" data-it-tab="cube" type="button"><img class="ui-tab-icon" src="/images/items/misc/quest/horadric_cube.webp" alt=""><span data-i18n="itTabCube">方块公式</span></button>
+          <button class="it-subtab" data-it-tab="drops" type="button"><img class="ui-tab-icon" src="/images/items/misc/shard/mote_of_anguish.webp" alt=""><span data-i18n="itTabDrops">掉率计算器</span></button>
         </div>
 
         <div class="rw-filter-bar" style="margin-bottom:14px">
@@ -2999,6 +3413,15 @@ export function renderDashboard() {
           <div class="tz-filter-row" id="it-subfilter-row">
             <div class="tz-filter-label">筛选：</div>
             <div class="tz-chips" id="it-subfilter-chips"></div>
+          </div>
+          <div class="tz-filter-row" id="it-grail-filter-row" style="display:none">
+            <div class="tz-filter-label">圣杯：</div>
+            <div class="tz-chips" id="it-grail-chips">
+              <button type="button" class="tz-chip active" data-grail-filter="all">全部状态</button>
+              <button type="button" class="tz-chip" data-grail-filter="todo">未收集</button>
+              <button type="button" class="tz-chip" data-grail-filter="done">已收集</button>
+              <button type="button" class="tz-chip" data-grail-filter="tc87">仅看 TC87 毕业稀有</button>
+            </div>
           </div>
           <div class="tz-filter-row" id="it-base-sockets-row">
             <div class="tz-filter-label">孔数：</div>
@@ -3011,9 +3434,274 @@ export function renderDashboard() {
               <button type="button" class="tz-chip" data-it-sock="6">可出 6 孔</button>
             </div>
           </div>
+          <div id="it-drops-console" style="display:none;flex-direction:column;gap:10px">
+            <div class="tz-filter-row" style="flex-wrap:wrap;gap:10px">
+              <div class="tz-filter-label">模式：</div>
+              <div class="tz-chips" id="dc-mode-chips">
+                <button type="button" class="tz-chip active" data-dc-mode="source">按首领 / 恐怖地带查掉落榜</button>
+                <button type="button" class="tz-chip" data-dc-mode="item">按指定物品查最佳首领排行</button>
+              </div>
+              <button type="button" class="rw-btn" id="dc-sync-tz-btn"><img class="ui-chip-icon" src="/images/ui/joingame_desecratedindicator.webp" alt="">联动当前恐怖地带</button>
+            </div>
+            <div class="tz-filter-row" id="dc-source-row" style="flex-wrap:wrap;gap:10px">
+              <div class="tz-filter-label">目标：</div>
+              <select class="sim-select" id="dc-source-select" style="min-width:260px"></select>
+            </div>
+            <div class="tz-filter-row" style="flex-wrap:wrap;gap:12px">
+              <div class="tz-filter-label">参数：</div>
+              <label class="sim-field">
+                <span>寻魔率 MF (%)</span>
+                <input type="number" class="sim-num-input" id="dc-mf-input" min="0" max="1200" value="250" />
+              </label>
+              <div class="tz-chips" id="dc-mf-presets">
+                <button type="button" class="tz-chip" data-dc-mf="0">0%</button>
+                <button type="button" class="tz-chip" data-dc-mf="100">100%</button>
+                <button type="button" class="tz-chip active" data-dc-mf="250">250%</button>
+                <button type="button" class="tz-chip" data-dc-mf="350">350%</button>
+                <button type="button" class="tz-chip" data-dc-mf="500">500%</button>
+              </div>
+              <div class="tz-chips" id="dc-players-chips">
+                <button type="button" class="tz-chip active" data-dc-players="1">/players 1</button>
+                <button type="button" class="tz-chip" data-dc-players="3">/players 3</button>
+                <button type="button" class="tz-chip" data-dc-players="5">/players 5</button>
+                <button type="button" class="tz-chip" data-dc-players="7">/players 7</button>
+              </div>
+            </div>
+          </div>
+          <div id="it-cube-sim-console" style="display:none;margin-top:8px">
+            <div class="bp-grid">
+              <!-- 左卡：暗金装备赫拉迪克方块升阶预览器 -->
+              <article class="bp-card" style="border-color:rgba(213,167,72,0.35)">
+                <div class="bp-card-head">
+                  <h3 class="bp-card-title" style="color:#f5cf7b"><img class="ui-chip-icon" src="/images/items/misc/quest/horadric_cube.webp" alt="">暗金装备方块升阶预览器（普通 → 扩展 → 精华）</h3>
+                  <label class="sk-bonus-ctrl" style="cursor:pointer">
+                    <input type="checkbox" class="rw-check" id="cube-up-eth" />
+                    <span>无形 Ethereal (+50% 基础防/伤)</span>
+                  </label>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:12px;color:var(--muted)">选择暗金装备：</span>
+                  <select class="sim-select" id="cube-up-select" style="flex:1;min-width:220px"></select>
+                </div>
+                <div id="cube-up-preview"></div>
+              </article>
+
+              <!-- 右卡：D2R 3.4 焕新破免板合成与随机词缀模拟器 -->
+              <article class="bp-card" style="border-color:rgba(226,132,219,0.38)">
+                <div class="bp-card-head">
+                  <h3 class="bp-card-title" style="color:#f1a7ec"><img class="ui-chip-icon" src="/images/items/misc/shard/mote_of_destruction.webp" alt="">3.4 焕新破免板（Renewed Sunder）合成与随机 Roll 模拟器</h3>
+                  <button type="button" class="rw-btn active" id="cube-sunder-roll-btn">随机 Roll 一次</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-size:12px;color:var(--muted)">选择破免板：</span>
+                  <select class="sim-select" id="cube-sunder-select" style="flex:1;min-width:220px"></select>
+                </div>
+                <div id="cube-sunder-preview"></div>
+              </article>
+            </div>
+          </div>
         </div>
 
         <div class="it-grid" id="it-grid">正在加载物品资讯...</div>
+      </section>
+    </div>
+
+    <!-- Tab 面板 6：八大职业技能树与加点模拟器 (含 3.4 新职业术士 Warlock) -->
+    <div class="main-tab-panel" id="main-panel-skills" role="tabpanel" aria-labelledby="main-tab-skills">
+      <section class="module-block skills-module" aria-label="职业技能树与加点模拟器">
+        <div class="module-header">
+          <div class="module-title-wrap">
+            <span class="module-tag skills-tag">SKILL PLANNER 3.4</span>
+            <h2 class="module-title" data-i18n="skModuleTitle">八大职业技能树与加点模拟器（含 3.4 新职业「术士 Warlock」）</h2>
+          </div>
+          <div class="module-meta">
+            <span data-i18n="skModuleMeta">全 8 职业 240 技能 · 协同加成与法力/伤害实时演算 · 一键分享配装加点</span>
+          </div>
+        </div>
+
+        <div class="sk-class-tabs" id="sk-class-tabs" role="tablist" aria-label="选择职业"></div>
+
+        <div class="af-subtabs" id="sk-view-subtabs" role="tablist" aria-label="技能与档位视图切换" style="border-bottom-color:rgba(239,107,91,0.25)">
+          <button class="af-subtab active" data-sk-view="planner" type="button"><img class="ui-tab-icon" src="/images/ui/skilltree.webp" alt=""><span>技能树与加点模拟器</span></button>
+          <button class="af-subtab" data-sk-view="breakpoints" type="button"><img class="ui-tab-icon" src="/images/ui/sprint.webp" alt=""><span>全职业档位速查 & 攻速/施法/格挡计算器 (FCR / FHR / FBR / IAS)</span></button>
+          <button class="af-subtab" data-sk-view="mercenary" type="button"><img class="ui-tab-icon" src="/images/ui/desertmercenaryicon.webp" alt=""><span>四幕佣兵成长 & 毕业配装模拟 (Act 1 / 2 / 3 / 5)</span></button>
+        </div>
+
+        <div id="sk-view-planner">
+        <div class="sk-planner-bar">
+          <div class="sk-metrics">
+            <span>已分配技能点：<strong class="rw-gold" id="sk-points-used">0</strong> / <span>110</span>（剩余 <strong class="rw-accent" id="sk-points-rem">110</strong>）</span>
+            <span class="rw-stat-sep">|</span>
+            <span>需求角色等级：<strong style="color:#a7d8ff" id="sk-req-clvl">1</strong> 级</span>
+            <span class="rw-stat-sep">|</span>
+            <label class="sk-bonus-ctrl">
+              <span>装备全技能 +</span>
+              <input type="number" class="sk-bonus-input" id="sk-bonus-all" min="0" max="35" value="0" />
+            </label>
+          </div>
+          <div class="rw-actions">
+            <button class="rw-btn" id="sk-share-btn" type="button">复制加点分享链接</button>
+            <button class="rw-btn rw-btn-danger" id="sk-reset-btn" type="button">重置当前职业加点</button>
+          </div>
+        </div>
+
+        <div class="sk-workspace">
+          <div class="sk-trees-wrap" id="sk-trees-wrap">正在加载八大职业技能树…</div>
+          <aside class="sk-inspector" id="sk-inspector" aria-label="技能详情与协同加成">
+            <h3 class="sk-insp-title" id="sk-insp-title">点击任意技能节点</h3>
+            <div class="sk-insp-sub" id="sk-insp-sub">左键点击技能 +1（自动补齐前置），Shift+左键 +5，右键或点击「-」减 1 点</div>
+            <div id="sk-insp-body"></div>
+          </aside>
+        </div>
+        </div>
+
+        <!-- 全职业档位速查与攻速/施法/格挡计算器视图 -->
+        <div id="sk-view-breakpoints" style="display:none">
+          <div class="bp-grid">
+            <!-- 1. FCR 快速施法档位 -->
+            <article class="bp-card">
+              <div class="bp-card-head">
+                <h3 class="bp-card-title">⚡ 快速施法速度 (FCR) 档位表</h3>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <select class="sim-select" id="bp-fcr-variant" style="height:30px;padding:2px 8px;font-size:12px"></select>
+                  <label class="sk-bonus-ctrl">
+                    <span>当前 FCR (%)</span>
+                    <input type="number" class="sk-bonus-input" id="bp-fcr-input" min="0" max="300" value="105" />
+                  </label>
+                </div>
+              </div>
+              <div class="bp-status-pill" id="bp-fcr-status"></div>
+              <div id="bp-fcr-table-wrap"></div>
+            </article>
+
+            <!-- 2. FHR 快速打击恢复档位 -->
+            <article class="bp-card">
+              <div class="bp-card-head">
+                <h3 class="bp-card-title">🛡️ 快速打击恢复 (FHR) 档位表</h3>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <select class="sim-select" id="bp-fhr-variant" style="height:30px;padding:2px 8px;font-size:12px"></select>
+                  <label class="sk-bonus-ctrl">
+                    <span>当前 FHR (%)</span>
+                    <input type="number" class="sk-bonus-input" id="bp-fhr-input" min="0" max="300" value="86" />
+                  </label>
+                </div>
+              </div>
+              <div class="bp-status-pill" id="bp-fhr-status"></div>
+              <div id="bp-fhr-table-wrap"></div>
+            </article>
+
+            <!-- 3. 武器攻速 IAS 档位计算器 -->
+            <article class="bp-card">
+              <div class="bp-card-head">
+                <h3 class="bp-card-title">⚔️ 武器攻击速度 (IAS) 帧数与档位计算器</h3>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                <label class="sk-bonus-ctrl">
+                  <span>底材攻速 WSM</span>
+                  <select class="sim-select" id="bp-ias-wsm" style="height:30px;padding:2px 8px;font-size:12px">
+                    <option value="-30">[-30] 幻化之刃 / 巨鹰爪 / 符纹爪 / 楚库弩</option>
+                    <option value="-20">[-20] 宝剑 / 骨刃 / 恶魔十字弓</option>
+                    <option value="-10" selected>[-10] 巨长斧 / 鲛尾巨斧 / 女族长之标枪 / 狂战士手斧</option>
+                    <option value="0">[0] 狂战士斧 / 执政官之杖 / 水晶剑 / 君主盾击</option>
+                    <option value="5">[5] 巨神之刃 / 锐利之斧</option>
+                    <option value="10">[10] 大院长之弓 / 神秘之斧 / 巨神长柄斧 / 雷锤</option>
+                    <option value="20">[20] 战枪 / 传说之锤 / 巨战十字弓</option>
+                  </select>
+                </label>
+                <label class="sk-bonus-ctrl">
+                  <span>装备总 IAS (%)</span>
+                  <input type="number" class="sk-bonus-input" id="bp-ias-input" min="0" max="250" value="60" />
+                </label>
+                <label class="sk-bonus-ctrl">
+                  <span>狂热灵气等级</span>
+                  <input type="number" class="sk-bonus-input" id="bp-ias-fana" min="0" max="35" value="0" />
+                </label>
+                <label class="sk-bonus-ctrl">
+                  <span>速度爆发/狂乱等级</span>
+                  <input type="number" class="sk-bonus-input" id="bp-ias-bos" min="0" max="35" value="0" />
+                </label>
+              </div>
+              <div class="bp-status-pill" id="bp-ias-status"></div>
+              <div id="bp-ias-table-wrap"></div>
+            </article>
+
+            <!-- 4. FBR 快速格挡档位 & 75% 满格挡敏捷计算器 -->
+            <article class="bp-card">
+              <div class="bp-card-head">
+                <h3 class="bp-card-title">🔰 快速格挡 (FBR) & 75% 满格挡敏捷计算器</h3>
+                <label class="sk-bonus-ctrl">
+                  <span>当前 FBR (%)</span>
+                  <input type="number" class="sk-bonus-input" id="bp-fbr-input" min="0" max="250" value="35" />
+                </label>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                <label class="sk-bonus-ctrl">
+                  <span>常用盾牌</span>
+                  <select class="sim-select" id="bp-blk-shield" style="height:30px;padding:2px 8px;font-size:12px">
+                    <option value="42">统治者大盾（精神 42% 基础）</option>
+                    <option value="67">暴风之盾 / 物免盾（67% 面板）</option>
+                    <option value="60">神圣小盾（60% 圣骑底材）</option>
+                    <option value="82">撒卡兰姆使者 HoZ（82% 面板）</option>
+                    <option value="72">侏儒 Homunculus（72% 死灵盾）</option>
+                    <option value="65">摩西祝福之环（65% 双钻盾）</option>
+                  </select>
+                </label>
+                <label class="sk-bonus-ctrl">
+                  <span>角色等级</span>
+                  <input type="number" class="sk-bonus-input" id="bp-blk-clvl" min="1" max="99" value="90" />
+                </label>
+                <label class="sk-bonus-ctrl">
+                  <span>神圣之盾/会心守御 +%</span>
+                  <input type="number" class="sk-bonus-input" id="bp-blk-skill" min="0" max="50" value="0" />
+                </label>
+              </div>
+              <div class="bp-status-pill" id="bp-blk-status"></div>
+              <div id="bp-fbr-table-wrap"></div>
+            </article>
+          </div>
+        </div>
+
+        <!-- 四幕佣兵成长与毕业配装模拟视图 -->
+        <div id="sk-view-mercenary" style="display:none">
+          <div class="bp-grid">
+            <article class="bp-card" style="border-color:rgba(213,167,72,0.4)">
+              <div class="bp-card-head">
+                <h3 class="bp-card-title" style="color:#f5cf7b"><img class="ui-chip-icon" src="/images/ui/desertmercenaryicon.webp" alt="">四幕佣兵类型与毕业配装选择</h3>
+                <label class="sk-bonus-ctrl">
+                  <span>佣兵等级</span>
+                  <input type="number" class="sk-bonus-input" id="merc-lvl-input" min="67" max="98" value="90" />
+                </label>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label class="sim-field" style="justify-content:space-between">
+                  <span>佣兵流派 (Act 1 / 2 / 3 / 5)</span>
+                  <select class="sim-select" id="merc-variant-select" style="flex:1;max-width:360px"></select>
+                </label>
+                <label class="sim-field" style="justify-content:space-between">
+                  <span>武器配装</span>
+                  <select class="sim-select" id="merc-weapon-select" style="flex:1;max-width:360px"></select>
+                </label>
+                <label class="sim-field" style="justify-content:space-between">
+                  <span>头盔配装</span>
+                  <select class="sim-select" id="merc-helm-select" style="flex:1;max-width:360px"></select>
+                </label>
+                <label class="sim-field" style="justify-content:space-between">
+                  <span>盔甲配装</span>
+                  <select class="sim-select" id="merc-armor-select" style="flex:1;max-width:360px"></select>
+                </label>
+              </div>
+              <div class="bp-status-pill" id="merc-equip-check"></div>
+            </article>
+
+            <article class="bp-card" style="border-color:rgba(87,219,112,0.4)">
+              <div class="bp-card-head">
+                <h3 class="bp-card-title" style="color:#8af49f" id="merc-summary-title">佣兵实时成长面板与灵气/攻速档位</h3>
+                <span class="rw-badge rw-badge-patch" id="merc-act-badge">ACT 2</span>
+              </div>
+              <div id="merc-stats-body"></div>
+            </article>
+          </div>
+        </div>
       </section>
     </div>
 
@@ -3188,7 +3876,11 @@ export function renderDashboard() {
         itTabMagicRare: "蓝/黄极品",
         itTabSet: "绿色套装",
         itTabUnique: "暗金装备",
-        itTabCube: "方块公式"
+        itTabCube: "方块公式",
+        itTabDrops: "掉率计算器",
+        tabSkills: "技能模拟",
+        skModuleTitle: "八大职业技能树与加点模拟器（含 3.4 新职业「术士 Warlock」）",
+        skModuleMeta: "全 8 职业 240 技能 · 协同加成与法力/伤害实时演算 · 一键分享配装加点"
       },
       zhTW: {
         docTitle: "暗黑破壞神 2：獄火重生 · 庇護之地即時戰報",
@@ -3230,7 +3922,11 @@ export function renderDashboard() {
         itTabMagicRare: "藍/黃極品",
         itTabSet: "綠色套裝",
         itTabUnique: "暗金裝備",
-        itTabCube: "方塊公式"
+        itTabCube: "方塊公式",
+        itTabDrops: "掉率計算器",
+        tabSkills: "技能模擬",
+        skModuleTitle: "八大職業技能樹與配點模擬器（含 3.4 新職業「術士 Warlock」）",
+        skModuleMeta: "全 8 職業 240 技能 · 協同加成與法力/傷害即時演算 · 一鍵分享配點"
       },
       enUS: {
         docTitle: "Diablo II: Resurrected · Sanctuary Live",
@@ -3272,7 +3968,11 @@ export function renderDashboard() {
         itTabMagicRare: "Magic & Rare",
         itTabSet: "Set Items",
         itTabUnique: "Uniques",
-        itTabCube: "Cube Recipes"
+        itTabCube: "Cube Recipes",
+        itTabDrops: "Drop Calc",
+        tabSkills: "Skill Planner",
+        skModuleTitle: "8-Class Skill Tree & Build Planner (incl. 3.4 Warlock)",
+        skModuleMeta: "All 8 Classes & 240 Skills · Live Synergies, Mana & Damage · Shareable Build Links"
       }
     };
 
@@ -3757,7 +4457,8 @@ export function renderDashboard() {
       { id: "dclone", tabId: "main-tab-dclone", panelId: "main-panel-dclone", hash: "#dclone" },
       { id: "runewords", tabId: "main-tab-runewords", panelId: "main-panel-runewords", hash: "#runewords" },
       { id: "affixes", tabId: "main-tab-affixes", panelId: "main-panel-affixes", hash: "#affixes" },
-      { id: "items", tabId: "main-tab-items", panelId: "main-panel-items", hash: "#items" }
+      { id: "items", tabId: "main-tab-items", panelId: "main-panel-items", hash: "#items" },
+      { id: "skills", tabId: "main-tab-skills", panelId: "main-panel-skills", hash: "#skills" }
     ];
     let activeMainTab = "terror";
 
@@ -3768,6 +4469,7 @@ export function renderDashboard() {
       if (hash === "#runewords" || hash === "#rw" || hash === "#runeword") return "runewords";
       if (hash === "#affixes" || hash === "#affix" || hash === "#craft") return "affixes";
       if (hash === "#items" || hash === "#item" || hash === "#db") return "items";
+      if (hash === "#skills" || hash === "#skill" || hash.startsWith("#skills:")) return "skills";
       return null;
     }
 
@@ -4786,6 +5488,7 @@ export function renderDashboard() {
     }
 
     function getSimLimits(outIlvl) {
+      const base = getSimBase();
       if (simQuality === "magic") {
         return { maxPrefix: 1, maxSuffix: 1, maxTotal: 2, label: "最多 1 前缀 + 1 后缀" };
       }
@@ -4797,6 +5500,9 @@ export function renderDashboard() {
           maxTotal: randMax,
           label: "固定属性 + " + (outIlvl >= 71 ? "必出 4 条随机" : "最多 " + randMax + " 条随机") + "（前≤3, 后≤3）"
         };
+      }
+      if (base && base.rareMaxAffixes) {
+        return { maxPrefix: 3, maxSuffix: 3, maxTotal: base.rareMaxAffixes, label: "亮金珠宝最多 " + base.rareMaxAffixes + " 条词缀（前≤3, 后≤3）" };
       }
       return { maxPrefix: 3, maxSuffix: 3, maxTotal: 6, label: "最多 3 前缀 + 3 后缀" };
     }
@@ -4836,13 +5542,22 @@ export function renderDashboard() {
       if (!afData) return;
       const base = getSimBase();
 
-      // 如果底材不支持手工且当前选中了手工，自动切回亮金
+      const rareBtn = document.querySelector('#sim-quality-chips [data-sim-quality="rare"]');
       const craftBtn = document.querySelector('#sim-quality-chips [data-sim-quality="crafted"]');
+      if (rareBtn) {
+        rareBtn.disabled = Boolean(base.magicOnly);
+        rareBtn.style.opacity = base.magicOnly ? ".4" : "1";
+      }
       if (craftBtn) {
         craftBtn.disabled = !base.supportsCraft;
         craftBtn.style.opacity = base.supportsCraft ? "1" : ".4";
       }
-      if (!base.supportsCraft && simQuality === "crafted") {
+      if (base.magicOnly && simQuality !== "magic") {
+        simQuality = "magic";
+        document.querySelectorAll("#sim-quality-chips button").forEach(b => {
+          b.classList.toggle("active", b.dataset.simQuality === "magic");
+        });
+      } else if (!base.supportsCraft && simQuality === "crafted") {
         simQuality = "rare";
         document.querySelectorAll("#sim-quality-chips button").forEach(b => {
           b.classList.toggle("active", b.dataset.simQuality === "rare");
@@ -5111,12 +5826,91 @@ export function renderDashboard() {
       updateSimStateAndRender();
     }
 
-    /* 物品资讯百科逻辑（基础 / 蓝黄 / 绿装 / 暗金 / 方块公式） */
+    /* 物品资讯百科逻辑（基础 / 蓝黄 / 绿装 / 暗金 / 方块公式） + 圣杯 100% 收集追踪 */
     let itData = null;
+    let dcData = null;
+    let dcMode = "source";
+    let dcSourceId = "andariel-tz";
+    let dcMf = 250;
+    let dcPlayers = 1;
     let itActiveTab = "base";
     let itSubFilter = "all";
     let itBaseSocketFilter = "all";
+    let itGrailFilter = "all";
     let itSearchQuery = "";
+
+    const GRAIL_UNIQUE_KEY = "d2r-grail-uniques-v1";
+    const GRAIL_SET_KEY = "d2r-grail-sets-v1";
+    let grailUniques = new Set();
+    let grailSetPieces = new Set();
+
+    function loadGrailState() {
+      try {
+        const rawU = localStorage.getItem(GRAIL_UNIQUE_KEY);
+        if (rawU) grailUniques = new Set(JSON.parse(rawU));
+        const rawS = localStorage.getItem(GRAIL_SET_KEY);
+        if (rawS) grailSetPieces = new Set(JSON.parse(rawS));
+      } catch (e) {
+        console.warn("读取圣杯存档失败", e);
+      }
+    }
+
+    function saveGrailState() {
+      try {
+        localStorage.setItem(GRAIL_UNIQUE_KEY, JSON.stringify([...grailUniques]));
+        localStorage.setItem(GRAIL_SET_KEY, JSON.stringify([...grailSetPieces]));
+      } catch (e) {
+        console.warn("保存圣杯存档失败", e);
+      }
+    }
+
+    function renderGrailSummary() {
+      if (!itData) return;
+      const uniques = itData.uniqueItems || [];
+      const sets = itData.setItems || [];
+      const allPieces = sets.flatMap(s => (s.detail && s.detail.pieces) ? s.detail.pieces : []);
+
+      const uTotal = uniques.length;
+      const uDone = uniques.filter(u => grailUniques.has(u.nameEn)).length;
+
+      const sTotal = allPieces.length;
+      const sDone = allPieces.filter(p => grailSetPieces.has(p.nameEn)).length;
+
+      const fullSetTotal = sets.length;
+      const fullSetDone = sets.filter(s => {
+        const pcs = (s.detail && s.detail.pieces) ? s.detail.pieces : [];
+        return pcs.length > 0 && pcs.every(p => grailSetPieces.has(p.nameEn));
+      }).length;
+
+      const tc87Uniques = uniques.filter(u => u.baseInfo && u.baseInfo.tc === 87);
+      const tc87Pieces = allPieces.filter(p => p.baseInfo && p.baseInfo.tc === 87);
+      const tc87Total = tc87Uniques.length + tc87Pieces.length;
+      const tc87Done = tc87Uniques.filter(u => grailUniques.has(u.nameEn)).length +
+        tc87Pieces.filter(p => grailSetPieces.has(p.nameEn)).length;
+
+      const totalAll = uTotal + sTotal;
+      const totalDone = uDone + sDone;
+      const pct = totalAll > 0 ? Math.round((totalDone / totalAll) * 1000) / 10 : 0;
+
+      const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(val);
+      };
+      setText("grail-total-done", totalDone);
+      setText("grail-total-all", totalAll);
+      setText("grail-total-pct", pct + "%");
+      setText("grail-unique-done", uDone);
+      setText("grail-unique-all", uTotal);
+      setText("grail-set-done", sDone);
+      setText("grail-set-all", sTotal);
+      setText("grail-fullset-done", fullSetDone);
+      setText("grail-fullset-all", fullSetTotal);
+      setText("grail-tc87-done", tc87Done);
+      setText("grail-tc87-all", tc87Total);
+
+      const fillEl = document.getElementById("grail-progress-fill");
+      if (fillEl) fillEl.style.width = Math.min(100, pct) + "%";
+    }
 
     const IT_SUBFILTERS = {
       base: [
@@ -5150,15 +5944,284 @@ export function renderDashboard() {
         { id: "charm", label: "咒符", icon: "/images/items/misc/torch/torch.webp" },
         { id: "jewel", label: "珠宝", icon: "/images/items/misc/body_part/fragment_fire.webp" }
       ],
-      cube: []
+      cube: [],
+      drops: [
+        { id: "all", label: "全部掉落", icon: "/images/items/misc/shard/mote_of_anguish.webp" },
+        { id: "unique", label: "暗金装备", icon: "/images/items/misc/quest/mephisto_soul_stone.webp" },
+        { id: "set", label: "绿色套装", icon: "/images/items/armor/helmet/horazons_countenance.webp" },
+        { id: "rune", label: "符文 (#1-#33)", icon: "/images/items/misc/rune/ber_rune.webp" },
+        { id: "special", label: "钥匙 / 精华 / 3.4 雕像", icon: "/images/items/misc/key/mephisto_key.webp" }
+      ]
     };
+
+    function populateDcSourceSelect() {
+      const sel = document.getElementById("dc-source-select");
+      if (!sel || !dcData || !Array.isArray(dcData.sources)) return;
+      sel.innerHTML = dcData.sources.map(src => {
+        const nm = currentLang === "zhTW" ? (src.nameTw || src.nameZh) : currentLang === "enUS" ? src.nameEn : src.nameZh;
+        return '<option value="' + escapeHtml(src.id) + '"' + (src.id === dcSourceId ? ' selected' : '') + '>' + escapeHtml(nm) + ' (mlvl ' + src.mlvl + ')</option>';
+      }).join("");
+    }
+
+    function syncDcSourceToCurrentTz() {
+      if (!dcData || !Array.isArray(dcData.sources)) return;
+      const curTzEn = (window.dashboardData && window.dashboardData.terrorZone && window.dashboardData.terrorZone.current) || "";
+      const matched = dcData.sources.find(s => s.isTz && s.tzZone && s.tzZone !== "*" && curTzEn.toLowerCase().includes(s.tzZone.toLowerCase().split(",")[0]));
+      dcSourceId = matched ? matched.id : "tz-unique-96";
+      populateDcSourceSelect();
+    }
+
+    function computePickDropProb(noDrop, probSum, players) {
+      if (noDrop <= 0) return 1;
+      const n = Math.max(1, Math.floor((1 + Number(players || 1)) / 2));
+      if (n <= 1) return probSum / (probSum + noDrop);
+      const baseNoDropRatio = noDrop / (noDrop + probSum);
+      const powRatio = Math.pow(baseNoDropRatio, n);
+      const newNoDrop = Math.floor(probSum * (powRatio / (1 - powRatio)));
+      if (newNoDrop <= 0) return 1;
+      return probSum / (probSum + newNoDrop);
+    }
+
+    function computeQualityChance(baseChance, divisor, minVal, effMf, tcFactor, mlvl, qlvl) {
+      let chance = (baseChance - Math.floor((mlvl - qlvl) / divisor)) * 128;
+      if (effMf > 0) {
+        chance = Math.floor((chance * 100) / (100 + effMf));
+      }
+      if (chance < minVal) chance = minVal;
+      chance = chance - Math.floor((chance * tcFactor) / 1024);
+      if (chance <= 128) return 1;
+      return 128 / chance;
+    }
+
+    function computeEquipQualityOdds(code, src, mf) {
+      if (!dcData || !dcData.baseMeta) return { unique: 0, set: 0 };
+      const meta = dcData.baseMeta[code];
+      if (!meta) return { unique: 0, set: 0 };
+      const isCs = meta.cs === 1;
+      const uBase = isCs ? 240 : 400;
+      const uDiv = isCs ? 3 : 1;
+      const sBase = isCs ? 120 : 160;
+      const sDiv = isCs ? 3 : 2;
+      const effMfU = mf > 0 ? Math.floor((mf * 250) / (mf + 250)) : 0;
+      const effMfS = mf > 0 ? Math.floor((mf * 500) / (mf + 500)) : 0;
+      const pU = src.uniqueFactor > 0 ? computeQualityChance(uBase, uDiv, 6400, effMfU, src.uniqueFactor, src.mlvl, meta.qlvl) : 0;
+      const pS = src.setFactor > 0 ? computeQualityChance(sBase, sDiv, 5600, effMfS, src.setFactor, src.mlvl, meta.qlvl) : 0;
+      return { unique: pU, set: (1 - pU) * pS };
+    }
+
+    function computeSingleItemDropChance(src, itemType, code, itemNameEn, mf, players) {
+      let leafP = Number((src.leaves && src.leaves[code]) || 0);
+      const pDrop = computePickDropProb(src.noDrop, src.probSum, players);
+      let perPickP = 0;
+
+      if (itemType === "rune" || itemType === "special") {
+        perPickP = pDrop * leafP;
+        let mainChance = perPickP > 0 ? (1 - Math.pow(1 - perPickP, src.picks)) : 0;
+        if (itemType === "rune" && src.extraRune && src.extraRune.leaves && src.extraRune.leaves[code]) {
+          const rDrop = computePickDropProb(src.extraRune.noDrop, src.extraRune.probSum, players);
+          const rPerPick = rDrop * Number(src.extraRune.leaves[code]);
+          const rChance = 1 - Math.pow(1 - rPerPick, src.extraRune.picks);
+          mainChance = 1 - (1 - mainChance) * (1 - rChance);
+        }
+        return mainChance;
+      }
+
+      if (leafP <= 0) return 0;
+      const qOdds = computeEquipQualityOdds(code, src, mf);
+
+      if (itemType === "unique") {
+        const pool = (dcData.uniquePools && dcData.uniquePools[code]) || [];
+        const eligible = pool.filter(u => u.qlvl <= src.mlvl);
+        const target = eligible.find(u => u.nameEn === itemNameEn);
+        if (!target) return 0;
+        const sumRarity = eligible.reduce((a, b) => a + b.rarity, 0);
+        perPickP = pDrop * leafP * qOdds.unique * (target.rarity / sumRarity);
+      } else if (itemType === "set") {
+        const pool = (dcData.setPools && dcData.setPools[code]) || [];
+        const eligible = pool.filter(s => s.qlvl <= src.mlvl);
+        const target = eligible.find(s => s.nameEn === itemNameEn);
+        if (!target) return 0;
+        const sumRarity = eligible.reduce((a, b) => a + b.rarity, 0);
+        perPickP = pDrop * leafP * qOdds.set * (target.rarity / sumRarity);
+      }
+
+      if (perPickP <= 0) return 0;
+      return 1 - Math.pow(1 - perPickP, src.picks);
+    }
+
+    let cubeUpTargetName = "Titan's Revenge";
+    let cubeUpEth = false;
+    let cubeSunderId = "cold";
+    let cubeSunderRolled = [];
+
+    function initCubeSimulators() {
+      if (!itData) return;
+      const upSel = document.getElementById("cube-up-select");
+      const metaMap = itData.uniqueUpgradeMeta || {};
+      const tiersMap = itData.baseUpgradeTiers || {};
+      if (upSel) {
+        const upItems = (itData.uniqueItems || []).filter(u => metaMap[u.nameEn]);
+        upSel.innerHTML = upItems.map(u => {
+          const m = metaMap[u.nameEn];
+          const b = tiersMap[m.code];
+          const tLabel = b && b.tier === 1 ? "普通→扩展→精华" : "扩展→精华";
+          return '<option value="' + escapeHtml(u.nameEn) + '"' + (u.nameEn === cubeUpTargetName ? ' selected' : '') + '>' + escapeHtml(pickLangTitle(u)) + ' (' + escapeHtml(u.nameEn) + ' · ' + tLabel + ')</option>';
+        }).join("");
+        upSel.onchange = (e) => {
+          cubeUpTargetName = e.target.value;
+          renderCubeUpgrader();
+        };
+      }
+      const ethCb = document.getElementById("cube-up-eth");
+      if (ethCb) {
+        ethCb.onchange = (e) => {
+          cubeUpEth = Boolean(e.target.checked);
+          renderCubeUpgrader();
+        };
+      }
+
+      const sunSel = document.getElementById("cube-sunder-select");
+      const sunList = itData.sunderCrafts34 || [];
+      if (sunSel && sunList.length) {
+        sunSel.innerHTML = sunList.map(s =>
+          '<option value="' + escapeHtml(s.id) + '"' + (s.id === cubeSunderId ? ' selected' : '') + '>' + escapeHtml(s.nameZh) + ' (' + escapeHtml(s.nameEn) + ')</option>'
+        ).join("");
+        sunSel.onchange = (e) => {
+          cubeSunderId = e.target.value;
+          rollAndRenderSunderSim();
+        };
+      }
+      const rollBtn = document.getElementById("cube-sunder-roll-btn");
+      if (rollBtn) {
+        rollBtn.onclick = () => rollAndRenderSunderSim();
+      }
+      renderCubeUpgrader();
+      rollAndRenderSunderSim();
+    }
+
+    function renderCubeUpgrader() {
+      const box = document.getElementById("cube-up-preview");
+      if (!box || !itData || !itData.uniqueUpgradeMeta || !itData.baseUpgradeTiers) return;
+      const meta = itData.uniqueUpgradeMeta[cubeUpTargetName];
+      const uObj = (itData.uniqueItems || []).find(u => u.nameEn === cubeUpTargetName);
+      if (!meta || !uObj) return;
+      const tiers = itData.baseUpgradeTiers;
+      const origBase = tiers[meta.code];
+      if (!origBase) return;
+
+      const codesToPreview = origBase.tier === 1
+        ? [origBase.norm, origBase.uber, origBase.ultra]
+        : [origBase.uber, origBase.ultra];
+
+      const rowsHtml = codesToPreview.map((code, idx) => {
+        const b = tiers[code];
+        if (!b) return "";
+        const isOrig = code === meta.code;
+        const stepPenalty = isOrig ? 0 : (origBase.tier === 1 ? (b.tier === 2 ? 5 : 12) : 7);
+        const finalReqLvl = Math.max(b.lvl, meta.reqLvl) + stepPenalty;
+        const finalStr = Math.max(0, b.str - (cubeUpEth ? 10 : 0));
+        const finalDex = Math.max(0, b.dex - (cubeUpEth ? 10 : 0));
+
+        let statText = "";
+        if (b.kind === "armor") {
+          const minBase = isOrig && meta.ed[1] > 0 ? (b.def[1] + 1) : b.def[0];
+          const maxBase = isOrig && meta.ed[1] > 0 ? (b.def[1] + 1) : b.def[1];
+          const eMinB = cubeUpEth ? Math.floor(minBase * 1.5) : minBase;
+          const eMaxB = cubeUpEth ? Math.floor(maxBase * 1.5) : maxBase;
+          const dMin = Math.floor(eMinB * (100 + meta.ed[0]) / 100) + meta.flatDef[0];
+          const dMax = Math.floor(eMaxB * (100 + meta.ed[1]) / 100) + meta.flatDef[1];
+          statText = "成品防御：" + (dMin === dMax ? dMin : (dMin + " – " + dMax)) + "（底材基础 " + eMinB + "–" + eMaxB + "）";
+        } else {
+          const calcDmg = (pair) => {
+            if (!pair || pair[1] <= 0) return null;
+            const eMin = cubeUpEth ? Math.floor(pair[0] * 1.5) : pair[0];
+            const eMax = cubeUpEth ? Math.floor(pair[1] * 1.5) : pair[1];
+            const mnMin = Math.floor(eMin * (100 + meta.ed[0]) / 100) + meta.flatDmg[0];
+            const mxMax = Math.floor(eMax * (100 + meta.ed[1]) / 100) + meta.flatDmg[1];
+            return mnMin + " – " + mxMax;
+          };
+          const d1 = calcDmg(b.d1);
+          const d2 = calcDmg(b.d2);
+          const dt = calcDmg(b.dt);
+          const dParts = [];
+          if (d1) dParts.push("单手伤害 " + d1);
+          if (d2) dParts.push("双手伤害 " + d2);
+          if (dt) dParts.push("投掷伤害 " + dt);
+          statText = dParts.join(" · ");
+        }
+
+        const tierLabel = b.tier === 1 ? "【普通级】" : b.tier === 2 ? "【扩展级】" : "【精华级】";
+        const recipeText = isOrig
+          ? "原始掉落阶级"
+          : (b.kind === "armor"
+              ? (b.tier === 2 ? "升阶公式：#7 塔尔 (Tal) + #13 沙伊 (Shael) + 完美钻石" : "升阶公式：#18 科 (Ko) + #20 兰姆 (Lem) + 完美钻石")
+              : (b.tier === 2 ? "升阶公式：#8 拉尔 (Ral) + #12 索尔 (Sol) + 完美绿宝石" : "升阶公式：#17 卢姆 (Lum) + #21 普尔 (Pul) + 完美绿宝石"));
+        const bName = currentLang === "zhTW" ? (b.zhTW || b.zhCN) : currentLang === "enUS" ? b.enUS : b.zhCN;
+
+        return '<div class="it-set-bonus-box" style="margin-top:6px;border-color:' + (isOrig ? 'rgba(255,255,255,0.15)' : 'rgba(87,219,112,0.45)') + '">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px">' +
+            '<strong style="color:' + (isOrig ? '#f5cf7b' : '#8af49f') + '">' + tierLabel + " " + escapeHtml(bName) + ' (' + escapeHtml(b.enUS) + ')</strong>' +
+            '<span class="rw-badge">' + escapeHtml(recipeText) + '</span>' +
+          '</div>' +
+          renderStatList(statText + " · 需求等级 " + finalReqLvl + (finalStr > 0 ? (" · 需求力量 " + finalStr) : "") + (finalDex > 0 ? (" · 需求敏捷 " + finalDex) : ""), "#9ad8ff", false) +
+        '</div>';
+      }).join("");
+
+      box.innerHTML = rowsHtml;
+    }
+
+    function rollAndRenderSunderSim() {
+      const box = document.getElementById("cube-sunder-preview");
+      if (!box || !itData || !Array.isArray(itData.sunderCrafts34)) return;
+      const sun = itData.sunderCrafts34.find(s => s.id === cubeSunderId) || itData.sunderCrafts34[0];
+      const commonPools = itData.sunderCommonPools || [];
+
+      const randInt = (mn, mx) => mn + Math.floor(Math.random() * (mx - mn + 1));
+      const pickWeighted = (opts) => {
+        const tot = opts.reduce((a, b) => a + (b.weight || 1), 0);
+        let r = Math.random() * tot;
+        for (const o of opts) {
+          r -= (o.weight || 1);
+          if (r <= 0) return o;
+        }
+        return opts[0];
+      };
+
+      const rolledLines = [];
+      if (Array.isArray(sun.slot1Pool) && sun.slot1Pool.length) {
+        const o1 = pickWeighted(sun.slot1Pool);
+        const v1 = randInt(o1.min, o1.max);
+        rolledLines.push("【词缀 1 · 元素专精】" + o1.label.replace("{v}", String(v1)) + "（范围 " + o1.min + "–" + o1.max + "）");
+      }
+      for (const pool of commonPools) {
+        const opt = pickWeighted(pool.options);
+        const val = randInt(opt.min, opt.max);
+        rolledLines.push("【" + pool.slotName + "】" + opt.label.replace("{v}", String(val)) + "（范围 " + opt.min + "–" + opt.max + "）");
+      }
+
+      box.innerHTML =
+        '<div class="it-card-note" style="color:#ffd584;margin-bottom:6px">方块公式：' + escapeHtml(sun.recipeZh) + '</div>' +
+        renderStatList(sun.fixedStats.join(" · "), "#f1a7ec", false) +
+        renderStatList(rolledLines.join(" · "), "#8af49f", false);
+    }
 
     async function loadItemsCatalog() {
       try {
-        const response = await fetch("/api/items", { cache: "no-store" });
+        loadGrailState();
+        const [response, dropRes] = await Promise.all([
+          fetch("/api/items", { cache: "no-store" }),
+          fetch("/api/drops", { cache: "no-store" })
+        ]);
         const data = await response.json();
+        const dropData = await dropRes.json();
+        if (dropData && dropData.ok) {
+          dcData = dropData;
+          populateDcSourceSelect();
+        }
         if (data.ok) {
           itData = data;
+          renderGrailSummary();
+          initCubeSimulators();
           renderItSubfilters();
           renderItemsGrid();
         }
@@ -5171,6 +6234,18 @@ export function renderDashboard() {
       const sockRow = document.getElementById("it-base-sockets-row");
       if (sockRow) {
         sockRow.style.display = itActiveTab === "base" ? "flex" : "none";
+      }
+      const grailRow = document.getElementById("it-grail-filter-row");
+      if (grailRow) {
+        grailRow.style.display = (itActiveTab === "unique" || itActiveTab === "set") ? "flex" : "none";
+      }
+      const dropsConsole = document.getElementById("it-drops-console");
+      if (dropsConsole) {
+        dropsConsole.style.display = itActiveTab === "drops" ? "flex" : "none";
+      }
+      const cubeSimConsole = document.getElementById("it-cube-sim-console");
+      if (cubeSimConsole) {
+        cubeSimConsole.style.display = itActiveTab === "cube" ? "block" : "none";
       }
       const row = document.getElementById("it-subfilter-row");
       const chips = document.getElementById("it-subfilter-chips");
@@ -5281,14 +6356,27 @@ export function renderDashboard() {
           const isGeneric = item.classZh.includes("通用");
           if (itSubFilter === "class" && isGeneric) return false;
           if (itSubFilter === "generic" && !isGeneric) return false;
+          const pcs = (item.detail && item.detail.pieces) ? item.detail.pieces : [];
+          const doneCount = pcs.filter(p => grailSetPieces.has(p.nameEn)).length;
+          const isAllDone = pcs.length > 0 && doneCount === pcs.length;
+          const hasTc87 = pcs.some(p => p.baseInfo && p.baseInfo.tc === 87);
+          if (itGrailFilter === "todo" && isAllDone) return false;
+          if (itGrailFilter === "done" && !isAllDone) return false;
+          if (itGrailFilter === "tc87" && !hasTc87) return false;
           return matchQuery(item.nameZh + " " + item.nameEn + " " + item.classZh + " " + item.pieceList + " " + item.fullBonus + " " + item.usage, item);
         });
         cardsHtml = list.map(item => {
-          return '<article class="it-card it-set" data-it-set="' + escapeHtml(item.id) + '">' +
+          const pcs = (item.detail && item.detail.pieces) ? item.detail.pieces : [];
+          const doneCount = pcs.filter(p => grailSetPieces.has(p.nameEn)).length;
+          const isAllDone = pcs.length > 0 && doneCount === pcs.length;
+          return '<article class="it-card it-set' + (isAllDone ? ' grail-done' : '') + '" data-it-set="' + escapeHtml(item.id) + '">' +
             '<div class="it-card-head">' +
-              '<div class="it-card-title-row">' + renderItemThumb(item.icon, pickLangTitle(item)) +
-              '<div data-no-sweep="1"><span class="it-card-title">' + escapeHtml(pickLangTitle(item)) + '</span><span class="it-card-en">' + escapeHtml(pickLangSub(item)) + '</span></div></div>' +
-              '<div class="af-card-badges"><span class="rw-badge">' + escapeHtml(item.classZh) + '</span><span class="rw-badge rw-badge-patch">' + item.pieces + ' 件套</span></div>' +
+              '<div class="it-card-title-row">' +
+                '<input type="checkbox" class="rw-check grail-set-check" data-grail-set="' + escapeHtml(item.id) + '" title="圣杯收集：勾选/取消整套" ' + (isAllDone ? 'checked' : '') + ' />' +
+                renderItemThumb(item.icon, pickLangTitle(item)) +
+                '<div data-no-sweep="1"><span class="it-card-title">' + escapeHtml(pickLangTitle(item)) + '</span><span class="it-card-en">' + escapeHtml(pickLangSub(item)) + '</span></div>' +
+              '</div>' +
+              '<div class="af-card-badges"><span class="rw-badge">' + escapeHtml(item.classZh) + '</span><span class="rw-badge ' + (isAllDone ? 'rw-badge-patch' : '') + '" data-grail-set-badge="' + escapeHtml(item.id) + '">' + doneCount + ' / ' + item.pieces + ' 件</span></div>' +
             '</div>' +
             '<div class="it-card-note">部件：' + escapeHtml(item.pieceList) + '</div>' +
             renderStatList(item.fullBonus, "#8af49f", true) +
@@ -5299,11 +6387,16 @@ export function renderDashboard() {
           '</article>';
         }).join("");
       } else if (itActiveTab === "unique") {
-        const list = (itData.uniqueItems || []).filter(item =>
-          (itSubFilter === "all" || item.slot === itSubFilter) &&
-          matchQuery(item.nameZh + " " + item.nameEn + " " + item.stats + " " + item.note + " " + (item.tier || ""), item)
-        );
+        const list = (itData.uniqueItems || []).filter(item => {
+          if (itSubFilter !== "all" && item.slot !== itSubFilter) return false;
+          const isDone = grailUniques.has(item.nameEn);
+          if (itGrailFilter === "todo" && isDone) return false;
+          if (itGrailFilter === "done" && !isDone) return false;
+          if (itGrailFilter === "tc87" && !(item.baseInfo && item.baseInfo.tc === 87)) return false;
+          return matchQuery(item.nameZh + " " + item.nameEn + " " + item.stats + " " + item.note + " " + (item.tier || ""), item);
+        });
         cardsHtml = list.map(item => {
+          const isDone = grailUniques.has(item.nameEn);
           const baseStatsStr = item.baseInfo
             ? (currentLang === "zhTW" ? (item.baseInfo.baseStatsZhTW || item.baseInfo.baseStats) : currentLang === "enUS" ? (item.baseInfo.baseStatsEnUS || item.baseInfo.baseStats) : item.baseInfo.baseStats)
             : "";
@@ -5313,15 +6406,24 @@ export function renderDashboard() {
           const baseLine = item.baseInfo
             ? renderStatList(baseNameStr + (baseStatsStr ? " · " + baseStatsStr : ""), "#c4b6a0", false)
             : '';
-          return '<article class="it-card it-unique">' +
+          return '<article class="it-card it-unique' + (isDone ? ' grail-done' : '') + '">' +
             '<div class="it-card-head">' +
-              '<div class="it-card-title-row">' + renderItemThumb(item.icon, pickLangTitle(item)) +
-              '<div data-no-sweep="1"><span class="it-card-title">' + escapeHtml(pickLangTitle(item)) + '</span><span class="it-card-en">' + escapeHtml(pickLangSub(item)) + '</span></div></div>' +
+              '<div class="it-card-title-row">' +
+                '<input type="checkbox" class="rw-check grail-unique-check" data-grail-unique="' + escapeHtml(item.nameEn) + '" title="圣杯收集：标记已收集" ' + (isDone ? 'checked' : '') + ' />' +
+                renderItemThumb(item.icon, pickLangTitle(item)) +
+                '<div data-no-sweep="1"><span class="it-card-title">' + escapeHtml(pickLangTitle(item)) + '</span><span class="it-card-en">' + escapeHtml(pickLangSub(item)) + '</span></div>' +
+              '</div>' +
               '<div class="af-card-badges">' + (item.tier ? '<span class="rw-badge">' + escapeHtml(item.tier) + '</span>' : '') + '</div>' +
             '</div>' +
             baseLine +
             renderStatList(item.stats, "", false) +
-            '<div class="it-card-note">说明：' + escapeHtml(item.note) + '</div>' +
+            '<div class="it-card-note" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+              '<span>说明：' + escapeHtml(item.note) + '</span>' +
+              '<span style="display:inline-flex;gap:6px;flex:0 0 auto">' +
+                ((itData.uniqueUpgradeMeta && itData.uniqueUpgradeMeta[item.nameEn]) ? '<button type="button" class="rw-detail-btn" data-jump-upgrade="' + escapeHtml(item.nameEn) + '">升阶预览</button>' : '') +
+                '<button type="button" class="rw-detail-btn" data-jump-drop="' + escapeHtml(item.nameEn) + '">查掉率</button>' +
+              '</span>' +
+            '</div>' +
           '</article>';
         }).join("");
       } else if (itActiveTab === "cube") {
@@ -5335,11 +6437,197 @@ export function renderDashboard() {
             renderStatList(item.detail, "#d8cab5", false) +
           '</article>'
         ).join("");
+      } else if (itActiveTab === "drops") {
+        if (!dcData || !Array.isArray(dcData.sources)) {
+          grid.innerHTML = '<div class="tz-empty">正在加载掉率计算器数据...</div>';
+          return;
+        }
+        const uCodeMap = new Map();
+        for (const code in (dcData.uniquePools || {})) {
+          for (const u of dcData.uniquePools[code]) uCodeMap.set(u.nameEn, code);
+        }
+        const sCodeMap = new Map();
+        for (const code in (dcData.setPools || {})) {
+          for (const s of dcData.setPools[code]) sCodeMap.set(s.nameEn, code);
+        }
+
+        const allDropItems = [];
+        if (itSubFilter === "all" || itSubFilter === "unique") {
+          for (const u of (itData.uniqueItems || [])) {
+            const c = uCodeMap.get(u.nameEn);
+            if (c) allDropItems.push({ type: "unique", code: c, nameEn: u.nameEn, itemObj: u, icon: u.icon, badge: "暗金", color: "#e3bc6d" });
+          }
+        }
+        if (itSubFilter === "all" || itSubFilter === "set") {
+          for (const s of (itData.setItems || [])) {
+            for (const p of ((s.detail && s.detail.pieces) || [])) {
+              const c = sCodeMap.get(p.nameEn);
+              if (c) allDropItems.push({ type: "set", code: c, nameEn: p.nameEn, itemObj: p, icon: p.icon || s.icon, badge: s.nameZh, color: "#67e87a" });
+            }
+          }
+        }
+        if (itSubFilter === "all" || itSubFilter === "rune") {
+          for (const r of (rwRunes || [])) {
+            const rCode = "r" + String(r.number).padStart(2, "0");
+            allDropItems.push({ type: "rune", code: rCode, nameEn: r.name, itemObj: r, icon: r.icon, badge: "#" + r.number + " 符文", color: "#ff9b42" });
+          }
+        }
+        if (itSubFilter === "all" || itSubFilter === "special") {
+          for (const sp of (dcData.specialDrops || [])) {
+            allDropItems.push({ type: "special", code: sp.code, nameEn: sp.nameEn, itemObj: sp, icon: sp.icon, badge: "首领专属", color: "#e284db" });
+          }
+        }
+
+        const filteredItems = allDropItems.filter(entry =>
+          matchQuery((entry.itemObj.nameZh || entry.itemObj.zhName || "") + " " + entry.nameEn + " " + entry.badge, entry.itemObj)
+        );
+
+        const formatOdds = (p) => {
+          if (p <= 0) return null;
+          const oneIn = Math.max(1, Math.round(1 / p));
+          const pct = (p * 100) >= 1 ? (p * 100).toFixed(2) + "%" : (p * 100).toFixed(4) + "%";
+          return { oneIn, pct };
+        };
+
+        if (dcMode === "source") {
+          const src = dcData.sources.find(s => s.id === dcSourceId) || dcData.sources[0];
+          const srcName = currentLang === "zhTW" ? (src.nameTw || src.nameZh) : currentLang === "enUS" ? src.nameEn : src.nameZh;
+          const ranked = [];
+          for (const entry of filteredItems) {
+            const prob = computeSingleItemDropChance(src, entry.type, entry.code, entry.nameEn, dcMf, dcPlayers);
+            if (prob > 0) ranked.push({ entry, prob });
+          }
+          ranked.sort((a, b) => b.prob - a.prob);
+          cardsHtml = ranked.slice(0, 120).map(({ entry, prob }) => {
+            const odds = formatOdds(prob);
+            return '<article class="it-card it-' + escapeHtml(entry.type) + '">' +
+              '<div class="it-card-head">' +
+                '<div class="it-card-title-row">' +
+                  renderItemThumb(entry.icon, pickLangTitle(entry.itemObj)) +
+                  '<div data-no-sweep="1"><span class="it-card-title" style="color:' + entry.color + '">' + escapeHtml(pickLangTitle(entry.itemObj)) + '</span><span class="it-card-en">' + escapeHtml(pickLangSub(entry.itemObj)) + '</span></div>' +
+                '</div>' +
+                '<div class="af-card-badges"><span class="rw-badge">' + escapeHtml(entry.badge) + '</span></div>' +
+              '</div>' +
+              renderStatList("目标首领：" + srcName + " (mlvl " + src.mlvl + ") · 单次击杀掉率：1 / " + odds.oneIn.toLocaleString() + " (" + odds.pct + ")", "#9ad8ff", false) +
+              '<div class="it-card-note" style="display:flex;align-items:center;justify-content:space-between;gap:8px">' +
+                '<span>当前参数：MF ' + dcMf + '% · /players ' + dcPlayers + '</span>' +
+                '<button type="button" class="rw-detail-btn" data-jump-drop="' + escapeHtml(entry.nameEn) + '">对比全部首领</button>' +
+              '</div>' +
+            '</article>';
+          }).join("");
+        } else {
+          const targetList = filteredItems.slice(0, 24);
+          cardsHtml = targetList.map(entry => {
+            const srcRanks = [];
+            for (const src of dcData.sources) {
+              const prob = computeSingleItemDropChance(src, entry.type, entry.code, entry.nameEn, dcMf, dcPlayers);
+              if (prob > 0) srcRanks.push({ src, prob });
+            }
+            srcRanks.sort((a, b) => b.prob - a.prob);
+            const topLines = srcRanks.slice(0, 6).map((r, idx) => {
+              const nm = currentLang === "zhTW" ? (r.src.nameTw || r.src.nameZh) : currentLang === "enUS" ? r.src.nameEn : r.src.nameZh;
+              const odds = formatOdds(r.prob);
+              return "#" + (idx + 1) + " " + nm + "：1 / " + odds.oneIn.toLocaleString() + " (" + odds.pct + ")";
+            }).join(" · ");
+            return '<article class="it-card it-' + escapeHtml(entry.type) + '">' +
+              '<div class="it-card-head">' +
+                '<div class="it-card-title-row">' +
+                  renderItemThumb(entry.icon, pickLangTitle(entry.itemObj)) +
+                  '<div data-no-sweep="1"><span class="it-card-title" style="color:' + entry.color + '">' + escapeHtml(pickLangTitle(entry.itemObj)) + '</span><span class="it-card-en">' + escapeHtml(pickLangSub(entry.itemObj)) + '</span></div>' +
+                '</div>' +
+                '<div class="af-card-badges"><span class="rw-badge">' + escapeHtml(entry.badge) + '</span></div>' +
+              '</div>' +
+              renderStatList(topLines || "当前难度无直接掉落", "#8af49f", false) +
+              '<div class="it-card-note">最佳刷取排行（MF ' + dcMf + '% · /players ' + dcPlayers + '，共 ' + srcRanks.length + ' 个来源可掉落）</div>' +
+            '</article>';
+          }).join("");
+        }
       }
 
       grid.innerHTML = cardsHtml || '<div class="tz-empty">未找到匹配的物品资料</div>';
 
+      grid.querySelectorAll("[data-jump-drop]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const targetName = btn.dataset.jumpDrop;
+          itActiveTab = "drops";
+          itSubFilter = "all";
+          dcMode = "item";
+          itSearchQuery = targetName;
+          const inp = document.getElementById("it-search-input");
+          const clr = document.getElementById("it-search-clear");
+          if (inp) inp.value = targetName;
+          if (clr) clr.style.display = "block";
+          document.querySelectorAll("#it-subtabs [data-it-tab]").forEach(b => b.classList.toggle("active", b.dataset.itTab === "drops"));
+          document.querySelectorAll("#dc-mode-chips [data-dc-mode]").forEach(b => b.classList.toggle("active", b.dataset.dcMode === "item"));
+          const srcRow = document.getElementById("dc-source-row");
+          if (srcRow) srcRow.style.display = "none";
+          renderItSubfilters();
+          renderItemsGrid();
+        });
+      });
+
+      grid.querySelectorAll("[data-jump-upgrade]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          cubeUpTargetName = btn.dataset.jumpUpgrade;
+          itActiveTab = "cube";
+          itSubFilter = "all";
+          document.querySelectorAll("#it-subtabs [data-it-tab]").forEach(b => b.classList.toggle("active", b.dataset.itTab === "cube"));
+          const upSel = document.getElementById("cube-up-select");
+          if (upSel) upSel.value = cubeUpTargetName;
+          renderCubeUpgrader();
+          renderItSubfilters();
+          renderItemsGrid();
+        });
+      });
+
+      if (itActiveTab === "unique") {
+        grid.querySelectorAll("[data-grail-unique]").forEach(cb => {
+          cb.addEventListener("change", (e) => {
+            const key = e.target.dataset.grailUnique;
+            const checked = e.target.checked;
+            if (checked) grailUniques.add(key);
+            else grailUniques.delete(key);
+            saveGrailState();
+            renderGrailSummary();
+            if (itGrailFilter === "todo" || itGrailFilter === "done") {
+              renderItemsGrid();
+            } else {
+              const card = e.target.closest(".it-card");
+              if (card) card.classList.toggle("grail-done", checked);
+            }
+          });
+        });
+      }
+
       if (itActiveTab === "set") {
+        grid.querySelectorAll("[data-grail-set]").forEach(cb => {
+          cb.addEventListener("click", (e) => e.stopPropagation());
+          cb.addEventListener("change", (e) => {
+            const setId = e.target.dataset.grailSet;
+            const checked = e.target.checked;
+            const setItem = (itData.setItems || []).find(s => s.id === setId);
+            const pcs = (setItem && setItem.detail && setItem.detail.pieces) ? setItem.detail.pieces : [];
+            pcs.forEach(p => {
+              if (checked) grailSetPieces.add(p.nameEn);
+              else grailSetPieces.delete(p.nameEn);
+            });
+            saveGrailState();
+            renderGrailSummary();
+            if (itGrailFilter === "todo" || itGrailFilter === "done") {
+              renderItemsGrid();
+            } else {
+              const card = e.target.closest(".it-card");
+              if (card) card.classList.toggle("grail-done", checked);
+              const badge = grid.querySelector('[data-grail-set-badge="' + setId + '"]');
+              if (badge && setItem) {
+                badge.textContent = (checked ? pcs.length : 0) + " / " + setItem.pieces + " 件";
+                badge.classList.toggle("rw-badge-patch", checked);
+              }
+            }
+          });
+        });
         grid.querySelectorAll("[data-it-set]").forEach(card => {
           card.addEventListener("click", () => openSetDetail(card.dataset.itSet));
         });
@@ -5365,6 +6653,7 @@ export function renderDashboard() {
       }
 
       const piecesHtml = (detail.pieces || []).map(p => {
+        const isPieceDone = grailSetPieces.has(p.nameEn);
         const pBaseStr = p.baseInfo
           ? (currentLang === "zhTW" ? (p.baseInfo.baseStatsZhTW || p.baseInfo.baseStats) : currentLang === "enUS" ? (p.baseInfo.baseStatsEnUS || p.baseInfo.baseStats) : p.baseInfo.baseStats)
           : "";
@@ -5381,10 +6670,13 @@ export function renderDashboard() {
         const pieceImg = p.icon
           ? '<div class="it-thumb-wrap" style="width:40px;height:40px"><img class="it-thumb" src="' + escapeHtml(p.icon) + '" alt="' + escapeHtml(p.nameZh) + '" loading="lazy"></div>'
           : '';
-        return '<div class="it-set-piece">' +
+        return '<div class="it-set-piece' + (isPieceDone ? ' grail-done' : '') + '">' +
           '<div class="it-set-piece-head">' +
-            '<div class="it-card-title-row">' + pieceImg +
-            '<div data-no-sweep="1"><span class="it-set-piece-title">' + escapeHtml(pickLangTitle(p)) + '</span> <span class="it-set-piece-sub">(' + escapeHtml(pickLangSub(p)) + ')</span></div></div>' +
+            '<div class="it-card-title-row">' +
+              '<input type="checkbox" class="rw-check grail-piece-check" data-grail-piece="' + escapeHtml(p.nameEn) + '" title="圣杯收集：标记该部件已收集" ' + (isPieceDone ? 'checked' : '') + ' />' +
+              pieceImg +
+              '<div data-no-sweep="1"><span class="it-set-piece-title">' + escapeHtml(pickLangTitle(p)) + '</span> <span class="it-set-piece-sub">(' + escapeHtml(pickLangSub(p)) + ')</span></div>' +
+            '</div>' +
             '<span class="rw-badge">' + escapeHtml(p.slotZh) + '</span>' +
           '</div>' +
           '<ul class="it-set-piece-stats">' + baseLines + '</ul>' +
@@ -5408,10 +6700,39 @@ export function renderDashboard() {
         '</ul>' +
       '</div>';
 
-      document.getElementById("it-set-modal-body").innerHTML =
+      const modalBody = document.getElementById("it-set-modal-body");
+      modalBody.innerHTML =
         '<div class="it-set-pieces-grid">' + piecesHtml + '</div>' +
         partialHtml +
         fullHtml;
+
+      modalBody.querySelectorAll("[data-grail-piece]").forEach(cb => {
+        cb.addEventListener("change", (e) => {
+          const pieceKey = e.target.dataset.grailPiece;
+          const checked = e.target.checked;
+          if (checked) grailSetPieces.add(pieceKey);
+          else grailSetPieces.delete(pieceKey);
+          saveGrailState();
+          renderGrailSummary();
+          const pieceCard = e.target.closest(".it-set-piece");
+          if (pieceCard) pieceCard.classList.toggle("grail-done", checked);
+
+          const pcs = detail.pieces || [];
+          const doneCount = pcs.filter(p => grailSetPieces.has(p.nameEn)).length;
+          const isAllDone = pcs.length > 0 && doneCount === pcs.length;
+          const outerCard = document.querySelector('[data-it-set="' + setId + '"]');
+          if (outerCard) {
+            outerCard.classList.toggle("grail-done", isAllDone);
+            const outerCb = outerCard.querySelector("[data-grail-set]");
+            if (outerCb) outerCb.checked = isAllDone;
+            const outerBadge = outerCard.querySelector("[data-grail-set-badge]");
+            if (outerBadge) {
+              outerBadge.textContent = doneCount + " / " + setItem.pieces + " 件";
+              outerBadge.classList.toggle("rw-badge-patch", isAllDone);
+            }
+          }
+        });
+      });
 
       if (typeof applyDomTraditionalSweep === "function") applyDomTraditionalSweep();
       modal.classList.add("open");
@@ -5433,11 +6754,162 @@ export function renderDashboard() {
         });
       });
 
+      document.querySelectorAll("#it-grail-chips [data-grail-filter]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#it-grail-chips [data-grail-filter]").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          itGrailFilter = btn.dataset.grailFilter;
+          renderItemsGrid();
+        });
+      });
+
+      const exportBtn = document.getElementById("grail-export-btn");
+      if (exportBtn) {
+        exportBtn.addEventListener("click", () => {
+          const payload = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            uniques: [...grailUniques],
+            setPieces: [...grailSetPieces],
+            runewords: [...rwCompleted]
+          };
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "d2r-holy-grail-" + new Date().toISOString().slice(0, 10) + ".json";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+      }
+
+      const importBtn = document.getElementById("grail-import-btn");
+      const importFile = document.getElementById("grail-import-file");
+      if (importBtn && importFile) {
+        importBtn.addEventListener("click", () => importFile.click());
+        importFile.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const data = JSON.parse(String(reader.result || "{}"));
+              if (Array.isArray(data.uniques)) grailUniques = new Set(data.uniques);
+              if (Array.isArray(data.setPieces)) grailSetPieces = new Set(data.setPieces);
+              saveGrailState();
+              renderGrailSummary();
+              renderItemsGrid();
+              if (Array.isArray(data.runewords)) {
+                rwCompleted = new Set(data.runewords);
+                saveRwStorage();
+                renderRunewordsSummary();
+                renderRunewordsList();
+              }
+            } catch (err) {
+              alert("导入圣杯存档失败：JSON 格式无效");
+            }
+            importFile.value = "";
+          };
+          reader.readAsText(file);
+        });
+      }
+
+      const resetBtn = document.getElementById("grail-reset-btn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          if (grailUniques.size === 0 && grailSetPieces.size === 0) return;
+          if (!confirm("确定要清空所有暗金与绿色套装的圣杯收集进度吗？")) return;
+          grailUniques.clear();
+          grailSetPieces.clear();
+          saveGrailState();
+          renderGrailSummary();
+          renderItemsGrid();
+        });
+      }
+
       document.querySelectorAll("#it-base-sockets-chips [data-it-sock]").forEach(btn => {
         btn.addEventListener("click", () => {
           document.querySelectorAll("#it-base-sockets-chips [data-it-sock]").forEach(b => b.classList.remove("active"));
           btn.classList.add("active");
           itBaseSocketFilter = btn.dataset.itSock;
+          renderItemsGrid();
+        });
+      });
+
+      document.querySelectorAll("#dc-mode-chips [data-dc-mode]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#dc-mode-chips [data-dc-mode]").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          dcMode = btn.dataset.dcMode;
+          const srcRow = document.getElementById("dc-source-row");
+          if (srcRow) srcRow.style.display = dcMode === "source" ? "flex" : "none";
+          renderItemsGrid();
+        });
+      });
+
+      const dcSrcSelect = document.getElementById("dc-source-select");
+      if (dcSrcSelect) {
+        dcSrcSelect.addEventListener("change", (e) => {
+          dcSourceId = e.target.value;
+          renderItemsGrid();
+        });
+      }
+
+      const dcSyncTzBtn = document.getElementById("dc-sync-tz-btn");
+      if (dcSyncTzBtn) {
+        dcSyncTzBtn.addEventListener("click", () => {
+          dcMode = "source";
+          document.querySelectorAll("#dc-mode-chips [data-dc-mode]").forEach(b => b.classList.toggle("active", b.dataset.dcMode === "source"));
+          const srcRow = document.getElementById("dc-source-row");
+          if (srcRow) srcRow.style.display = "flex";
+          syncDcSourceToCurrentTz();
+          renderItemsGrid();
+        });
+      }
+
+      const tzJumpDropsBtn = document.getElementById("tz-jump-drops-btn");
+      if (tzJumpDropsBtn) {
+        tzJumpDropsBtn.addEventListener("click", () => {
+          switchMainTab("items");
+          itActiveTab = "drops";
+          itSubFilter = "all";
+          dcMode = "source";
+          document.querySelectorAll("#it-subtabs [data-it-tab]").forEach(b => b.classList.toggle("active", b.dataset.itTab === "drops"));
+          document.querySelectorAll("#dc-mode-chips [data-dc-mode]").forEach(b => b.classList.toggle("active", b.dataset.dcMode === "source"));
+          const srcRow = document.getElementById("dc-source-row");
+          if (srcRow) srcRow.style.display = "flex";
+          syncDcSourceToCurrentTz();
+          renderItSubfilters();
+          renderItemsGrid();
+        });
+      }
+
+      const dcMfInput = document.getElementById("dc-mf-input");
+      if (dcMfInput) {
+        dcMfInput.addEventListener("input", () => {
+          dcMf = Math.min(1200, Math.max(0, Number(dcMfInput.value) || 0));
+          document.querySelectorAll("#dc-mf-presets [data-dc-mf]").forEach(b => b.classList.toggle("active", Number(b.dataset.dcMf) === dcMf));
+          renderItemsGrid();
+        });
+      }
+
+      document.querySelectorAll("#dc-mf-presets [data-dc-mf]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          dcMf = Number(btn.dataset.dcMf);
+          if (dcMfInput) dcMfInput.value = String(dcMf);
+          document.querySelectorAll("#dc-mf-presets [data-dc-mf]").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderItemsGrid();
+        });
+      });
+
+      document.querySelectorAll("#dc-players-chips [data-dc-players]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          dcPlayers = Number(btn.dataset.dcPlayers);
+          document.querySelectorAll("#dc-players-chips [data-dc-players]").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
           renderItemsGrid();
         });
       });
@@ -5498,7 +6970,7 @@ export function renderDashboard() {
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
         if (tag === "input" || tag === "textarea" || tag === "select") return;
-        if (e.key >= "1" && e.key <= "5") {
+        if (e.key >= "1" && e.key <= "6") {
           const idx = Number(e.key) - 1;
           if (MAIN_TABS[idx]) {
             e.preventDefault();
@@ -5529,6 +7001,856 @@ export function renderDashboard() {
           }
         }
       });
+    }
+
+    /* 八大职业技能树与加点模拟器（含 3.4 新职业术士 Warlock） */
+    const SK_STORAGE_KEY = "d2r-skill-builds-v1";
+    const SK_MAX_POINTS = 110;
+    let skClasses = [];
+    let skActiveClassId = "war";
+    let skSelectedSkillKey = null;
+    let skBonusAll = 0;
+    let skBuilds = {};
+
+    function loadSkBuilds() {
+      try {
+        const raw = localStorage.getItem(SK_STORAGE_KEY);
+        if (raw) skBuilds = JSON.parse(raw) || {};
+      } catch (e) {
+        skBuilds = {};
+      }
+    }
+
+    function saveSkBuilds() {
+      try {
+        localStorage.setItem(SK_STORAGE_KEY, JSON.stringify(skBuilds));
+      } catch (e) {}
+    }
+
+    function getClassBuild(classId) {
+      if (!skBuilds[classId]) skBuilds[classId] = {};
+      return skBuilds[classId];
+    }
+
+    function getActiveClassObj() {
+      return skClasses.find(c => c.id === skActiveClassId) || skClasses[0] || null;
+    }
+
+    function getClassTotalPoints(classId) {
+      const b = skBuilds[classId] || {};
+      let sum = 0;
+      for (const k in b) sum += Number(b[k] || 0);
+      return sum;
+    }
+
+    function computeScaledValue(arr, hitShift, lvl) {
+      if (!Array.isArray(arr) || lvl <= 0) return 0;
+      let val = Number(arr[0] || 0);
+      const l1 = Math.max(0, Math.min(lvl - 1, 7));
+      const l2 = Math.max(0, Math.min(lvl - 8, 8));
+      const l3 = Math.max(0, Math.min(lvl - 16, 6));
+      const l4 = Math.max(0, Math.min(lvl - 22, 6));
+      const l5 = Math.max(0, lvl - 28);
+      val += l1 * Number(arr[1] || 0) + l2 * Number(arr[2] || 0) + l3 * Number(arr[3] || 0) + l4 * Number(arr[4] || 0) + l5 * Number(arr[5] || 0);
+      const shift = typeof hitShift === "number" ? hitShift : 8;
+      return Math.round((val * Math.pow(2, shift)) / 256 * 10) / 10;
+    }
+
+    function computeSkillMana(sk, lvl) {
+      if (!sk || !sk.mana || lvl <= 0) return 0;
+      const raw = (sk.mana.base + (lvl - 1) * sk.mana.lvl) * Math.pow(2, sk.mana.shift) / 256;
+      return Math.max(sk.mana.min || 0, Math.round(raw * 10) / 10);
+    }
+
+    function computeSkillDamage(sk, clsObj, build, lvl) {
+      if (!sk || !sk.dmg || lvl <= 0) return null;
+      const baseMin = computeScaledValue(sk.dmg.min, sk.dmg.hitShift, lvl);
+      const baseMax = computeScaledValue(sk.dmg.max, sk.dmg.hitShift, lvl);
+      let synPct = 0;
+      if (Array.isArray(sk.dmgSynergies)) {
+        for (const syn of sk.dmgSynergies) {
+          const pts = Number(build[syn.skill] || 0);
+          synPct += pts * Number(syn.pct || 0);
+        }
+      }
+      const mult = 1 + synPct / 100;
+      return {
+        type: sk.dmg.type,
+        min: Math.round(baseMin * mult),
+        max: Math.round(baseMax * mult),
+        synPct
+      };
+    }
+
+    function ensureSkillPrereqs(clsObj, build, sk, budgetRem) {
+      let needed = 0;
+      const toActivate = [];
+      const visited = new Set();
+      function walk(s) {
+        if (!s || visited.has(s.key)) return;
+        visited.add(s.key);
+        for (const reqKey of (s.reqs || [])) {
+          const reqSk = clsObj.skills.find(x => x.key === reqKey);
+          if (reqSk) {
+            walk(reqSk);
+            if (!build[reqSk.key]) {
+              needed += 1;
+              toActivate.push(reqSk.key);
+            }
+          }
+        }
+      }
+      walk(sk);
+      if (needed > budgetRem) return -1;
+      for (const k of toActivate) build[k] = 1;
+      return needed;
+    }
+
+    function canRemoveSkillPoint(clsObj, build, sk) {
+      const cur = Number(build[sk.key] || 0);
+      if (cur <= 0) return false;
+      if (cur > 1) return true;
+      for (const other of clsObj.skills) {
+        if (Number(build[other.key] || 0) > 0 && (other.reqs || []).includes(sk.key)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function modifySkillPoint(skillKey, delta) {
+      const clsObj = getActiveClassObj();
+      if (!clsObj) return;
+      const sk = clsObj.skills.find(s => s.key === skillKey);
+      if (!sk) return;
+      const build = getClassBuild(clsObj.id);
+      skSelectedSkillKey = sk.key;
+
+      if (delta > 0) {
+        let used = getClassTotalPoints(clsObj.id);
+        let rem = SK_MAX_POINTS - used;
+        if (rem <= 0) return;
+        const cur = Number(build[sk.key] || 0);
+        if (cur >= 20) return;
+        const preSpent = ensureSkillPrereqs(clsObj, build, sk, rem - 1);
+        if (preSpent < 0) return;
+        rem -= preSpent;
+        const add = Math.min(delta, 20 - cur, rem);
+        if (add > 0) {
+          build[sk.key] = cur + add;
+        }
+      } else if (delta < 0) {
+        let steps = Math.abs(delta);
+        while (steps > 0 && canRemoveSkillPoint(clsObj, build, sk)) {
+          build[sk.key] = Number(build[sk.key] || 0) - 1;
+          if (build[sk.key] <= 0) delete build[sk.key];
+          steps -= 1;
+        }
+      }
+
+      saveSkBuilds();
+      renderSkillsAll();
+    }
+
+    function pickSkLang(obj, zhKey, twKey, enKey) {
+      if (!obj) return "";
+      if (currentLang === "zhTW") return obj[twKey] || obj[zhKey] || "";
+      if (currentLang === "enUS") return obj[enKey] || obj[zhKey] || "";
+      return obj[zhKey] || "";
+    }
+
+    function renderSkillsClassTabs() {
+      const wrap = document.getElementById("sk-class-tabs");
+      if (!wrap || !skClasses.length) return;
+
+      if (wrap.querySelectorAll("[data-sk-class]").length !== skClasses.length) {
+        wrap.innerHTML = skClasses.map(cls => {
+          const badge34 = cls.isNew34 ? ' <span class="rw-badge rw-badge-patch" style="font-size:10px;padding:1px 4px">3.4</span>' : '';
+          return '<button type="button" class="sk-class-btn" data-sk-class="' + escapeHtml(cls.id) + '">' +
+            '<img class="sk-class-avatar" src="' + escapeHtml(cls.icon) + '" alt="" />' +
+            '<div class="sk-class-meta" data-no-sweep="1">' +
+              '<div class="sk-class-name"><span class="sk-cls-title"></span>' + badge34 + '</div>' +
+              '<div class="sk-class-pts">0 / 110</div>' +
+            '</div>' +
+          '</button>';
+        }).join("");
+
+        wrap.querySelectorAll("[data-sk-class]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            skActiveClassId = btn.dataset.skClass;
+            const clsObj = getActiveClassObj();
+            skSelectedSkillKey = clsObj && clsObj.skills[0] ? clsObj.skills[0].key : null;
+            renderSkillsAll();
+          });
+        });
+      }
+
+      wrap.querySelectorAll("[data-sk-class]").forEach(btn => {
+        const cid = btn.dataset.skClass;
+        const cls = skClasses.find(c => c.id === cid);
+        btn.classList.toggle("active", cid === skActiveClassId);
+        const titleEl = btn.querySelector(".sk-cls-title");
+        if (titleEl && cls) titleEl.textContent = pickSkLang(cls, "nameZh", "nameTw", "nameEn");
+        const ptsEl = btn.querySelector(".sk-class-pts");
+        if (ptsEl) ptsEl.textContent = getClassTotalPoints(cid) + " / " + SK_MAX_POINTS;
+      });
+    }
+
+    function renderSkillsTrees() {
+      const wrap = document.getElementById("sk-trees-wrap");
+      const clsObj = getActiveClassObj();
+      if (!wrap || !clsObj) return;
+
+      const build = getClassBuild(clsObj.id);
+      const totalUsed = getClassTotalPoints(clsObj.id);
+      let maxReqLvl = 1;
+      for (const sk of clsObj.skills) {
+        const pts = Number(build[sk.key] || 0);
+        if (pts > 0) {
+          const reqForRank = sk.reqLvl + pts - 1;
+          if (reqForRank > maxReqLvl) maxReqLvl = reqForRank;
+        }
+      }
+      const reqClvl = totalUsed > 0 ? Math.min(99, Math.max(maxReqLvl, totalUsed - 12 + 1, 1)) : 1;
+
+      const usedEl = document.getElementById("sk-points-used");
+      const remEl = document.getElementById("sk-points-rem");
+      const clvlEl = document.getElementById("sk-req-clvl");
+      if (usedEl) usedEl.textContent = String(totalUsed);
+      if (remEl) remEl.textContent = String(Math.max(0, SK_MAX_POINTS - totalUsed));
+      if (clvlEl) clvlEl.textContent = String(reqClvl);
+
+      wrap.innerHTML = (clsObj.tabs || []).map(tab => {
+        const pageSkills = clsObj.skills.filter(s => s.page === tab.page);
+        let tabPoints = 0;
+        pageSkills.forEach(s => { tabPoints += Number(build[s.key] || 0); });
+
+        let cellsHtml = "";
+        for (let r = 1; r <= 6; r++) {
+          for (let c = 1; c <= 3; c++) {
+            const sk = pageSkills.find(s => s.row === r && s.col === c);
+            if (!sk) {
+              cellsHtml += '<div class="sk-cell-empty"></div>';
+              continue;
+            }
+            const basePts = Number(build[sk.key] || 0);
+            const effPts = basePts > 0 ? basePts + skBonusAll : 0;
+            const clsList = ["sk-node"];
+            if (basePts > 0) clsList.push("allocated");
+            if (basePts >= 20) clsList.push("maxed");
+            if (skSelectedSkillKey === sk.key) clsList.push("selected");
+
+            const rankText = basePts > 0 && skBonusAll > 0
+              ? (basePts + " (" + effPts + ")/20")
+              : (basePts + " / 20");
+            const tagText = sk.passive
+              ? (currentLang === "enUS" ? "Passive" : "被动")
+              : ("Lv." + sk.reqLvl);
+
+            cellsHtml += '<div class="' + clsList.join(" ") + '" data-sk-node="' + escapeHtml(sk.key) + '">' +
+              '<div class="sk-node-top">' +
+                '<span class="sk-node-lvlreq">' + escapeHtml(tagText) + '</span>' +
+                '<div class="sk-node-step-btns">' +
+                  '<button type="button" class="sk-step-btn" data-sk-step="-1" data-sk-key="' + escapeHtml(sk.key) + '" title="-1">-</button>' +
+                  '<button type="button" class="sk-step-btn" data-sk-step="1" data-sk-key="' + escapeHtml(sk.key) + '" title="+1">+</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="sk-node-title" data-no-sweep="1">' + escapeHtml(pickSkLang(sk, "nameZh", "nameTw", "nameEn")) + '</div>' +
+              '<div class="sk-node-foot">' +
+                '<span class="sk-node-rank">' + escapeHtml(rankText) + '</span>' +
+              '</div>' +
+            '</div>';
+          }
+        }
+
+        const tabTitle = pickSkLang(tab, "zhCN", "zhTW", "enUS");
+        return '<div class="sk-tree-col">' +
+          '<div class="sk-tree-head">' +
+            '<span class="sk-tree-title" data-no-sweep="1">' + escapeHtml(tabTitle) + '</span>' +
+            '<span class="sk-tree-pts">' + tabPoints + ' 点</span>' +
+          '</div>' +
+          '<div class="sk-matrix">' + cellsHtml + '</div>' +
+        '</div>';
+      }).join("");
+
+      wrap.querySelectorAll("[data-sk-step]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const k = btn.dataset.skKey;
+          const step = Number(btn.dataset.skStep) * (e.shiftKey ? 5 : 1);
+          modifySkillPoint(k, step);
+        });
+      });
+
+      wrap.querySelectorAll("[data-sk-node]").forEach(node => {
+        node.addEventListener("click", (e) => {
+          const k = node.dataset.skNode;
+          modifySkillPoint(k, e.shiftKey ? 5 : 1);
+        });
+        node.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          const k = node.dataset.skNode;
+          modifySkillPoint(k, e.shiftKey ? -5 : -1);
+        });
+        node.addEventListener("mouseenter", () => {
+          skSelectedSkillKey = node.dataset.skNode;
+          wrap.querySelectorAll("[data-sk-node]").forEach(n => n.classList.toggle("selected", n.dataset.skNode === skSelectedSkillKey));
+          renderSkillInspector();
+        });
+      });
+    }
+
+    function renderSkillInspector() {
+      const clsObj = getActiveClassObj();
+      if (!clsObj) return;
+      const sk = clsObj.skills.find(s => s.key === skSelectedSkillKey) || clsObj.skills[0];
+      if (!sk) return;
+
+      const build = getClassBuild(clsObj.id);
+      const basePts = Number(build[sk.key] || 0);
+      const effLvl = basePts > 0 ? basePts + skBonusAll : 1;
+
+      const titleEl = document.getElementById("sk-insp-title");
+      const subEl = document.getElementById("sk-insp-sub");
+      const bodyEl = document.getElementById("sk-insp-body");
+      if (!titleEl || !subEl || !bodyEl) return;
+
+      titleEl.textContent = pickSkLang(sk, "nameZh", "nameTw", "nameEn");
+      const secName = currentLang === "enUS" ? sk.nameZh : sk.nameEn;
+      subEl.textContent = secName + " · 需求等级 " + sk.reqLvl + (sk.passive ? " · 被动技能" : "") +
+        " · 当前投入 " + basePts + " 点" + (basePts > 0 && skBonusAll > 0 ? ("（含装备共 " + effLvl + " 级）") : "");
+
+      const lines = [];
+      const descText = pickSkLang(sk, "descZh", "descTw", "descEn");
+      if (descText) {
+        lines.push('<div class="it-card-note" style="color:#f2e7d5;font-size:13px">' + escapeHtml(descText) + '</div>');
+      }
+
+      const statParts = [];
+      if (sk.mana) {
+        const mCur = computeSkillMana(sk, effLvl);
+        const m1 = computeSkillMana(sk, 1);
+        const m20 = computeSkillMana(sk, 20);
+        statParts.push("法力消耗：当前 " + mCur + "（1级: " + m1 + " · 20级: " + m20 + "）");
+      }
+      if (sk.cooldown > 0) {
+        statParts.push("技能冷却：" + sk.cooldown + " 秒");
+      }
+      if (sk.dmg) {
+        const dCur = computeSkillDamage(sk, clsObj, build, effLvl);
+        const d1 = computeSkillDamage(sk, clsObj, build, 1);
+        const d20 = computeSkillDamage(sk, clsObj, build, 20);
+        if (dCur) {
+          statParts.push("技能伤害（" + effLvl + "级）：" + dCur.min + " – " + dCur.max + (dCur.synPct > 0 ? ("（已含 +" + dCur.synPct + "% 协同加成）") : ""));
+          statParts.push("成长对照：1级 " + d1.min + "–" + d1.max + " · 20级 " + d20.min + "–" + d20.max);
+        }
+      }
+      if (statParts.length > 0) {
+        lines.push(renderStatList(statParts.join(" · "), "#9ad8ff", false));
+      }
+
+      if (Array.isArray(sk.reqs) && sk.reqs.length > 0) {
+        const reqNames = sk.reqs.map(rk => {
+          const rSk = clsObj.skills.find(x => x.key === rk);
+          const hasIt = Number(build[rk] || 0) > 0;
+          const nm = rSk ? pickSkLang(rSk, "nameZh", "nameTw", "nameEn") : rk;
+          return (hasIt ? "✓ " : "○ ") + nm;
+        });
+        lines.push('<div class="it-card-note">前置技能：' + escapeHtml(reqNames.join(" → ")) + '（点击技能可自动补齐前置）</div>');
+      }
+
+      if (Array.isArray(sk.synergies) && sk.synergies.length > 0) {
+        const synItems = sk.synergies.map(s => pickSkLang(s, "zhCN", "zhTW", "enUS")).join(" · ");
+        lines.push('<div class="it-set-bonus-box" style="margin-top:4px"><h4 class="it-set-bonus-title" style="color:#67e87a">协同技能加成（仅基础投入点数生效）</h4>' +
+          renderStatList(synItems, "#8af49f", false) + '</div>');
+      }
+
+      bodyEl.innerHTML = lines.join("");
+    }
+
+    const CLASS_BREAKPOINTS = {
+      war: {
+        blockFactor: 25,
+        iasBaseFrames: 15,
+        fcr: [
+          { label: "常规施法 (邪术/混沌/恶魔)", frames: [[15,0],[14,9],[13,18],[12,30],[11,48],[10,75],[9,125]] }
+        ],
+        fhr: [
+          { label: "常规武器 / 法杖 / 魔典", frames: [[13,0],[12,5],[11,10],[10,16],[9,26],[8,39],[7,56],[6,86],[5,152],[4,377]] }
+        ],
+        fbr: [
+          { label: "常规格挡 (会心守御可额外加速)", frames: [[7,0],[6,13],[5,32],[4,86],[3,600]] }
+        ]
+      },
+      sor: {
+        blockFactor: 20,
+        iasBaseFrames: 16,
+        fcr: [
+          { label: "常规法术 (冰/火/传送/新星)", frames: [[13,0],[12,9],[11,20],[10,37],[9,63],[8,105],[7,200]] },
+          { label: "闪电 / 连锁闪电 (L/CL)", frames: [[19,0],[18,7],[17,15],[16,23],[15,35],[14,52],[13,78],[12,117],[11,194]] }
+        ],
+        fhr: [
+          { label: "全部武器", frames: [[15,0],[14,5],[13,9],[12,14],[11,20],[10,30],[9,42],[8,60],[7,86],[6,142],[5,280]] }
+        ],
+        fbr: [
+          { label: "常规格挡", frames: [[9,0],[8,7],[7,15],[6,27],[5,48],[4,86],[3,200]] }
+        ]
+      },
+      pal: {
+        blockFactor: 30,
+        iasBaseFrames: 15,
+        fcr: [
+          { label: "全部法术 (祝福之锤/天拳/传送)", frames: [[15,0],[14,9],[13,18],[12,30],[11,48],[10,75],[9,125]] }
+        ],
+        fhr: [
+          { label: "常规武器 (单手/双手剑斧锤)", frames: [[9,0],[8,7],[7,15],[6,27],[5,48],[4,86],[3,200]] },
+          { label: "长矛 / 长柄武器 / 法杖", frames: [[13,0],[12,3],[11,7],[10,13],[9,20],[8,32],[7,48],[6,75],[5,129],[4,280]] }
+        ],
+        fbr: [
+          { label: "开启神圣之盾 (Holy Shield)", frames: [[2,0],[1,86]] },
+          { label: "未开神圣之盾", frames: [[5,0],[4,13],[3,32],[2,86],[1,600]] }
+        ]
+      },
+      ama: {
+        blockFactor: 25,
+        iasBaseFrames: 14,
+        fcr: [
+          { label: "全部法术 (传送/女武神/诱饵)", frames: [[19,0],[18,7],[17,14],[16,22],[15,32],[14,48],[13,68],[12,99],[11,152]] }
+        ],
+        fhr: [
+          { label: "全部武器", frames: [[11,0],[10,6],[9,13],[8,20],[7,32],[6,52],[5,86],[4,174],[3,600]] }
+        ],
+        fbr: [
+          { label: "单手挥砍武器 (剑/斧/锤)", frames: [[17,0],[16,4],[15,6],[14,11],[13,15],[12,23],[11,29],[10,40],[9,56],[8,80],[7,120],[6,200]] },
+          { label: "标枪 / 匕首 (穿刺武器)", frames: [[5,0],[4,13],[3,32],[2,86],[1,600]] }
+        ]
+      },
+      nec: {
+        blockFactor: 20,
+        iasBaseFrames: 16,
+        fcr: [
+          { label: "人类形态 (骨矛/尸爆/传送)", frames: [[15,0],[14,9],[13,18],[12,30],[11,48],[10,75],[9,125]] },
+          { label: "塔格奥吸血鬼形态", frames: [[23,0],[22,6],[21,11],[20,18],[19,24],[18,35],[17,48],[16,65],[15,86],[14,120],[13,180]] }
+        ],
+        fhr: [
+          { label: "常规武器", frames: [[13,0],[12,5],[11,10],[10,16],[9,26],[8,39],[7,56],[6,86],[5,152],[4,377]] }
+        ],
+        fbr: [
+          { label: "常规格挡", frames: [[11,0],[10,6],[9,13],[8,20],[7,32],[6,52],[5,86],[4,174],[3,600]] }
+        ]
+      },
+      bar: {
+        blockFactor: 25,
+        iasBaseFrames: 14,
+        fcr: [
+          { label: "全部法术 (战吼/寻宝/传送)", frames: [[13,0],[12,9],[11,20],[10,37],[9,63],[8,105],[7,200]] }
+        ],
+        fhr: [
+          { label: "常规武器", frames: [[9,0],[8,7],[7,15],[6,27],[5,48],[4,86],[3,200]] }
+        ],
+        fbr: [
+          { label: "常规格挡", frames: [[7,0],[6,9],[5,20],[4,42],[3,86],[2,280]] }
+        ]
+      },
+      dru: {
+        blockFactor: 20,
+        iasBaseFrames: 16,
+        fcr: [
+          { label: "人类形态 (龙卷风/火山/传送)", frames: [[18,0],[17,4],[16,10],[15,19],[14,30],[13,46],[12,68],[11,99],[10,163]] },
+          { label: "狼人变化形态", frames: [[16,0],[15,6],[14,14],[13,26],[12,40],[11,60],[10,95],[9,157]] },
+          { label: "熊人变化形态", frames: [[16,0],[15,7],[14,15],[13,26],[12,40],[11,63],[10,99],[9,163]] }
+        ],
+        fhr: [
+          { label: "人类形态 (单手挥砍)", frames: [[14,0],[13,3],[12,7],[11,13],[10,19],[9,29],[8,42],[7,63],[6,99],[5,174],[4,456]] },
+          { label: "人类形态 (双手/法杖/长柄)", frames: [[13,0],[12,5],[11,10],[10,16],[9,26],[8,39],[7,56],[6,86],[5,152],[4,377]] },
+          { label: "狼人变化形态", frames: [[7,0],[6,9],[5,20],[4,42],[3,86],[2,280]] },
+          { label: "熊人变化形态", frames: [[13,0],[12,5],[11,10],[10,16],[9,24],[8,37],[7,54],[6,86],[5,152],[4,360]] }
+        ],
+        fbr: [
+          { label: "人类形态", frames: [[11,0],[10,6],[9,13],[8,20],[7,32],[6,52],[5,86],[4,174],[3,600]] },
+          { label: "熊人变化形态", frames: [[12,0],[11,5],[10,10],[9,16],[8,27],[7,40],[6,65],[5,109],[4,223]] },
+          { label: "狼人变化形态", frames: [[9,0],[8,7],[7,15],[6,27],[5,48],[4,86],[3,200]] }
+        ]
+      },
+      ass: {
+        blockFactor: 25,
+        iasBaseFrames: 14,
+        fcr: [
+          { label: "全部法术 (心灵震爆/传送)", frames: [[16,0],[15,8],[14,16],[13,27],[12,42],[11,65],[10,102],[9,174]] }
+        ],
+        fhr: [
+          { label: "全部武器", frames: [[9,0],[8,7],[7,15],[6,27],[5,48],[4,86],[3,200]] }
+        ],
+        fbr: [
+          { label: "盾牌格挡", frames: [[5,0],[4,13],[3,32],[2,86],[1,600]] }
+        ]
+      }
+    };
+
+    let bpFcrVariantIdx = 0;
+    let bpFhrVariantIdx = 0;
+
+    function renderBpTable(framesArr, curValue, unitLabel) {
+      let activeIdx = 0;
+      for (let i = 0; i < framesArr.length; i++) {
+        if (curValue >= framesArr[i][1]) activeIdx = i;
+      }
+      const curFrame = framesArr[activeIdx][0];
+      const curReq = framesArr[activeIdx][1];
+      const nextEntry = framesArr[activeIdx + 1];
+      const perSec = (25 / curFrame).toFixed(2);
+      const statusHtml = "当前档位：<strong>" + curFrame + " 帧</strong>（每秒 " + perSec + " 次，需 ≥" + curReq + "% " + unitLabel + "）" +
+        (nextEntry ? (" · 距离下一档 <strong>" + nextEntry[0] + " 帧</strong>（" + nextEntry[1] + "%）还差 <strong>+" + (nextEntry[1] - curValue) + "%</strong>") : " · 已达最高极限档位！");
+
+      const rowsHtml = framesArr.map((pair, idx) => {
+        const f = pair[0];
+        const req = pair[1];
+        const cps = (25 / f).toFixed(2);
+        return '<tr class="' + (idx === activeIdx ? 'bp-active' : '') + '">' +
+          '<td>' + f + ' 帧</td>' +
+          '<td>' + req + '%</td>' +
+          '<td>' + cps + ' 次/秒</td>' +
+          '<td>' + (idx === activeIdx ? '★ 当前档位' : (curValue >= req ? '✓ 已达成' : '差 +' + (req - curValue) + '%')) + '</td>' +
+        '</tr>';
+      }).join("");
+
+      const tableHtml = '<table class="bp-table"><thead><tr><th>动作帧数</th><th>所需 ' + unitLabel + '</th><th>动作频率</th><th>状态</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
+      return { statusHtml, tableHtml };
+    }
+
+    function renderBreakpointsAll() {
+      const bp = CLASS_BREAKPOINTS[skActiveClassId] || CLASS_BREAKPOINTS.war;
+      const fcrVarSel = document.getElementById("bp-fcr-variant");
+      const fhrVarSel = document.getElementById("bp-fhr-variant");
+      if (!fcrVarSel || !fhrVarSel) return;
+
+      if (bpFcrVariantIdx >= bp.fcr.length) bpFcrVariantIdx = 0;
+      if (bpFhrVariantIdx >= bp.fhr.length) bpFhrVariantIdx = 0;
+
+      fcrVarSel.innerHTML = bp.fcr.map((v, i) => '<option value="' + i + '"' + (i === bpFcrVariantIdx ? ' selected' : '') + '>' + escapeHtml(v.label) + '</option>').join("");
+      fhrVarSel.innerHTML = bp.fhr.map((v, i) => '<option value="' + i + '"' + (i === bpFhrVariantIdx ? ' selected' : '') + '>' + escapeHtml(v.label) + '</option>').join("");
+
+      const curFcr = Math.max(0, Number(document.getElementById("bp-fcr-input")?.value || 0));
+      const fcrRes = renderBpTable(bp.fcr[bpFcrVariantIdx].frames, curFcr, "FCR");
+      document.getElementById("bp-fcr-status").innerHTML = fcrRes.statusHtml;
+      document.getElementById("bp-fcr-table-wrap").innerHTML = fcrRes.tableHtml;
+
+      const curFhr = Math.max(0, Number(document.getElementById("bp-fhr-input")?.value || 0));
+      const fhrRes = renderBpTable(bp.fhr[bpFhrVariantIdx].frames, curFhr, "FHR");
+      document.getElementById("bp-fhr-status").innerHTML = fhrRes.statusHtml;
+      document.getElementById("bp-fhr-table-wrap").innerHTML = fhrRes.tableHtml;
+
+      // Weapon IAS Breakpoint calculation
+      const wsm = Number(document.getElementById("bp-ias-wsm")?.value || 0);
+      const curIas = Math.max(0, Number(document.getElementById("bp-ias-input")?.value || 0));
+      const fanaLvl = Math.max(0, Number(document.getElementById("bp-ias-fana")?.value || 0));
+      const bosLvl = Math.max(0, Number(document.getElementById("bp-ias-bos")?.value || 0));
+      const fanaEias = fanaLvl > 0 ? Math.min(40, 10 + Math.floor((30 * ((110 * fanaLvl) / (fanaLvl + 6))) / 100)) : 0;
+      const bosEias = bosLvl > 0 ? Math.min(60, 15 + Math.floor((45 * ((110 * bosLvl) / (bosLvl + 6))) / 100)) : 0;
+      const skillEias = fanaEias + bosEias;
+
+      const baseFrames = bp.iasBaseFrames || 15;
+      const calcFramesForIas = (iasVal) => {
+        const gearEias = Math.floor((120 * iasVal) / (120 + iasVal));
+        const eias = Math.min(75, Math.max(-75, gearEias + skillEias - wsm));
+        return Math.max(7, Math.ceil((256 * baseFrames) / Math.floor((256 * (100 + eias)) / 100)) - 1);
+      };
+
+      const iasTablePairs = [];
+      let prevF = 999;
+      for (let testIas = 0; testIas <= 200; testIas++) {
+        const f = calcFramesForIas(testIas);
+        if (f < prevF) {
+          iasTablePairs.push([f, testIas]);
+          prevF = f;
+        }
+      }
+      const iasRes = renderBpTable(iasTablePairs, curIas, "IAS");
+      document.getElementById("bp-ias-status").innerHTML = iasRes.statusHtml;
+      document.getElementById("bp-ias-table-wrap").innerHTML = iasRes.tableHtml;
+
+      // FBR + 75% Max Block Dexterity calculator
+      const curFbr = Math.max(0, Number(document.getElementById("bp-fbr-input")?.value || 0));
+      const fbrRes = renderBpTable(bp.fbr[0].frames, curFbr, "FBR");
+      const shieldBase = Number(document.getElementById("bp-blk-shield")?.value || 42);
+      const clvl = Math.min(99, Math.max(1, Number(document.getElementById("bp-blk-clvl")?.value || 90)));
+      const skillBlk = Math.max(0, Number(document.getElementById("bp-blk-skill")?.value || 0));
+      const totalShieldBlock = shieldBase + (bp.blockFactor - 20) + skillBlk;
+      const reqDex75 = Math.ceil((75 * 2 * clvl) / Math.max(1, totalShieldBlock)) + 15;
+      document.getElementById("bp-blk-status").innerHTML =
+        "<strong>75% 满格挡所需敏捷：" + reqDex75 + " 点</strong>（" + clvl + " 级 · 有效盾牌格挡率 " + totalShieldBlock + "%）<br>" + fbrRes.statusHtml;
+      document.getElementById("bp-fbr-table-wrap").innerHTML = fbrRes.tableHtml;
+    }
+
+    const MERC_VARIANTS = [
+      { id: "a2-might", act: 2, name: "第二幕 · 沙漠米山（进攻 · 力量灵气 Might）", baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res8: 4, baseFrames: 16, skills: [{ name: "戳刺 Jab", base: 23, per32: 0 }, { name: "力量灵气 Might", base: 15, per32: 8, auraDesc: (l) => "全队物理伤害 +" + (30 + l * 10) + "%" }] },
+      { id: "a2-hf", act: 2, name: "第二幕 · 沙漠米山（防御 · 神圣冰冻 Holy Freeze）", baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res8: 4, baseFrames: 16, skills: [{ name: "戳刺 Jab", base: 23, per32: 0 }, { name: "神圣冰冻 Holy Freeze", base: 16, per32: 0, auraDesc: (l) => "大范围冰冷控场减速 " + Math.min(58, 25 + l * 2) + "%" }] },
+      { id: "a2-prayer", act: 2, name: "第二幕 · 沙漠米山（战斗 · 祈祷灵气 Prayer）", baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res8: 4, baseFrames: 16, skills: [{ name: "戳刺 Jab", base: 24, per32: 10 }, { name: "祈祷灵气 Prayer", base: 18, per32: 0, auraDesc: (l) => "单层每秒回血 +" + (l * 2 - 5) + "（配眼光+治愈头享 3 倍回血协同）" }] },
+      { id: "a2-defiance", act: 2, name: "第二幕 · 沙漠米山（防御 · 反抗灵气 Defiance）", baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res8: 4, baseFrames: 16, skills: [{ name: "戳刺 Jab", base: 24, per32: 0 }, { name: "反抗灵气 Defiance", base: 18, per32: 0, auraDesc: (l) => "全队防御 +" + (60 + l * 10) + "%" }] },
+      { id: "a2-ba", act: 2, name: "第二幕 · 沙漠米山（进攻 · 祝福瞄准 Blessed Aim）", baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res8: 4, baseFrames: 16, skills: [{ name: "戳刺 Jab", base: 24, per32: 0 }, { name: "祝福瞄准 Blessed Aim", base: 18, per32: 0, auraDesc: (l) => "全队命中率 +" + (60 + l * 15) + "%" }] },
+      { id: "a1-cold", act: 1, name: "第一幕 · 萝格斥候（冰冷箭 + 冻结箭 + 内视）", baseLvl: 67, hp: 900, hpLvl: 30, str: 116, str8: 10, dex: 173, dex8: 16, def: 744, defLvl: 23, res: 121, res8: 5, baseFrames: 15, skills: [{ name: "内视 Inner Sight", base: 22, per32: 10, auraDesc: (l) => "降低周围敌人基础防御 -" + (40 + l * 45) }, { name: "冰冷箭 Cold Arrow", base: 22, per32: 10 }, { name: "冻结箭 Freezing Arrow", base: 7, per32: 3 }] },
+      { id: "a1-fire", act: 1, name: "第一幕 · 萝格斥候（火焰箭 + 爆裂箭 + 内视）", baseLvl: 67, hp: 900, hpLvl: 30, str: 116, str8: 10, dex: 173, dex8: 16, def: 744, defLvl: 23, res: 121, res8: 5, baseFrames: 15, skills: [{ name: "内视 Inner Sight", base: 22, per32: 10 }, { name: "火焰箭 Fire Arrow", base: 22, per32: 10 }, { name: "爆裂箭 Exploding Arrow", base: 12, per32: 5 }] },
+      { id: "a3-fire", act: 3, name: "第三幕 · 东方铁狼法师（火焰 · 强化 Enchant + 火球）", baseLvl: 79, hp: 1224, hpLvl: 34, str: 130, str8: 10, dex: 104, dex8: 8, def: 907, defLvl: 25, res: 155, res8: 5, baseFrames: 16, skills: [{ name: "火焰强化 Enchant", base: 26, per32: 20, auraDesc: (l) => "为主角、召唤物与全队附加高额火焰伤害与 +" + (20 + l * 9) + "% 命中率" }, { name: "火球术 Fire Ball", base: 25, per32: 10 }, { name: "火焰弹 Fire Bolt", base: 27, per32: 10 }] },
+      { id: "a3-ltng", act: 3, name: "第三幕 · 东方铁狼法师（闪电 · 静电力场 Static Field + 闪电）", baseLvl: 79, hp: 1224, hpLvl: 34, str: 130, str8: 10, dex: 104, dex8: 8, def: 907, defLvl: 25, res: 155, res8: 5, baseFrames: 16, skills: [{ name: "静电力场 Static Field", base: 18, per32: 8, auraDesc: (l) => "群体削减怪物 25% 当前生命（半径 " + (3.3 + l * 0.66).toFixed(1) + " 码）" }, { name: "闪电 Lightning", base: 24, per32: 10 }, { name: "充能弹 Charged Bolt", base: 25, per32: 10 }] },
+      { id: "a3-cold", act: 3, name: "第三幕 · 东方铁狼法师（冰冷 · 冰尖柱 + 寒冰装甲）", baseLvl: 79, hp: 1224, hpLvl: 34, str: 130, str8: 10, dex: 104, dex8: 8, def: 907, defLvl: 25, res: 155, res8: 5, baseFrames: 16, skills: [{ name: "冰尖柱 Glacial Spike", base: 22, per32: 10, auraDesc: () => "群体冻结控场" }, { name: "寒冰装甲 Chilling Armor", base: 27, per32: 15 }, { name: "冰风暴 Ice Blast", base: 27, per32: 10 }] },
+      { id: "a5-frenzy", act: 5, name: "第五幕 · 哈洛加斯野蛮人（双持狂乱 Frenzy + 嘲讽 + 铁皮）", baseLvl: 80, hp: 1680, hpLvl: 45, str: 200, str8: 15, dex: 129, dex8: 10, def: 1332, defLvl: 35, res: 148, res8: 4, baseFrames: 14, skills: [{ name: "狂乱 Frenzy", base: 13, per32: 7, auraDesc: (l) => "攻速与移速极速叠加 (Lv." + l + ")" }, { name: "钢铁皮肤 Iron Skin", base: 12, per32: 6 }, { name: "嘲讽 Taunt", base: 17, per32: 6 }] },
+      { id: "a5-bash", act: 5, name: "第五幕 · 哈洛加斯野蛮人（双手重剑 · 战吼 Battle Cry + 击晕）", baseLvl: 80, hp: 1680, hpLvl: 45, str: 200, str8: 15, dex: 129, dex8: 10, def: 1332, defLvl: 35, res: 148, res8: 4, baseFrames: 15, skills: [{ name: "战吼 Battle Cry", base: 19, per32: 8, auraDesc: (l) => "降低周围怪物防御 -" + (48 + l * 2) + "% 与伤害 -" + (24 + l) + "%" }, { name: "猛击 Bash", base: 25, per32: 10 }, { name: "击晕 Stun", base: 20, per32: 8 }] }
+    ];
+
+    const MERC_WEAPONS = [
+      { id: "infinity-gt", name: "无形巨长斧「无限 Infinity」（Lv.12 信念 -85% 敌抗 · 40% CB）", wsm: -10, ias: 0, skills: 0, str: 0, allRes: 0, reqStr: 130, reqDex: 100, note: "元素流派（电法/标马/陷阱刺/火德/混沌术士）毕业首选" },
+      { id: "insight-gt", name: "无形鲛尾巨斧「眼光 Insight」（Lv.17 冥思回蓝 · +5 全属性 · 35% FCR）", wsm: -10, ias: 0, skills: 0, str: 5, allRes: 0, reqStr: 142, reqDex: 103, note: "全法系无限回蓝，搭配祈祷米山+治愈头实现三倍回血" },
+      { id: "reapers-eth", name: "无形「死神之丧钟」镶 13# Shael（33% 触发衰老 -50% 物抗 · 20% IAS · 15% LL）", wsm: -10, ias: 20, skills: 0, str: 0, allRes: 0, reqStr: 104, reqDex: 79, note: "物理流派与风德破物免控场神器" },
+      { id: "insight-cv", name: "无形巨神长柄斧「眼光 Insight」（高面板 200 力量需求底材）", wsm: 10, ias: 0, skills: 0, str: 5, allRes: 0, reqStr: 200, reqDex: 45, note: "拉祖克必打 4 孔，需注意 200 力量门槛" },
+      { id: "faith-bow", name: "大院长/阴影弓「信心 Faith」（A1 萝格 · Lv.15 狂热灵气 · +2 技能 · +15 全抗）", wsm: 0, ias: 0, skills: 2, str: 0, allRes: 15, reqStr: 108, reqDex: 152, note: "物理弓马/召唤流 A1 萝格毕业狂热弓" },
+      { id: "plague-law", name: "幻化之刃「瘟疫 Plague」+「执法者 Lawbringer」（A5 狂乱 · 降抗+净化+衰老+庇护所）", wsm: -30, ias: 20, skills: 2, str: 10, allRes: 0, reqStr: 25, reqDex: 136, note: "A5 双持狂乱野蛮人最强辅助与破免组合" },
+      { id: "spirit-dual", name: "水晶剑「精神」+ 统治者大盾「精神」（A3 铁狼 · +4 全技能 · +70% FCR）", wsm: 0, ias: 0, skills: 4, str: 0, allRes: 0, reqStr: 156, reqDex: 0, note: "A3 火焰强化/静电力场铁狼毕业双精神（需头/甲补足 156 力量拿统盾）" }
+    ];
+
+    const MERC_HELMS = [
+      { id: "andy-ral", name: "安达利尔的面容 (镶 8# 拉尔抵消 -30% 火抗 · +2 技能 · 20% IAS · +30 力量)", ias: 20, skills: 2, str: 30, def: 350, fireRes: 0, coldRes: 0, ltngRes: 0, poisRes: 70, ll: 10 },
+      { id: "andy-1530", name: "安达利尔的面容 (镶 15% IAS / 30% 火抗红白珠 · +2 技能 · 35% IAS · +30 力量)", ias: 35, skills: 2, str: 30, def: 350, fireRes: 0, coldRes: 0, ltngRes: 0, poisRes: 70, ll: 10 },
+      { id: "andy-raw", name: "安达利尔的面容 (未镶嵌 · 注意 -30% 火抗缺口 · +2 技能 · 20% IAS · +30 力量)", ias: 20, skills: 2, str: 30, def: 350, fireRes: -30, coldRes: 0, ltngRes: 0, poisRes: 70, ll: 10 },
+      { id: "cure-helm", name: "「治愈 Cure」无形精华头（Lv.1 净化灵气 · 祈祷+眼光+治愈三倍回血核心）", ias: 0, skills: 0, str: 0, def: 420, fireRes: 0, coldRes: 0, ltngRes: 0, poisRes: 50, ll: 0, hasCure: true },
+      { id: "gface-15", name: "吉永之脸 (镶 15% IAS 珠 · 35% 压碎性打击 CB · 15% 致命 DS · +15 力量)", ias: 15, skills: 0, str: 15, def: 217, fireRes: 0, coldRes: 0, ltngRes: 0, poisRes: 0, ll: 0 },
+      { id: "vgaze", name: "无形吸血鬼的凝视（20% 物理减伤 PDR · 8% 吸血 · 法术减伤 15）", ias: 0, skills: 0, str: 0, def: 378, fireRes: 0, coldRes: 0, ltngRes: 0, poisRes: 0, ll: 8 }
+    ];
+
+    const MERC_ARMORS = [
+      { id: "fort-ap", name: "无形执政官铠甲「刚毅 Fortitude」（+300% 伤害 · +30 全抗 · +2200 防御 · 需 93 力量）", ias: 0, skills: 0, str: 0, def: 2250, allRes: 30, reqStr: 93, hpPerLvl: 1.5 },
+      { id: "fort-sa", name: "无形神圣盔甲「刚毅 Fortitude」（+300% 伤害 · +30 全抗 · +2700 防御 · 需 222 力量）", ias: 0, skills: 0, str: 0, def: 2700, allRes: 30, reqStr: 222, hpPerLvl: 1.5 },
+      { id: "treachery", name: "无形精华甲「背信 Treachery」（+45% IAS · 触发 Lv.15 能量消解 +60 全抗 +15% 物免）", ias: 45, skills: 0, str: 0, def: 750, allRes: 60, reqStr: 80, hpPerLvl: 0 },
+      { id: "coh-eth", name: "无形执政官铠甲「荣耀之链 CoH」（+2 全技能 · +65 全抗 · 8% 吸血 · +20 力量）", ias: 0, skills: 2, str: 20, def: 1350, allRes: 65, reqStr: 93, hpPerLvl: 0 },
+      { id: "duriel-up", name: "无形升阶「督瑞尔的壳」（无法冰冻 CBF · +15 力量 · +20 全抗/+50 冰抗 · +生命/级）", ias: 0, skills: 0, str: 15, def: 1950, allRes: 20, reqStr: 108, hpPerLvl: 1 }
+    ];
+
+    function initMercenarySimulator() {
+      const vSel = document.getElementById("merc-variant-select");
+      const wSel = document.getElementById("merc-weapon-select");
+      const hSel = document.getElementById("merc-helm-select");
+      const aSel = document.getElementById("merc-armor-select");
+      if (!vSel || !wSel || !hSel || !aSel) return;
+
+      if (!vSel.options.length) {
+        vSel.innerHTML = MERC_VARIANTS.map(v => '<option value="' + escapeHtml(v.id) + '">' + escapeHtml(v.name) + '</option>').join("");
+        wSel.innerHTML = MERC_WEAPONS.map(w => '<option value="' + escapeHtml(w.id) + '">' + escapeHtml(w.name) + '</option>').join("");
+        hSel.innerHTML = MERC_HELMS.map(h => '<option value="' + escapeHtml(h.id) + '">' + escapeHtml(h.name) + '</option>').join("");
+        aSel.innerHTML = MERC_ARMORS.map(a => '<option value="' + escapeHtml(a.id) + '">' + escapeHtml(a.name) + '</option>').join("");
+
+        ["merc-lvl-input", "merc-variant-select", "merc-weapon-select", "merc-helm-select", "merc-armor-select"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener("input", renderMercenarySimulator);
+            el.addEventListener("change", renderMercenarySimulator);
+          }
+        });
+      }
+      renderMercenarySimulator();
+    }
+
+    function renderMercenarySimulator() {
+      const vSel = document.getElementById("merc-variant-select");
+      const wSel = document.getElementById("merc-weapon-select");
+      const hSel = document.getElementById("merc-helm-select");
+      const aSel = document.getElementById("merc-armor-select");
+      const checkEl = document.getElementById("merc-equip-check");
+      const bodyEl = document.getElementById("merc-stats-body");
+      const badgeEl = document.getElementById("merc-act-badge");
+      if (!vSel || !checkEl || !bodyEl) return;
+
+      const merc = MERC_VARIANTS.find(v => v.id === vSel.value) || MERC_VARIANTS[0];
+      const weap = MERC_WEAPONS.find(w => w.id === wSel.value) || MERC_WEAPONS[0];
+      const helm = MERC_HELMS.find(h => h.id === hSel.value) || MERC_HELMS[0];
+      const armo = MERC_ARMORS.find(a => a.id === aSel.value) || MERC_ARMORS[0];
+      const lvl = Math.min(98, Math.max(merc.baseLvl, Number(document.getElementById("merc-lvl-input")?.value || 90)));
+
+      if (badgeEl) badgeEl.textContent = "ACT " + merc.act + " · Lv." + lvl;
+
+      const dLvl = Math.max(0, lvl - merc.baseLvl);
+      const baseStr = merc.str + Math.floor((dLvl * merc.str8) / 8);
+      const baseDex = merc.dex + Math.floor((dLvl * merc.dex8) / 8);
+      const baseHp = merc.hp + dLvl * merc.hpLvl;
+      const baseDef = merc.def + dLvl * merc.defLvl;
+      const baseResHell = merc.res + Math.floor((dLvl * merc.res8) / 8) - 100;
+
+      const totalStr = baseStr + weap.str + helm.str + armo.str;
+      const totalDex = baseDex + (weap.str || 0);
+      const totalHp = Math.round(baseHp + lvl * (armo.hpPerLvl || 0));
+      const totalDef = baseDef + helm.def + armo.def;
+      const bonusSkills = weap.skills + helm.skills + armo.skills;
+      const totalIas = weap.ias + helm.ias + armo.ias;
+
+      const fRes = Math.min(75, baseResHell + weap.allRes + armo.allRes + helm.fireRes);
+      const cRes = Math.min(75, baseResHell + weap.allRes + armo.allRes + helm.coldRes);
+      const lRes = Math.min(75, baseResHell + weap.allRes + armo.allRes + helm.ltngRes);
+      const pRes = Math.min(85, baseResHell + weap.allRes + armo.allRes + helm.poisRes);
+
+      const maxReqStr = Math.max(weap.reqStr || 0, armo.reqStr || 0);
+      const canEquipStr = totalStr >= maxReqStr;
+      checkEl.innerHTML = (canEquipStr
+        ? ("✓ <strong>力量达标可穿戴全部装备</strong>（当前总力量 <strong>" + totalStr + "</strong> / 最高装备需求 <strong>" + maxReqStr + "</strong>，裸力量 " + baseStr + "）")
+        : ("⚠️ <strong>力量不足警告！</strong>当前总力量 <strong>" + totalStr + "</strong>，低于所选底材最高需求 <strong>" + maxReqStr + "</strong>（还差 " + (maxReqStr - totalStr) + " 点力量，建议搭配安达利尔的面容或提升佣兵等级）")) +
+        "<br>配装定位：" + escapeHtml(weap.note);
+
+      // Compute IAS frame
+      const gearEias = Math.floor((120 * totalIas) / (120 + totalIas));
+      const eias = Math.min(75, Math.max(-75, gearEias - weap.wsm));
+      const atkFrames = Math.max(8, Math.ceil((256 * merc.baseFrames) / Math.floor((256 * (100 + eias)) / 100)) - 1);
+      const aps = (25 / atkFrames).toFixed(2);
+
+      const skLines = merc.skills.map(sk => {
+        const effL = sk.base + Math.floor((dLvl * sk.per32) / 32) + bonusSkills;
+        const extra = sk.auraDesc ? (" — " + sk.auraDesc(effL)) : "";
+        return sk.name + "：Lv." + effL + "（含装备 +" + bonusSkills + " 技能）" + extra;
+      });
+      if (merc.id === "a2-prayer" && weap.id.startsWith("insight") && helm.hasCure) {
+        const pLvl = 18 + bonusSkills;
+        const singleHeal = pLvl * 2 - 5;
+        skLines.push("★ 祈祷 + 眼光(冥思) + 治愈(净化) 三重协同激活：全队每秒恢复 +" + (singleHeal * 3) + " 点生命，同时快速消除毒素与诅咒时间！");
+      }
+
+      const statSummary = [
+        "生命值：" + totalHp.toLocaleString() + "（基础 " + baseHp + "） · 总防御：" + totalDef.toLocaleString(),
+        "力量：" + totalStr + "（裸 " + baseStr + "） · 敏捷：" + totalDex + "（裸 " + baseDex + "）",
+        "地狱四抗：火 " + fRes + "% · 冰 " + cRes + "% · 电 " + lRes + "% · 毒 " + pRes + "%（裸抗 " + baseResHell + "%）",
+        "攻击速度：总 IAS " + totalIas + "%（底材 WSM [" + weap.wsm + "]） → 动作帧数 " + atkFrames + " 帧（每秒攻击 " + aps + " 次）"
+      ].join(" · ");
+
+      bodyEl.innerHTML =
+        renderStatList(statSummary, "#9ad8ff", false) +
+        '<div class="it-set-bonus-box" style="margin-top:8px;border-color:rgba(87,219,112,0.35)">' +
+          '<h4 class="it-set-bonus-title" style="color:#67e87a">佣兵技能与灵气实时等级</h4>' +
+          renderStatList(skLines.join(" · "), "#8af49f", false) +
+        '</div>';
+    }
+
+    function renderSkillsAll() {
+      if (!skClasses.length) return;
+      renderSkillsClassTabs();
+      renderSkillsTrees();
+      renderSkillInspector();
+      renderBreakpointsAll();
+      initMercenarySimulator();
+    }
+
+    function parseSkillsHashBuild(hashValue) {
+      if (!hashValue || !hashValue.startsWith("#skills:")) return;
+      const parts = hashValue.slice(8).split(":");
+      const cid = parts[0];
+      const code = parts[1] || "";
+      const clsObj = skClasses.find(c => c.id === cid);
+      if (!clsObj) return;
+      skActiveClassId = cid;
+      if (code) {
+        const b = {};
+        code.split(",").forEach(pair => {
+          const kv = pair.split("-");
+          const skId = Number(kv[0]);
+          const pts = Math.min(20, Math.max(0, Number(kv[1]) || 0));
+          const sk = clsObj.skills.find(s => s.id === skId);
+          if (sk && pts > 0) b[sk.key] = pts;
+        });
+        skBuilds[cid] = b;
+        saveSkBuilds();
+      }
+    }
+
+    async function loadSkillsCatalog() {
+      try {
+        loadSkBuilds();
+        const response = await fetch("/api/skills", { cache: "no-store" });
+        const data = await response.json();
+        if (data.ok && Array.isArray(data.classes)) {
+          skClasses = data.classes;
+          parseSkillsHashBuild(window.location.hash);
+          const clsObj = getActiveClassObj();
+          if (clsObj && !skSelectedSkillKey && clsObj.skills[0]) {
+            skSelectedSkillKey = clsObj.skills[0].key;
+          }
+          renderSkillsAll();
+        }
+      } catch (err) {
+        console.error("加载职业技能树失败", err);
+      }
+    }
+
+    function setupSkillsEvents() {
+      document.querySelectorAll("#sk-view-subtabs [data-sk-view]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#sk-view-subtabs [data-sk-view]").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const view = btn.dataset.skView;
+          const pEl = document.getElementById("sk-view-planner");
+          const bEl = document.getElementById("sk-view-breakpoints");
+          const mEl = document.getElementById("sk-view-mercenary");
+          if (pEl) pEl.style.display = view === "planner" ? "block" : "none";
+          if (bEl) bEl.style.display = view === "breakpoints" ? "block" : "none";
+          if (mEl) mEl.style.display = view === "mercenary" ? "block" : "none";
+          renderBreakpointsAll();
+          initMercenarySimulator();
+        });
+      });
+
+      const fcrVarSel = document.getElementById("bp-fcr-variant");
+      if (fcrVarSel) fcrVarSel.addEventListener("change", (e) => { bpFcrVariantIdx = Number(e.target.value) || 0; renderBreakpointsAll(); });
+      const fhrVarSel = document.getElementById("bp-fhr-variant");
+      if (fhrVarSel) fhrVarSel.addEventListener("change", (e) => { bpFhrVariantIdx = Number(e.target.value) || 0; renderBreakpointsAll(); });
+
+      ["bp-fcr-input", "bp-fhr-input", "bp-ias-wsm", "bp-ias-input", "bp-ias-fana", "bp-ias-bos", "bp-fbr-input", "bp-blk-shield", "bp-blk-clvl", "bp-blk-skill"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", renderBreakpointsAll);
+          el.addEventListener("change", renderBreakpointsAll);
+        }
+      });
+
+      const bonusInput = document.getElementById("sk-bonus-all");
+      if (bonusInput) {
+        bonusInput.addEventListener("input", () => {
+          skBonusAll = Math.min(35, Math.max(0, Number(bonusInput.value) || 0));
+          renderSkillsAll();
+        });
+      }
+
+      const resetBtn = document.getElementById("sk-reset-btn");
+      if (resetBtn) {
+        resetBtn.addEventListener("click", () => {
+          const clsObj = getActiveClassObj();
+          if (!clsObj) return;
+          if (getClassTotalPoints(clsObj.id) === 0) return;
+          skBuilds[clsObj.id] = {};
+          saveSkBuilds();
+          renderSkillsAll();
+        });
+      }
+
+      const shareBtn = document.getElementById("sk-share-btn");
+      if (shareBtn) {
+        shareBtn.addEventListener("click", () => {
+          const clsObj = getActiveClassObj();
+          if (!clsObj) return;
+          const build = getClassBuild(clsObj.id);
+          const pairs = clsObj.skills
+            .filter(s => Number(build[s.key] || 0) > 0)
+            .map(s => s.id + "-" + build[s.key]);
+          const hash = "#skills:" + clsObj.id + (pairs.length ? (":" + pairs.join(",")) : "");
+          try {
+            history.replaceState(null, "", hash);
+          } catch (e) {
+            window.location.hash = hash;
+          }
+          const fullUrl = window.location.origin + window.location.pathname + hash;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullUrl).then(() => {
+              const old = shareBtn.textContent;
+              shareBtn.textContent = "✓ 已复制分享链接";
+              setTimeout(() => { shareBtn.textContent = old; }, 1800);
+            });
+          }
+        });
+      }
+
+      loadSkillsCatalog();
     }
 
     let _twSweeping = false;
@@ -5604,6 +7926,7 @@ export function renderDashboard() {
         if (typeof renderAffixesCraftRecipes === "function") renderAffixesCraftRecipes();
         if (typeof renderAffixesList === "function") renderAffixesList();
         if (typeof renderItemsGrid === "function") renderItemsGrid();
+        if (typeof renderSkillsAll === "function") renderSkillsAll();
         applyDomTraditionalSweep();
       };
       applyAllLang();
@@ -5635,6 +7958,7 @@ export function renderDashboard() {
     setupRunewordsEvents();
     setupAffixesEvents();
     setupItemsEvents();
+    setupSkillsEvents();
     initMainTabs();
     load();
   </script>
