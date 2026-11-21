@@ -8,6 +8,10 @@ import {
   syncTerrorZone
 } from "./tracker.js";
 import { fetchTerrorZone, isTerrorZonePullDue } from "./terror-zone.js";
+import { getAllTerrorZones } from "./terror-zone-metadata.js";
+import { getRunewordsCatalog } from "./runewords-metadata.js";
+import { getAffixesCatalog } from "./affixes-metadata.js";
+import { getItemsCatalog } from "./items-metadata.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -23,7 +27,7 @@ function html(content) {
   return new Response(content, {
     headers: {
       "content-type": "text/html; charset=utf-8",
-      "cache-control": "public, max-age=60",
+      "cache-control": "no-store, no-cache, must-revalidate",
       "x-content-type-options": "nosniff",
       "referrer-policy": "no-referrer"
     }
@@ -97,6 +101,22 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/") {
       return html(renderDashboard());
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/terror-zones") {
+      return json({ ok: true, terrorZones: getAllTerrorZones() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/runewords") {
+      return json({ ok: true, ...getRunewordsCatalog() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/affixes") {
+      return json({ ok: true, ...getAffixesCatalog() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/items") {
+      return json({ ok: true, ...getItemsCatalog() });
     }
 
     if (request.method === "GET" && url.pathname === "/api/status") {

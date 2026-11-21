@@ -107,6 +107,9 @@ test("毁灭之王 HC 映射正确", () => {
 
 test("仪表盘包含完整分组和筛选入口", () => {
   const html = renderDashboard();
+  assert.match(html, /暗黑 2 重置版 · 庇护之地实时战报/);
+  assert.match(html, /Diablo II: Resurrected · Sanctuary Live/);
+  assert.match(html, /实时掌握恐怖地带异动与迪亚波罗克隆入侵进度/);
   assert.match(html, /毁灭之王/);
   assert.match(html, /术士君临/);
   assert.match(html, /非天梯 SC/);
@@ -116,6 +119,9 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /DC 后台接口拉取/);
   assert.match(html, /展示数据最近变更/);
   assert.match(html, /不会整页重载/);
+  assert.match(html, /切换待确认时每 15 秒读取一次/);
+  assert.match(html, /isAwaitingTerrorConfirmation/);
+  assert.match(html, /15 \* 1000/);
   assert.match(html, /恐怖区域仍按整点、半点独立同步/);
   assert.match(html, /当前恐怖区域/);
   assert.match(html, /下一阶段恐怖区域/);
@@ -131,6 +137,54 @@ test("仪表盘包含完整分组和筛选入口", () => {
     html.indexOf('renderDlc(data.servers, true, "术士君临")') <
       html.indexOf('renderDlc(data.servers, false, "毁灭之王")')
   );
+  assert.match(html, /terror-module/);
+  assert.match(html, /dclone-module/);
+  assert.match(html, /settings-module/);
+  assert.match(html, /main-nav-tabs/);
+  assert.match(html, /main-tab-terror/);
+  assert.match(html, /main-tab-dclone/);
+  assert.match(html, /main-tab-runewords/);
+  assert.match(html, /main-tab-affixes/);
+  assert.match(html, /main-tab-items/);
+  assert.match(html, /main-panel-terror/);
+  assert.match(html, /main-panel-dclone/);
+  assert.match(html, /main-panel-runewords/);
+  assert.match(html, /main-panel-affixes/);
+  assert.match(html, /main-panel-items/);
+  assert.match(html, /物品资讯百科/);
+  assert.match(html, /\/api\/items/);
+  assert.match(html, /it-set-modal/);
+  assert.match(html, /openSetDetail/);
+  assert.match(html, /物品词缀/);
+  assert.match(html, /\/api\/affixes/);
+  assert.match(html, /af-list/);
+  assert.match(html, /af-view-sim/);
+  assert.match(html, /sim-base-select/);
+  assert.match(html, /rollSimulatedItem/);
+
+  const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
+  assert.ok(scriptMatch, "仪表盘应当包含内联脚本");
+  assert.doesNotThrow(() => new Function(scriptMatch[1]), "仪表盘内联脚本语法必须合法");
+  assert.match(html, /符文之语 100% 记事/);
+  assert.match(html, /\/api\/runewords/);
+  assert.match(html, /rw-rune-grid/);
+  assert.match(html, /rw-mode-chips/);
+  assert.match(html, /rw-list/);
+  assert.match(html, /rw-detail-modal/);
+  assert.match(html, /openRunewordDetail/);
+  assert.match(html, /switchMainTab/);
+  assert.match(html, /initMainTabs/);
+  assert.match(html, /TERROR ZONE/);
+  assert.match(html, /DIABLO CLONE/);
+  assert.match(html, /immunity-f/);
+  assert.match(html, /rating-s/);
+  assert.match(html, /tz-directory-section/);
+  assert.match(html, /恐怖地带全图鉴与历史记录查询/);
+  assert.match(html, /全部区域图鉴/);
+  assert.match(html, /轮换历史记录/);
+  assert.match(html, /tz-catalog-grid/);
+  assert.match(html, /tz-history-container/);
+  assert.match(html, /\/api\/terror-zones/);
   assert.match(html, /storedAutoRefresh === null/);
   assert.match(html, /updateSyncAge/);
   assert.match(html, /data-auto-minutes="5"/);
@@ -176,7 +230,10 @@ test("读取旧 KV 状态时即时补充恐怖区域资料", async () => {
   };
 
   const state = await getStoredState(env);
-  assert.equal(state.terrorZone.currentDetails.rating, "A");
+  assert.equal(state.terrorZone.current, "Durance of Hate");
+  assert.equal(state.terrorZone.currentZh, "憎恨囚牢");
+  assert.equal(state.terrorZone.next, "Moo Moo Farm");
+  assert.equal(state.terrorZone.nextZh, "秘密奶牛关");
   assert.equal(state.terrorZone.nextDetails.rating, "S");
 });
 
@@ -243,4 +300,74 @@ test("每分钟轮询但状态无变化时不重复写 KV", async () => {
   assert.equal(first.stateWritten, true);
   assert.equal(second.stateWritten, false);
   assert.equal(putCount, 1);
+});
+
+test("DC 变化不会刷新未变化恐怖区域的确认时间", async () => {
+  const apiServers = [];
+  for (const rotw of [false, true]) {
+    for (const ladder of [false, true]) {
+      for (const hardcore of [false, true]) {
+        for (const region of ["Asia", "Americas", "Europe"]) {
+          apiServers.push({
+            server: `${ladder ? "ladder" : "nonLadder"}${hardcore ? "Hardcore" : "Softcore"}${region}${rotw ? "Rotw" : ""}`,
+            progress: 2,
+            message: "Terror approaches Sanctuary",
+            ladder,
+            hardcore,
+            rotw,
+            region: `${region}${rotw ? "Rotw" : ""}`,
+            lastUpdate: { seconds: 200 },
+            lastWalk: { seconds: 0 }
+          });
+        }
+      }
+    }
+  }
+
+  const oldCheckedAt = "2026-08-30T15:04:32.000Z";
+  let writtenState;
+  const env = {
+    FEISHU_WEBHOOK: "https://example.com/webhook",
+    DCLONE_STATE: {
+      async get(key) {
+        if (key !== "diablo-clone-state-v1") return null;
+        return {
+          checkedAt: oldCheckedAt,
+          servers: apiServers.map((item) => ({
+            ...item,
+            progress: 1,
+            lastUpdate: 100,
+            lastWalk: 0
+          })),
+          terrorZone: {
+            schemaVersion: 2,
+            current: "Far Oasis",
+            currentZh: "遥远绿洲",
+            previous: "Burial Grounds, Crypt, and Mausoleum",
+            checkedAt: oldCheckedAt
+          }
+        };
+      },
+      async put(_key, value) {
+        writtenState = JSON.parse(value);
+      }
+    }
+  };
+  const fetchImpl = async (url) => {
+    if (url === env.FEISHU_WEBHOOK) {
+      return new Response(JSON.stringify({ code: 0 }));
+    }
+    return new Response(JSON.stringify({ servers: apiServers }));
+  };
+
+  await checkForUpdates(env, fetchImpl, {
+    terrorZone: {
+      schemaVersion: 3,
+      current: "Burial Grounds, Crypt, and Mausoleum",
+      next: "Far Oasis",
+      checkedAt: "2026-08-30T15:30:00.000Z"
+    }
+  });
+
+  assert.equal(writtenState.terrorZone.checkedAt, oldCheckedAt);
 });

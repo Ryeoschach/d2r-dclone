@@ -1,4 +1,8 @@
-import { enrichTerrorZone, fetchTerrorZone } from "./terror-zone.js";
+import {
+  appendTerrorZoneHistory,
+  enrichTerrorZone,
+  fetchTerrorZone
+} from "./terror-zone.js";
 
 const STATE_KEY = "diablo-clone-state-v1";
 const SETTINGS_KEY = "diablo-clone-settings-v1";
@@ -108,9 +112,16 @@ export async function getStoredState(env) {
     throw new Error("缺少 DCLONE_STATE KV 绑定");
   }
   const state = await env.DCLONE_STATE.get(STATE_KEY, "json");
-  return state
-    ? { ...state, terrorZone: enrichTerrorZone(state.terrorZone) }
-    : state;
+  if (!state) {
+    return state;
+  }
+  return {
+    ...state,
+    terrorZone: enrichTerrorZone(state.terrorZone),
+    terrorZoneHistory: Array.isArray(state.terrorZoneHistory)
+      ? state.terrorZoneHistory
+      : []
+  };
 }
 
 export async function getTrackerSettings(env) {
@@ -170,12 +181,19 @@ export async function syncTerrorZone(
 
   const terrorZone = fetchedTerrorZone ?? await fetchTerrorZone(env, fetchImpl);
   if (terrorZoneChanged(state.terrorZone, terrorZone)) {
+    const checkedAt = new Date().toISOString();
+    const updatedHistory = appendTerrorZoneHistory(
+      state.terrorZoneHistory,
+      terrorZone,
+      checkedAt
+    );
     await env.DCLONE_STATE.put(
       STATE_KEY,
       JSON.stringify({
         ...state,
-        checkedAt: new Date().toISOString(),
-        terrorZone
+        checkedAt,
+        terrorZone,
+        terrorZoneHistory: updatedHistory
       })
     );
   }
@@ -314,11 +332,17 @@ export async function checkForUpdates(env, fetchImpl = fetch, options = {}) {
   const previousState = await getStoredState(env);
   const isFirstRun = !previousState;
   const changes = findChanges(previousState?.servers, currentServers);
-  const nextTerrorZone = options.terrorZone ?? previousState?.terrorZone ?? null;
+  const hasTerrorZoneChanged = terrorZoneChanged(
+    previousState?.terrorZone,
+    options.terrorZone
+  );
+  const nextTerrorZone = hasTerrorZoneChanged || !previousState?.terrorZone
+    ? options.terrorZone ?? previousState?.terrorZone ?? null
+    : previousState.terrorZone;
   const shouldWrite =
     isFirstRun ||
     changes.length > 0 ||
-    terrorZoneChanged(previousState?.terrorZone, options.terrorZone);
+    hasTerrorZoneChanged;
   const shouldNotify =
     changes.length > 0 &&
     (!isFirstRun || String(env.NOTIFY_ON_FIRST_RUN).toLowerCase() === "true");
@@ -336,13 +360,23 @@ export async function checkForUpdates(env, fetchImpl = fetch, options = {}) {
     );
   }
 
+  const nowIso = new Date().toISOString();
+  const nextHistory = nextTerrorZone
+    ? appendTerrorZoneHistory(
+        previousState?.terrorZoneHistory,
+        nextTerrorZone,
+        nextTerrorZone.checkedAt ?? nowIso
+      )
+    : (previousState?.terrorZoneHistory ?? []);
+
   if (shouldWrite) {
     await env.DCLONE_STATE.put(
       STATE_KEY,
       JSON.stringify({
-        checkedAt: new Date().toISOString(),
+        checkedAt: nowIso,
         servers: currentServers,
-        terrorZone: nextTerrorZone
+        terrorZone: nextTerrorZone,
+        terrorZoneHistory: nextHistory
       })
     );
   }

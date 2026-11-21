@@ -2,3 +2,7 @@ node_modules/
 .wrangler/
 .dev.vars
 wrangler.toml
+data/
+.build.info
+extracted/
+.DS_Store
