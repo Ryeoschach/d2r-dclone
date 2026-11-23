@@ -91,6 +91,8 @@ test("公开读取全部符文之语与符文需求统计", async () => {
   assert.equal(data.runes.length, 33);
   assert.equal(data.runewords.length, 99);
   assert.ok(data.runewords.some((item) => item.zhName === "谜团"));
+  const cure = data.runewords.find((item) => item.id === "cure");
+  assert.ok(cure && Array.isArray(cure.stats) && cure.stats.includes("生命上限提高 5%"));
 });
 
 test("公开读取魔法亮金手工物品词缀范围与配方", async () => {
@@ -128,12 +130,16 @@ test("公开读取物品资讯百科数据（基础/蓝黄/绿装/暗金/方块�
   assert.ok(data.setItems.some((s) => s.id === "horazons-splendor"));
   assert.ok(data.uniqueItems.length >= 110);
   assert.ok(data.uniqueItems.every((u) => !u.nameEn.includes("/")));
-  assert.ok(data.uniqueItems.some((u) => u.nameEn === "Ars Dul'Mephistos"));
-  assert.ok(data.uniqueItems.some((u) => u.nameEn === "Hellwarden's Will"));
+  assert.ok(data.uniqueItems.some((u) => u.nameEn === "Ars Dul'Mephistos" && u.stats.includes("强化防御")));
+  assert.ok(data.uniqueItems.some((u) => u.nameEn === "Hellwarden's Will" && u.stats.includes("强化防御")));
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "Gheed's Wager"));
   const horazon = data.setItems.find((s) => s.id === "horazons-splendor");
   const hold = horazon.detail.pieces.find((p) => p.nameEn === "Horazon's Hold");
+  const dominion = horazon.detail.pieces.find((p) => p.nameEn === "Horazon's Dominion");
   assert.ok(Array.isArray(hold.setPieceBonus) && hold.setPieceBonus.some((b) => b.includes("7% 击中偷取法力")));
+  assert.ok(Array.isArray(dominion.setPieceBonus) && dominion.setPieceBonus.some((b) => b.includes("5 件：物理伤害减少 15%")));
+  assert.ok(horazon.detail.partialBonuses.some((p) => p.count === 2 && p.stats.includes("+20 敏捷")));
+  assert.ok(horazon.detail.partialBonuses.some((p) => p.count === 3 && p.stats.includes("+30 精力")));
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "The Atlantean"));
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "Crack of the Heavens"));
   assert.ok(data.uniqueItems.some((u) => u.nameEn === "Defender's Fire"));
@@ -174,4 +180,70 @@ test("公开读取恐怖地带与首领掉率计算器数据（含 3.4 远古雕
   assert.ok(andyTz && andyTz.mlvl === 96 && andyTz.leaves.ci3 > 0 && andyTz.leaves.ua1 > 0);
   assert.ok(Array.isArray(data.uniquePools.ci3) && data.uniquePools.ci3.some((u) => u.nameEn === "Griffon's Eye"));
   assert.ok(Array.isArray(data.specialDrops) && data.specialDrops.some((sp) => sp.code === "ua1"));
+});
+
+test("公开读取角色与佣兵纸娃娃配装元数据（含 3.4 术士魔典、最大孔数与 49 种镶嵌物）", async () => {
+  const response = await worker.fetch(
+    new Request("https://example.com/api/paperdoll"),
+    createEnv()
+  );
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.ok, true);
+  assert.ok(data.baseRules && Object.keys(data.baseRules).length >= 500);
+  assert.equal(data.baseRules.waf.type, "grim");
+  assert.equal(data.baseRules.waf.classOnly, "war");
+  assert.equal(data.baseRules.waf.gemApplyType, 2);
+  assert.equal(data.baseRules["7wc"].twoHanded, true);
+  assert.ok(data.baseRules["7vo"].nameZh.includes("巨神长柄斧"));
+  assert.ok(data.baseRules["6cs"].nameZh.includes("长者法杖"));
+  assert.ok(data.baseRules["7vo"].aliasZh.includes("巨神戟"));
+  assert.equal(data.uniqueMeta["Harlequin Crest (Shako)"].maxSockets, 1);
+  assert.equal(data.uniqueMeta["Crown of Ages (CoA)"].maxSockets, 2);
+  assert.equal(data.uniqueMeta["Rune Master"].maxSockets, 5);
+  assert.equal(data.uniqueMeta["Ars Al'Diabolos"].code, "waf");
+  assert.equal(data.setMeta["Griswold's Redemption"].maxSockets, 4);
+  assert.equal(data.setMeta["Tal Rasha's Guardianship"].code, "uth");
+  assert.equal(data.setMeta["Whistan's Guard"].code, "xml");
+  assert.equal(data.socketables.length, 49);
+  assert.ok(data.socketables.some((s) => s.id === "r08" && s.helm.includes("火焰抗性")));
+  assert.ok(data.socketables.some((s) => s.id === "jw-55-ltng"));
+  assert.equal(Object.keys(data.charBaseStats).length, 8);
+  assert.equal(data.charBaseStats.war.lifePerVit, 3);
+  assert.equal(data.charBaseStats.bar.lifePerVit, 4);
+  assert.ok(data.baseRules["7cr"].maxDmg > 0 && data.baseRules.uit.block > 0);
+  assert.ok(data.skillCombatMeta.Zeal && data.skillCombatMeta.Whirlwind && data.skillCombatMeta.Cleave);
+  assert.equal(data.skillCombatMeta["Echoing Strike"].srcDam, 116);
+  assert.equal(data.skillCombatMeta["Echoing Strike"].edBase, 30);
+  assert.equal(data.skillCombatMeta["Echoing Strike"].edLvl, 5);
+  assert.equal(data.skillCombatMeta["Echoing Strike"].usesFcr, true);
+  assert.equal(data.skillCombatMeta["Echoing Strike"].edSynergies.length, 2);
+  assert.equal(data.skillCombatMeta.Zeal.edStartLvl, 5);
+  assert.equal(data.skillCombatMeta.Zeal.edSynergies[0].skill, "Sacrifice");
+  assert.equal(data.skillCombatMeta.Frenzy.edSynergies.length, 2);
+  assert.equal(data.skillCombatMeta.Strafe.edSynergies.length, 2);
+  assert.equal(data.skillCombatMeta.Vengeance.eleConvEachBase, 70);
+  assert.ok(Array.isArray(data.inventoryCharms) && data.inventoryCharms.length >= 33);
+  assert.ok(data.inventoryCharms.some((c) => c.id === "magic-sc" && c.isBlankMagic === true && c.affixSlot === "charm_sc"));
+  assert.ok(data.inventoryCharms.some((c) => c.id === "magic-lc" && c.isBlankMagic === true && c.affixSlot === "charm_lc"));
+  assert.ok(data.inventoryCharms.some((c) => c.id === "magic-gc" && c.isBlankMagic === true && c.affixSlot === "charm_gc"));
+  assert.ok(data.inventoryCharms.some((c) => c.id === "torch" && c.w === 1 && c.h === 2));
+  assert.ok(data.inventoryCharms.some((c) => c.id === "anni" && c.w === 1 && c.h === 1));
+  assert.ok(data.inventoryCharms.some((c) => c.id === "util-cube" && c.w === 2 && c.h === 2));
+  assert.ok(Array.isArray(data.craftedItems) && data.craftedItems.length >= 20);
+  assert.ok(data.craftedItems.some((c) => c.id === "craft-amu-caster" && c.slot === "amulet" && c.skillCapable === "all" && c.stats.includes("+5–10% 快速施法 (FCR)") && c.stats.includes("+10–20 法力")));
+  assert.ok(data.craftedItems.some((c) => c.id === "craft-glv-blood-cb" && c.slot === "gloves" && c.skillCapable === "tab"));
+  assert.ok(data.craftedItems.some((c) => c.id === "craft-weap-blood-axe" && c.maxSockets === 2));
+  assert.ok(Array.isArray(data.affixCatalog) && data.affixCatalog.length >= 300);
+  assert.ok(data.typeAffixMap && Object.keys(data.typeAffixMap).length >= 38);
+  const rareAmuAffixes = data.typeAffixMap.amul.r.map((idx) => data.affixCatalog[idx][3]);
+  assert.ok(rareAmuAffixes.includes("物理伤害减少 1–4 (PDR)"));
+  assert.ok(rareAmuAffixes.includes("+10% 快速施法 (FCR)"));
+  const rareRingAffixes = data.typeAffixMap.ring.r.map((idx) => data.affixCatalog[idx][3]);
+  assert.ok(rareRingAffixes.includes("+10–120 命中值 (AR)"));
+  assert.ok(rareRingAffixes.includes("+1–90 法力"));
+  assert.ok(rareRingAffixes.includes("所有抗性 +3–11%"));
+  assert.ok(rareRingAffixes.includes("3–8% 击中偷取生命 (LL)"));
+  assert.ok(rareRingAffixes.includes("+1–40 生命"));
+  assert.ok(rareRingAffixes.includes("魔法伤害减少 1–2 (MDR)"));
 });

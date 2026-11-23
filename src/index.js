@@ -14,6 +14,7 @@ import { getAffixesCatalog } from "./affixes-metadata.js";
 import { getItemsCatalog } from "./items-metadata.js";
 import { getSkillsCatalog } from "./skills-catalog.js";
 import { getDropCalculatorData } from "./drop-calculator.js";
+import { getPaperdollCatalog } from "./paperdoll-data.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -127,6 +128,10 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/drops") {
       return json({ ok: true, ...getDropCalculatorData() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/paperdoll") {
+      return json({ ok: true, ...getPaperdollCatalog() });
     }
 
     if (request.method === "GET" && url.pathname === "/api/status") {
