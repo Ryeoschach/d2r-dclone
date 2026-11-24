@@ -57,7 +57,8 @@ export const SKILL_CLASSES = [
             "zhTW": "死亡印記：每等級 +1% 機率造成粉碎打擊",
             "enUS": "Death Mark: +1% Chance of Crushing Blow per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/373.webp"
       },
       {
         "id": 374,
@@ -79,7 +80,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/374.webp"
       },
       {
         "id": 375,
@@ -106,7 +108,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0.8,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/375.webp"
       },
       {
         "id": 376,
@@ -139,7 +142,8 @@ export const SKILL_CLASSES = [
             "zhTW": "沸血術：每等級 +0% 火焰傷害",
             "enUS": "Blood Boil: +0% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/376.webp"
       },
       {
         "id": 377,
@@ -166,7 +170,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0.6,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/377.webp"
       },
       {
         "id": 378,
@@ -188,7 +193,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/378.webp"
       },
       {
         "id": 379,
@@ -226,7 +232,8 @@ export const SKILL_CLASSES = [
             "zhTW": "血誓：每等級 +0 點回復生命",
             "enUS": "Blood Oath: +0 Replenish life per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/379.webp"
       },
       {
         "id": 380,
@@ -289,7 +296,8 @@ export const SKILL_CLASSES = [
             "zhTW": "吞食：每等級 +20% 傷害",
             "enUS": "Engorge: +20% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/380.webp"
       },
       {
         "id": 381,
@@ -316,7 +324,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/381.webp"
       },
       {
         "id": 382,
@@ -350,7 +359,8 @@ export const SKILL_CLASSES = [
             "zhTW": "死亡印記：每等級 +1% 束縛惡魔機率",
             "enUS": "Death Mark: +1% Chance to Bind Demon per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/382.webp"
       },
       {
         "id": 383,
@@ -370,7 +380,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/383.webp"
       },
       {
         "id": 384,
@@ -442,7 +453,8 @@ export const SKILL_CLASSES = [
             "zhTW": "靈能護盾：每等級 +0 秒",
             "enUS": "Psychic Ward: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/384.webp"
       },
       {
         "id": 385,
@@ -521,7 +533,8 @@ export const SKILL_CLASSES = [
             "zhTW": "邪異轟擊：每等級 +0.2 秒邪咒持續時間",
             "enUS": "Eldritch Blast: Hex Duration +0.2 seconds per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/385.webp"
       },
       {
         "id": 386,
@@ -559,7 +572,8 @@ export const SKILL_CLASSES = [
             "zhTW": "邪異轟擊：每等級 +0.2 秒邪咒持續時間",
             "enUS": "Eldritch Blast: Hex Duration +0.2 seconds per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/386.webp"
       },
       {
         "id": 387,
@@ -597,7 +611,8 @@ export const SKILL_CLASSES = [
             "zhTW": "懸浮精通：每等級 +15 傷害吸收",
             "enUS": "Levitation Mastery: +15 Damage Absorbed per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/387.webp"
       },
       {
         "id": 388,
@@ -659,7 +674,8 @@ export const SKILL_CLASSES = [
             "zhTW": "飛刃躍傳：每等級 +5% 傷害",
             "enUS": "Blade Warp: +5% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/388.webp"
       },
       {
         "id": 389,
@@ -736,7 +752,8 @@ export const SKILL_CLASSES = [
             "zhTW": "邪異轟擊：每等級 +0.2 秒邪咒持續時間",
             "enUS": "Eldritch Blast: Hex Duration +0.2 seconds per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/389.webp"
       },
       {
         "id": 390,
@@ -803,7 +820,8 @@ export const SKILL_CLASSES = [
             "zhTW": "迴響打擊：每等級 +24% 魔法傷害",
             "enUS": "Echoing Strike: +24% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/390.webp"
       },
       {
         "id": 391,
@@ -846,7 +864,8 @@ export const SKILL_CLASSES = [
             "zhTW": "邪異轟擊：每等級 +10% 傷害",
             "enUS": "Eldritch Blast: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/391.webp"
       },
       {
         "id": 392,
@@ -874,7 +893,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/392.webp"
       },
       {
         "id": 393,
@@ -899,7 +919,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/393.webp"
       },
       {
         "id": 394,
@@ -964,7 +985,8 @@ export const SKILL_CLASSES = [
             "zhTW": "天啟末日：每等級 +10% 火焰傷害",
             "enUS": "Apocalypse: +10% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/394.webp"
       },
       {
         "id": 395,
@@ -1039,7 +1061,8 @@ export const SKILL_CLASSES = [
             "zhTW": "深淵裂口：每等級 +20% 每秒平均魔法傷害",
             "enUS": "Abyss: +20% Average Magic Damage per Second per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/395.webp"
       },
       {
         "id": 396,
@@ -1066,7 +1089,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/396.webp"
       },
       {
         "id": 397,
@@ -1088,7 +1112,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/397.webp"
       },
       {
         "id": 398,
@@ -1165,7 +1190,8 @@ export const SKILL_CLASSES = [
             "zhTW": "天啟末日：每等級 +10% 平均每秒火焰傷害",
             "enUS": "Apocalypse: +10% Average Fire Damage per Second per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/398.webp"
       },
       {
         "id": 399,
@@ -1242,7 +1268,8 @@ export const SKILL_CLASSES = [
             "zhTW": "深淵裂口：每等級 +20% 每秒平均魔法傷害",
             "enUS": "Abyss: +20% Average Magic Damage per Second per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/399.webp"
       },
       {
         "id": 400,
@@ -1269,7 +1296,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/war/400.webp"
       },
       {
         "id": 401,
@@ -1337,7 +1365,8 @@ export const SKILL_CLASSES = [
             "zhTW": "烈焰湧浪：每等級 +10% 火焰傷害",
             "enUS": "Flame Wave: +10% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/401.webp"
       },
       {
         "id": 402,
@@ -1414,7 +1443,8 @@ export const SKILL_CLASSES = [
             "zhTW": "瘴氣鎖鏈：每等級 +10% 每秒平均魔法傷害",
             "enUS": "Miasma Chain: +10% Average Magic Damage per Second per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/war/402.webp"
       }
     ]
   },
@@ -1508,7 +1538,8 @@ export const SKILL_CLASSES = [
             "zhTW": "隕石術：每等級 +16% 火焰傷害",
             "enUS": "Meteor: +16% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/36.webp"
       },
       {
         "id": 37,
@@ -1528,7 +1559,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/37.webp"
       },
       {
         "id": 38,
@@ -1584,7 +1616,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃電箭：每等級 +6% 電擊傷害",
             "enUS": "Lightning: +6% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/38.webp"
       },
       {
         "id": 39,
@@ -1676,7 +1709,8 @@ export const SKILL_CLASSES = [
             "zhTW": "冰封球：每等級 +15% 冰寒傷害",
             "enUS": "Frozen Orb: +15% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/39.webp"
       },
       {
         "id": 40,
@@ -1722,7 +1756,8 @@ export const SKILL_CLASSES = [
             "zhTW": "寒冰甲：每等級 +0 秒",
             "enUS": "Chilling Armor: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/40.webp"
       },
       {
         "id": 41,
@@ -1778,7 +1813,8 @@ export const SKILL_CLASSES = [
             "zhTW": "暖流：每等級 +16% 火焰傷害",
             "enUS": "Warmth: +16% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/41.webp"
       },
       {
         "id": 42,
@@ -1803,7 +1839,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/42.webp"
       },
       {
         "id": 43,
@@ -1847,7 +1884,8 @@ export const SKILL_CLASSES = [
             1
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/43.webp"
       },
       {
         "id": 44,
@@ -1912,7 +1950,8 @@ export const SKILL_CLASSES = [
             "zhTW": "冰封球：每等級 +10% 冰寒傷害",
             "enUS": "Frozen Orb: +10% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/44.webp"
       },
       {
         "id": 45,
@@ -1993,7 +2032,8 @@ export const SKILL_CLASSES = [
             "zhTW": "冰封球：每等級 +8% 冰寒傷害",
             "enUS": "Frozen Orb: +8% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/45.webp"
       },
       {
         "id": 46,
@@ -2051,7 +2091,8 @@ export const SKILL_CLASSES = [
             "zhTW": "暖流：每等級 +6% 火焰傷害",
             "enUS": "Warmth: +6% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/46.webp"
       },
       {
         "id": 47,
@@ -2118,7 +2159,8 @@ export const SKILL_CLASSES = [
             "zhTW": "隕石術：每等級 +14% 火焰傷害",
             "enUS": "Meteor: +14% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/47.webp"
       },
       {
         "id": 48,
@@ -2176,7 +2218,8 @@ export const SKILL_CLASSES = [
             "zhTW": "靜電力場：每等級 +5% 電擊傷害",
             "enUS": "Static Field: +5% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/48.webp"
       },
       {
         "id": 49,
@@ -2252,7 +2295,8 @@ export const SKILL_CLASSES = [
             "zhTW": "連鎖閃電：每等級 +8% 電擊傷害",
             "enUS": "Chain Lightning: +8% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/49.webp"
       },
       {
         "id": 50,
@@ -2330,7 +2374,8 @@ export const SKILL_CLASSES = [
             "zhTW": "寒冰甲：每等級 +0 秒",
             "enUS": "Chilling Armor: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/50.webp"
       },
       {
         "id": 51,
@@ -2397,7 +2442,8 @@ export const SKILL_CLASSES = [
             "zhTW": "煉獄之火：每等級 +1% 火焰傷害",
             "enUS": "Inferno: +1% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/51.webp"
       },
       {
         "id": 52,
@@ -2456,7 +2502,8 @@ export const SKILL_CLASSES = [
             "zhTW": "暖流：每等級 +9% 火焰傷害",
             "enUS": "Warmth: +9% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/52.webp"
       },
       {
         "id": 53,
@@ -2532,7 +2579,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃電箭：每等級 +4% 電擊傷害",
             "enUS": "Lightning: +4% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/53.webp"
       },
       {
         "id": 54,
@@ -2559,7 +2607,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/54.webp"
       },
       {
         "id": 55,
@@ -2640,7 +2689,8 @@ export const SKILL_CLASSES = [
             "zhTW": "冰封球：每等級 +5% 冰寒傷害",
             "enUS": "Frozen Orb: +5% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/55.webp"
       },
       {
         "id": 56,
@@ -2713,7 +2763,8 @@ export const SKILL_CLASSES = [
             "zhTW": "煉獄之火：每等級 +3% 平均每秒火焰傷害",
             "enUS": "Inferno: +3% Average Fire Damage per Second per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/56.webp"
       },
       {
         "id": 57,
@@ -2772,7 +2823,8 @@ export const SKILL_CLASSES = [
             "zhTW": "靜電力場：每等級 +7% 電擊傷害",
             "enUS": "Static Field: +7% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/57.webp"
       },
       {
         "id": 58,
@@ -2825,7 +2877,8 @@ export const SKILL_CLASSES = [
             "zhTW": "心靈傳動：每等級抵銷傷害的法力消耗 -6.25%",
             "enUS": "Telekinesis: -6.25% Mana consumed per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/58.webp"
       },
       {
         "id": 59,
@@ -2902,7 +2955,8 @@ export const SKILL_CLASSES = [
             "zhTW": "冰川之槍：每等級 +5% 冰寒傷害",
             "enUS": "Glacial Spike: +5% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/59.webp"
       },
       {
         "id": 60,
@@ -2979,7 +3033,8 @@ export const SKILL_CLASSES = [
             "zhTW": "碎冰甲：每等級 +0 秒",
             "enUS": "Shiver Armor: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/60.webp"
       },
       {
         "id": 61,
@@ -2999,7 +3054,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/61.webp"
       },
       {
         "id": 62,
@@ -3066,7 +3122,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火球術：每等級 +3% 火焰傷害",
             "enUS": "Fire Ball: +3% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/62.webp"
       },
       {
         "id": 63,
@@ -3086,7 +3143,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/63.webp"
       },
       {
         "id": 64,
@@ -3144,7 +3202,8 @@ export const SKILL_CLASSES = [
             "zhTW": "寒冰彈：每等級 +2% 冰寒傷害",
             "enUS": "Ice Bolt: +2% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/sor/64.webp"
       },
       {
         "id": 65,
@@ -3164,7 +3223,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/sor/65.webp"
       }
     ]
   },
@@ -3224,7 +3284,8 @@ export const SKILL_CLASSES = [
             "zhTW": "狂熱：每等級 +5% 傷害",
             "enUS": "Fanaticism: +5% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/96.webp"
       },
       {
         "id": 97,
@@ -3249,7 +3310,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/97.webp"
       },
       {
         "id": 98,
@@ -3269,7 +3331,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/98.webp"
       },
       {
         "id": 99,
@@ -3313,7 +3376,8 @@ export const SKILL_CLASSES = [
             0
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/99.webp"
       },
       {
         "id": 100,
@@ -3333,7 +3397,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/100.webp"
       },
       {
         "id": 101,
@@ -3394,7 +3459,8 @@ export const SKILL_CLASSES = [
             "zhTW": "祈禱：每等級 +20% 生命治療",
             "enUS": "Prayer: +20% Life Healed per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/101.webp"
       },
       {
         "id": 102,
@@ -3456,7 +3522,8 @@ export const SKILL_CLASSES = [
             "zhTW": "聖護：每等級 +10% 火焰傷害",
             "enUS": "Salvation: +10% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/102.webp"
       },
       {
         "id": 103,
@@ -3495,7 +3562,8 @@ export const SKILL_CLASSES = [
             0
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/103.webp"
       },
       {
         "id": 104,
@@ -3515,7 +3583,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/104.webp"
       },
       {
         "id": 105,
@@ -3535,7 +3604,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/105.webp"
       },
       {
         "id": 106,
@@ -3568,7 +3638,8 @@ export const SKILL_CLASSES = [
             "zhTW": "犧牲打擊：每等級 +12% 傷害",
             "enUS": "Sacrifice: +12% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/106.webp"
       },
       {
         "id": 107,
@@ -3606,7 +3677,8 @@ export const SKILL_CLASSES = [
             "zhTW": "力量：每等級 +20% 傷害",
             "enUS": "Might: +20% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/107.webp"
       },
       {
         "id": 108,
@@ -3628,7 +3700,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/108.webp"
       },
       {
         "id": 109,
@@ -3656,7 +3729,8 @@ export const SKILL_CLASSES = [
             "zhTW": "祈禱",
             "enUS": "Prayer"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/109.webp"
       },
       {
         "id": 110,
@@ -3676,7 +3750,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/110.webp"
       },
       {
         "id": 111,
@@ -3724,7 +3799,8 @@ export const SKILL_CLASSES = [
             "zhTW": "聖護：每等級 +2% 元素傷害",
             "enUS": "Salvation: +2% Elemental Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/111.webp"
       },
       {
         "id": 112,
@@ -3791,7 +3867,8 @@ export const SKILL_CLASSES = [
             "zhTW": "活力：每等級 +14% 魔法傷害",
             "enUS": "Vigor: +14% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/112.webp"
       },
       {
         "id": 113,
@@ -3813,7 +3890,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/113.webp"
       },
       {
         "id": 114,
@@ -3875,7 +3953,8 @@ export const SKILL_CLASSES = [
             "zhTW": "聖護：每等級 +7% 冰寒傷害",
             "enUS": "Salvation: +7% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/114.webp"
       },
       {
         "id": 115,
@@ -3898,7 +3977,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/115.webp"
       },
       {
         "id": 116,
@@ -3925,7 +4005,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/116.webp"
       },
       {
         "id": 117,
@@ -3978,7 +4059,8 @@ export const SKILL_CLASSES = [
             "zhTW": "反抗：每等級 +15% 防禦",
             "enUS": "Defiance: +15% Defense per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/117.webp"
       },
       {
         "id": 118,
@@ -4040,7 +4122,8 @@ export const SKILL_CLASSES = [
             "zhTW": "聖護：每等級 +4% 電擊傷害",
             "enUS": "Salvation: +4% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/118.webp"
       },
       {
         "id": 119,
@@ -4099,7 +4182,8 @@ export const SKILL_CLASSES = [
             "zhTW": "淨化：每等級 +7% 魔法傷害",
             "enUS": "Cleansing: +7% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/119.webp"
       },
       {
         "id": 120,
@@ -4127,7 +4211,8 @@ export const SKILL_CLASSES = [
             "zhTW": "祈禱",
             "enUS": "Prayer"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/120.webp"
       },
       {
         "id": 121,
@@ -4191,7 +4276,8 @@ export const SKILL_CLASSES = [
             "zhTW": "神聖電擊：每等級 +7% 電擊傷害",
             "enUS": "Holy Shock: +7% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/pal/121.webp"
       },
       {
         "id": 122,
@@ -4213,7 +4299,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/122.webp"
       },
       {
         "id": 123,
@@ -4235,7 +4322,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/123.webp"
       },
       {
         "id": 124,
@@ -4257,7 +4345,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/124.webp"
       },
       {
         "id": 125,
@@ -4277,7 +4366,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/pal/125.webp"
       }
     ]
   },
@@ -4350,7 +4440,8 @@ export const SKILL_CLASSES = [
             1
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/6.webp"
       },
       {
         "id": 7,
@@ -4406,7 +4497,8 @@ export const SKILL_CLASSES = [
             "zhTW": "爆裂箭：每等級 +12% 火焰傷害",
             "enUS": "Exploding Arrow: +12% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/7.webp"
       },
       {
         "id": 8,
@@ -4450,7 +4542,8 @@ export const SKILL_CLASSES = [
             0
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/8.webp"
       },
       {
         "id": 9,
@@ -4470,7 +4563,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/9.webp"
       },
       {
         "id": 10,
@@ -4495,7 +4589,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/10.webp"
       },
       {
         "id": 11,
@@ -4551,7 +4646,8 @@ export const SKILL_CLASSES = [
             "zhTW": "寒冰箭：每等級 +12% 冰寒傷害",
             "enUS": "Ice Arrow: +12% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/11.webp"
       },
       {
         "id": 12,
@@ -4584,7 +4680,8 @@ export const SKILL_CLASSES = [
             "zhTW": "導引箭：每等級 +12% 傷害",
             "enUS": "Guided Arrow: +12% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/12.webp"
       },
       {
         "id": 13,
@@ -4604,7 +4701,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/13.webp"
       },
       {
         "id": 14,
@@ -4680,7 +4778,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃電強擊：每等級 +14% 電擊傷害",
             "enUS": "Lightning Strike: +14% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/14.webp"
       },
       {
         "id": 15,
@@ -4736,7 +4835,8 @@ export const SKILL_CLASSES = [
             "zhTW": "瘟疫標槍：每等級 +12% 毒素傷害",
             "enUS": "Plague Javelin: +12% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/15.webp"
       },
       {
         "id": 16,
@@ -4795,7 +4895,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火焰箭：每等級 +14% 火焰傷害",
             "enUS": "Fire Arrow: +14% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/16.webp"
       },
       {
         "id": 17,
@@ -4822,7 +4923,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/17.webp"
       },
       {
         "id": 18,
@@ -4844,7 +4946,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/18.webp"
       },
       {
         "id": 19,
@@ -4871,7 +4974,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/19.webp"
       },
       {
         "id": 20,
@@ -4956,7 +5060,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃電烈怒：每等級 +3% 電擊傷害",
             "enUS": "Lightning Fury: +3% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/20.webp"
       },
       {
         "id": 21,
@@ -5019,7 +5124,8 @@ export const SKILL_CLASSES = [
             "zhTW": "冰凍箭：每等級 +5% 凍結時效",
             "enUS": "Freezing Arrow: +5% Freeze Length per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/21.webp"
       },
       {
         "id": 22,
@@ -5053,7 +5159,8 @@ export const SKILL_CLASSES = [
             "zhTW": "多重箭：每等級 +12% 傷害",
             "enUS": "Multiple Shot: +12% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/22.webp"
       },
       {
         "id": 23,
@@ -5075,7 +5182,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/23.webp"
       },
       {
         "id": 24,
@@ -5152,7 +5260,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃電強擊：每等級 +14% 電擊傷害",
             "enUS": "Lightning Strike: +14% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/24.webp"
       },
       {
         "id": 25,
@@ -5210,7 +5319,8 @@ export const SKILL_CLASSES = [
             "zhTW": "劇毒標槍：每等級 +14% 毒素傷害",
             "enUS": "Poison Javelin: +14% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/25.webp"
       },
       {
         "id": 26,
@@ -5248,7 +5358,8 @@ export const SKILL_CLASSES = [
             "zhTW": "導引箭：每等級 +10% 傷害",
             "enUS": "Guided Arrow: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/26.webp"
       },
       {
         "id": 27,
@@ -5311,7 +5422,8 @@ export const SKILL_CLASSES = [
             "zhTW": "爆裂箭：每等級 +10% 火焰傷害",
             "enUS": "Exploding Arrow: +10% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/27.webp"
       },
       {
         "id": 28,
@@ -5338,7 +5450,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/28.webp"
       },
       {
         "id": 29,
@@ -5360,7 +5473,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/29.webp"
       },
       {
         "id": 30,
@@ -5387,7 +5501,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/30.webp"
       },
       {
         "id": 31,
@@ -5450,7 +5565,8 @@ export const SKILL_CLASSES = [
             "zhTW": "寒冰箭：每等級 +5% 凍結時效",
             "enUS": "Ice Arrow: +5% Freeze Length per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/31.webp"
       },
       {
         "id": 32,
@@ -5509,7 +5625,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃避",
             "enUS": "Evade"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/32.webp"
       },
       {
         "id": 33,
@@ -5531,7 +5648,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ama/33.webp"
       },
       {
         "id": 34,
@@ -5607,7 +5725,8 @@ export const SKILL_CLASSES = [
             "zhTW": "聚能強擊：每等級 +11% 電擊傷害",
             "enUS": "Charged Strike: +11% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/34.webp"
       },
       {
         "id": 35,
@@ -5692,7 +5811,8 @@ export const SKILL_CLASSES = [
             "zhTW": "閃電強擊：每等級 +1% 電擊傷害",
             "enUS": "Lightning Strike: +1% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ama/35.webp"
       }
     ]
   },
@@ -5746,7 +5866,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/66.webp"
       },
       {
         "id": 67,
@@ -5829,7 +5950,8 @@ export const SKILL_CLASSES = [
             "zhTW": "骸骨之魂：每等級 +15% 魔法傷害",
             "enUS": "Bone Spirit: +15% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/67.webp"
       },
       {
         "id": 68,
@@ -5865,7 +5987,8 @@ export const SKILL_CLASSES = [
             "zhTW": "骨牢：每等級 +15 傷害吸收",
             "enUS": "Bone Prison: +15 Damage Absorbed per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/68.webp"
       },
       {
         "id": 69,
@@ -5887,7 +6010,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/69.webp"
       },
       {
         "id": 70,
@@ -5942,7 +6066,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚物抗性",
             "enUS": "Summon Resist"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/70.webp"
       },
       {
         "id": 71,
@@ -5967,7 +6092,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/71.webp"
       },
       {
         "id": 72,
@@ -5994,7 +6120,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/72.webp"
       },
       {
         "id": 73,
@@ -6059,7 +6186,8 @@ export const SKILL_CLASSES = [
             "zhTW": "劇毒新星：每等級 +20% 毒素傷害",
             "enUS": "Poison Nova: +20% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/73.webp"
       },
       {
         "id": 74,
@@ -6086,7 +6214,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/74.webp"
       },
       {
         "id": 75,
@@ -6137,7 +6266,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火焰魔像：每等級 +6% 傷害",
             "enUS": "Fire Golem: +6% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/75.webp"
       },
       {
         "id": 76,
@@ -6164,7 +6294,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/76.webp"
       },
       {
         "id": 77,
@@ -6191,7 +6322,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/77.webp"
       },
       {
         "id": 78,
@@ -6229,7 +6361,8 @@ export const SKILL_CLASSES = [
             "zhTW": "骨牢：每等級 +10% 生命",
             "enUS": "Bone Prison: +10% Life per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/78.webp"
       },
       {
         "id": 79,
@@ -6251,7 +6384,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/79.webp"
       },
       {
         "id": 80,
@@ -6289,7 +6423,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚物抗性",
             "enUS": "Summon Resist"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/80.webp"
       },
       {
         "id": 81,
@@ -6316,7 +6451,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/81.webp"
       },
       {
         "id": 82,
@@ -6343,7 +6479,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/82.webp"
       },
       {
         "id": 83,
@@ -6411,7 +6548,8 @@ export const SKILL_CLASSES = [
             "zhTW": "劇毒新星：每等級 +15% 毒素傷害",
             "enUS": "Poison Nova: +15% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/83.webp"
       },
       {
         "id": 84,
@@ -6496,7 +6634,8 @@ export const SKILL_CLASSES = [
             "zhTW": "骸骨之魂：每等級 +8% 魔法傷害",
             "enUS": "Bone Spirit: +8% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/84.webp"
       },
       {
         "id": 85,
@@ -6549,7 +6688,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火焰魔像：每等級 +6% 傷害",
             "enUS": "Fire Golem: +6% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/85.webp"
       },
       {
         "id": 86,
@@ -6576,7 +6716,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/86.webp"
       },
       {
         "id": 87,
@@ -6603,7 +6744,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/87.webp"
       },
       {
         "id": 88,
@@ -6642,7 +6784,8 @@ export const SKILL_CLASSES = [
             "zhTW": "骨牆：每等級 +8% 生命",
             "enUS": "Bone Wall: +8% Life per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/88.webp"
       },
       {
         "id": 89,
@@ -6669,7 +6812,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/89.webp"
       },
       {
         "id": 90,
@@ -6741,7 +6885,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火焰魔像：每等級 +6% 傷害",
             "enUS": "Fire Golem: +6% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/90.webp"
       },
       {
         "id": 91,
@@ -6769,7 +6914,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/nec/91.webp"
       },
       {
         "id": 92,
@@ -6836,7 +6982,8 @@ export const SKILL_CLASSES = [
             "zhTW": "毒爆：每等級 +10% 毒素傷害",
             "enUS": "Poison Explosion: +10% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/92.webp"
       },
       {
         "id": 93,
@@ -6921,7 +7068,8 @@ export const SKILL_CLASSES = [
             "zhTW": "骨牢：每等級 +8% 魔法傷害",
             "enUS": "Bone Prison: +8% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/93.webp"
       },
       {
         "id": 94,
@@ -6993,7 +7141,8 @@ export const SKILL_CLASSES = [
             "zhTW": "鋼鐵魔像：每等級 +35 防禦",
             "enUS": "Iron Golem: +35 Defense per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/94.webp"
       },
       {
         "id": 95,
@@ -7032,7 +7181,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚物抗性",
             "enUS": "Summon Resist"
           }
-        ]
+        ],
+        "icon": "/images/skills/nec/95.webp"
       }
     ]
   },
@@ -7097,7 +7247,8 @@ export const SKILL_CLASSES = [
             "zhTW": "專注打擊：每等級 +5% 準確率",
             "enUS": "Concentrate: +5% Attack Rating per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/126.webp"
       },
       {
         "id": 127,
@@ -7117,7 +7268,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/127.webp"
       },
       {
         "id": 128,
@@ -7137,7 +7289,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/128.webp"
       },
       {
         "id": 129,
@@ -7157,7 +7310,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/129.webp"
       },
       {
         "id": 130,
@@ -7182,7 +7336,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/130.webp"
       },
       {
         "id": 131,
@@ -7207,7 +7362,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/131.webp"
       },
       {
         "id": 132,
@@ -7232,7 +7388,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/132.webp"
       },
       {
         "id": 133,
@@ -7265,7 +7422,8 @@ export const SKILL_CLASSES = [
             "zhTW": "猛擊：每等級 +10% 傷害",
             "enUS": "Bash: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/133.webp"
       },
       {
         "id": 134,
@@ -7285,7 +7443,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/134.webp"
       },
       {
         "id": 135,
@@ -7305,7 +7464,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/135.webp"
       },
       {
         "id": 136,
@@ -7325,7 +7485,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/136.webp"
       },
       {
         "id": 137,
@@ -7352,7 +7513,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/137.webp"
       },
       {
         "id": 138,
@@ -7390,7 +7552,8 @@ export const SKILL_CLASSES = [
             "zhTW": "戰鬥指揮：每等級 +0 秒",
             "enUS": "Battle Command: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/138.webp"
       },
       {
         "id": 139,
@@ -7433,7 +7596,8 @@ export const SKILL_CLASSES = [
             "zhTW": "戰爭狂嘯：每等級 +5% 持續時效",
             "enUS": "War Cry: +5% Duration per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/139.webp"
       },
       {
         "id": 140,
@@ -7466,7 +7630,8 @@ export const SKILL_CLASSES = [
             "zhTW": "雙手揮擊：每等級 +8% 傷害",
             "enUS": "Double Swing: +8% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/140.webp"
       },
       {
         "id": 141,
@@ -7486,7 +7651,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/141.webp"
       },
       {
         "id": 142,
@@ -7519,7 +7685,8 @@ export const SKILL_CLASSES = [
             "zhTW": "尋找藥水：每等級 +1% 機率",
             "enUS": "Find Potion: +1% Chance per level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/142.webp"
       },
       {
         "id": 143,
@@ -7571,7 +7738,8 @@ export const SKILL_CLASSES = [
             "zhTW": "跳躍：每等級 +10% 傷害",
             "enUS": "Leap: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/143.webp"
       },
       {
         "id": 144,
@@ -7614,7 +7782,8 @@ export const SKILL_CLASSES = [
             "zhTW": "狂暴之擊：每等級 +1% 魔法傷害",
             "enUS": "Berserk: +1% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/144.webp"
       },
       {
         "id": 145,
@@ -7634,7 +7803,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/145.webp"
       },
       {
         "id": 146,
@@ -7661,7 +7831,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/146.webp"
       },
       {
         "id": 147,
@@ -7709,7 +7880,8 @@ export const SKILL_CLASSES = [
             "zhTW": "狂暴之擊：每等級 +1% 魔法傷害",
             "enUS": "Berserk: +1% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/147.webp"
       },
       {
         "id": 148,
@@ -7731,7 +7903,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/148.webp"
       },
       {
         "id": 149,
@@ -7769,7 +7942,8 @@ export const SKILL_CLASSES = [
             "zhTW": "戰鬥指揮：每等級 +0 秒",
             "enUS": "Battle Command: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/149.webp"
       },
       {
         "id": 150,
@@ -7802,7 +7976,8 @@ export const SKILL_CLASSES = [
             "zhTW": "尋找藥水：每等級 +5% 受到的傷害",
             "enUS": "Find Potion: +5% Damage Taken per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/150.webp"
       },
       {
         "id": 151,
@@ -7830,7 +8005,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/151.webp"
       },
       {
         "id": 152,
@@ -7868,7 +8044,8 @@ export const SKILL_CLASSES = [
             "zhTW": "戰鬥命令：每等級 +10% 魔法傷害",
             "enUS": "Battle Orders: +10% Magic Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/152.webp"
       },
       {
         "id": 153,
@@ -7890,7 +8067,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/bar/153.webp"
       },
       {
         "id": 154,
@@ -7953,7 +8131,8 @@ export const SKILL_CLASSES = [
             "zhTW": "戰鬥怒吼：每等級 +6% 傷害",
             "enUS": "Battle Cry: +6% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/154.webp"
       },
       {
         "id": 155,
@@ -7991,7 +8170,8 @@ export const SKILL_CLASSES = [
             "zhTW": "戰鬥命令：每等級 +0 秒",
             "enUS": "Battle Orders: +0 Seconds per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/bar/155.webp"
       }
     ]
   },
@@ -8080,7 +8260,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚灰熊：每等級 +12% 傷害",
             "enUS": "Summon Grizzly: +12% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/221.webp"
       },
       {
         "id": 222,
@@ -8136,7 +8317,8 @@ export const SKILL_CLASSES = [
             "zhTW": "狂犬撕咬：每等級 +10% 毒素傷害",
             "enUS": "Rabies: +10% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/222.webp"
       },
       {
         "id": 223,
@@ -8167,7 +8349,8 @@ export const SKILL_CLASSES = [
             "zhTW": "變形術",
             "enUS": "Lycanthropy"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/223.webp"
       },
       {
         "id": 224,
@@ -8189,7 +8372,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/224.webp"
       },
       {
         "id": 225,
@@ -8254,7 +8438,8 @@ export const SKILL_CLASSES = [
             "zhTW": "裂地之火：每等級 +23% 火焰傷害",
             "enUS": "Fissure: +23% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/225.webp"
       },
       {
         "id": 226,
@@ -8279,7 +8464,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/226.webp"
       },
       {
         "id": 227,
@@ -8336,7 +8522,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚灰熊：每等級 +10% 傷害",
             "enUS": "Summon Grizzly: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/227.webp"
       },
       {
         "id": 228,
@@ -8367,7 +8554,8 @@ export const SKILL_CLASSES = [
             "zhTW": "變形術",
             "enUS": "Lycanthropy"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/228.webp"
       },
       {
         "id": 229,
@@ -8430,7 +8618,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火焰風暴：每等級 +8% 火焰傷害",
             "enUS": "Firestorm: +8% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/229.webp"
       },
       {
         "id": 230,
@@ -8486,7 +8675,8 @@ export const SKILL_CLASSES = [
             "zhTW": "氣旋護甲：每等級 +15% 冰寒傷害",
             "enUS": "Cyclone Armor: +15% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/230.webp"
       },
       {
         "id": 231,
@@ -8513,7 +8703,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/231.webp"
       },
       {
         "id": 232,
@@ -8540,7 +8731,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/232.webp"
       },
       {
         "id": 233,
@@ -8567,7 +8759,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/233.webp"
       },
       {
         "id": 234,
@@ -8634,7 +8827,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火山噴發：每等級 +12% 火焰傷害",
             "enUS": "Volcano: +12% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/234.webp"
       },
       {
         "id": 235,
@@ -8677,7 +8871,8 @@ export const SKILL_CLASSES = [
             "zhTW": "颶風術：每等級 +7% 傷害",
             "enUS": "Hurricane: +7% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/235.webp"
       },
       {
         "id": 236,
@@ -8704,7 +8899,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/236.webp"
       },
       {
         "id": 237,
@@ -8767,7 +8963,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚灰熊：每等級 +10% 傷害",
             "enUS": "Summon Grizzly: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/237.webp"
       },
       {
         "id": 238,
@@ -8825,7 +9022,8 @@ export const SKILL_CLASSES = [
             "zhTW": "劇毒藤蔓：每等級 +20% 毒素傷害",
             "enUS": "Poison Creeper: +20% Poison Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/238.webp"
       },
       {
         "id": 239,
@@ -8893,7 +9091,8 @@ export const SKILL_CLASSES = [
             "zhTW": "熔火巨石：每等級 +22% 火焰傷害",
             "enUS": "Molten Boulder: +22% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/239.webp"
       },
       {
         "id": 240,
@@ -8955,7 +9154,8 @@ export const SKILL_CLASSES = [
             "zhTW": "颶風術：每等級 +10% 傷害",
             "enUS": "Hurricane: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/240.webp"
       },
       {
         "id": 241,
@@ -8982,7 +9182,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/241.webp"
       },
       {
         "id": 242,
@@ -9009,7 +9210,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/242.webp"
       },
       {
         "id": 243,
@@ -9061,7 +9263,8 @@ export const SKILL_CLASSES = [
             "zhTW": "槌擊：每等級 +10% 傷害",
             "enUS": "Maul: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/243.webp"
       },
       {
         "id": 244,
@@ -9133,7 +9336,8 @@ export const SKILL_CLASSES = [
             "zhTW": "毀天滅地：每等級 +12% 火焰傷害",
             "enUS": "Armageddon: +12% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/244.webp"
       },
       {
         "id": 245,
@@ -9195,7 +9399,8 @@ export const SKILL_CLASSES = [
             "zhTW": "颶風術：每等級 +9% 傷害",
             "enUS": "Hurricane: +9% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/245.webp"
       },
       {
         "id": 246,
@@ -9241,7 +9446,8 @@ export const SKILL_CLASSES = [
             0
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/246.webp"
       },
       {
         "id": 247,
@@ -9303,7 +9509,8 @@ export const SKILL_CLASSES = [
             "zhTW": "召喚恐狼：每等級 +15% 生命",
             "enUS": "Summon Dire Wolf: +15% Life per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/247.webp"
       },
       {
         "id": 248,
@@ -9330,7 +9537,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/dru/248.webp"
       },
       {
         "id": 249,
@@ -9407,7 +9615,8 @@ export const SKILL_CLASSES = [
             "zhTW": "火山噴發：每等級 +18% 傷害",
             "enUS": "Volcano: +18% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/249.webp"
       },
       {
         "id": 250,
@@ -9479,7 +9688,8 @@ export const SKILL_CLASSES = [
             "zhTW": "龍捲風：每等級 +9% 傷害",
             "enUS": "Tornado: +9% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/dru/250.webp"
       }
     ]
   },
@@ -9600,7 +9810,8 @@ export const SKILL_CLASSES = [
             "zhTW": "獄火衛哨：每等級 +11% 火焰傷害",
             "enUS": "Wake of Inferno: +11% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/251.webp"
       },
       {
         "id": 252,
@@ -9620,7 +9831,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/252.webp"
       },
       {
         "id": 253,
@@ -9664,7 +9876,8 @@ export const SKILL_CLASSES = [
             7
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/253.webp"
       },
       {
         "id": 254,
@@ -9689,7 +9902,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/254.webp"
       },
       {
         "id": 255,
@@ -9714,7 +9928,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/255.webp"
       },
       {
         "id": 256,
@@ -9786,7 +10001,8 @@ export const SKILL_CLASSES = [
             "zhTW": "雷光衛哨：每等級 +17% 電擊傷害",
             "enUS": "Lightning Sentry: +17% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/256.webp"
       },
       {
         "id": 257,
@@ -9841,7 +10057,8 @@ export const SKILL_CLASSES = [
             "zhTW": "利刃之盾：每等級 +10% 傷害",
             "enUS": "Blade Shield: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/257.webp"
       },
       {
         "id": 258,
@@ -9868,7 +10085,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/258.webp"
       },
       {
         "id": 259,
@@ -9924,7 +10142,8 @@ export const SKILL_CLASSES = [
             "zhTW": "鳳凰擊：每等級 +12% 火焰傷害",
             "enUS": "Phoenix Strike: +12% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/259.webp"
       },
       {
         "id": 260,
@@ -9957,7 +10176,8 @@ export const SKILL_CLASSES = [
             "zhTW": "利爪專精：每等級 +4% 傷害",
             "enUS": "Claw Mastery: +4% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/260.webp"
       },
       {
         "id": 261,
@@ -10034,7 +10254,8 @@ export const SKILL_CLASSES = [
             "zhTW": "雷光衛哨：每等級 +9% 電擊傷害",
             "enUS": "Lightning Sentry: +9% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/261.webp"
       },
       {
         "id": 262,
@@ -10101,7 +10322,8 @@ export const SKILL_CLASSES = [
             "zhTW": "獄火衛哨：每等級 +10% 火焰傷害",
             "enUS": "Wake of Inferno: +10% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/262.webp"
       },
       {
         "id": 263,
@@ -10123,7 +10345,8 @@ export const SKILL_CLASSES = [
         "mana": null,
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/263.webp"
       },
       {
         "id": 264,
@@ -10150,7 +10373,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/264.webp"
       },
       {
         "id": 265,
@@ -10177,7 +10401,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/265.webp"
       },
       {
         "id": 266,
@@ -10235,7 +10460,8 @@ export const SKILL_CLASSES = [
             "zhTW": "利刃之盾：每等級 +10% 傷害",
             "enUS": "Blade Shield: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/266.webp"
       },
       {
         "id": 267,
@@ -10262,7 +10488,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/267.webp"
       },
       {
         "id": 268,
@@ -10290,7 +10517,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0.6,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/268.webp"
       },
       {
         "id": 269,
@@ -10348,7 +10576,8 @@ export const SKILL_CLASSES = [
             "zhTW": "鳳凰擊：每等級 +8% 電擊傷害",
             "enUS": "Phoenix Strike: +8% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/269.webp"
       },
       {
         "id": 270,
@@ -10375,7 +10604,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/270.webp"
       },
       {
         "id": 271,
@@ -10442,7 +10672,8 @@ export const SKILL_CLASSES = [
             "zhTW": "電能衛哨：每等級 +18% 電擊傷害",
             "enUS": "Charged Bolt Sentry: +18% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/271.webp"
       },
       {
         "id": 272,
@@ -10514,7 +10745,8 @@ export const SKILL_CLASSES = [
             "zhTW": "焰痕衛哨：每等級 +18% 火焰傷害",
             "enUS": "Wake of Fire: +18% Fire Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/272.webp"
       },
       {
         "id": 273,
@@ -10560,7 +10792,8 @@ export const SKILL_CLASSES = [
             8
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/273.webp"
       },
       {
         "id": 274,
@@ -10618,7 +10851,8 @@ export const SKILL_CLASSES = [
             "zhTW": "鳳凰擊：每等級 +8% 冰寒傷害",
             "enUS": "Phoenix Strike: +8% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/274.webp"
       },
       {
         "id": 275,
@@ -10645,7 +10879,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/275.webp"
       },
       {
         "id": 276,
@@ -10708,7 +10943,8 @@ export const SKILL_CLASSES = [
             "zhTW": "雷光衛哨：每等級 +12% 電擊傷害",
             "enUS": "Lightning Sentry: +12% Lightning Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/276.webp"
       },
       {
         "id": 277,
@@ -10765,7 +11001,8 @@ export const SKILL_CLASSES = [
             "zhTW": "狂怒旋刃：每等級 +10% 傷害",
             "enUS": "Blade Fury: +10% Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/277.webp"
       },
       {
         "id": 278,
@@ -10811,7 +11048,8 @@ export const SKILL_CLASSES = [
             14
           ]
         },
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/278.webp"
       },
       {
         "id": 279,
@@ -10838,7 +11076,8 @@ export const SKILL_CLASSES = [
         },
         "cooldown": 0.6,
         "dmg": null,
-        "synergies": []
+        "synergies": [],
+        "icon": "/images/skills/ass/279.webp"
       },
       {
         "id": 280,
@@ -10887,7 +11126,8 @@ export const SKILL_CLASSES = [
             "zhTW": "寒冰刃：每等級 +10% 冰寒傷害",
             "enUS": "Blades of Ice: +10% Cold Damage per Level"
           }
-        ]
+        ],
+        "icon": "/images/skills/ass/280.webp"
       }
     ]
   }

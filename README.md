@@ -97,6 +97,43 @@ npx wrangler secret put MANUAL_TRIGGER_TOKEN
 该令牌也用于保护网页中的“DC 后台接口拉取”设置。未配置令牌时，访客仍可查看
 仪表盘和设置自己的页面自动刷新，但无法修改 Worker 的后台拉取频率。
 
+### 管理员账号初始化与管理后台（`/admin`）
+
+系统监控与刷新设置（前台全局自动刷新频率、DC 后台拉取间隔、手动立即同步、注册用户列表、角色管理及 15 分钟应急重置码）已统一移至独立管理后台 **`/admin`**。
+
+支持以下 3 种方式初始化首个管理员账号（任选其一，源代码不含硬编码密码）：
+
+1. **网页首次引导（最简便）**：部署后直接访问 `https://<你的 Worker 域名>/admin`，按提示创建首个管理员账号（若已配置 `MANUAL_TRIGGER_TOKEN`，将校验该令牌以确保仅站长本人可初始化）；初始化后该入口自动永久关闭。
+2. **命令行一键初始化（推荐给已有部署）**：
+   ```bash
+   # 初始化线上 Cloudflare KV 管理员（自动生成强密码与 5 个恢复码）
+   npm run init-admin -- --account admin --remote
+
+   # 或初始化本地 wrangler dev 环境管理员
+   npm run init-admin -- --account admin
+   ```
+3. **环境变量自动初始化**：配置 Worker Secret `ADMIN_PASSWORD`（可选 `ADMIN_ACCOUNT`，默认 `admin`），系统在无管理员时会自动写入 KV。
+
+### 用户登录、密码找回与 Google OAuth 配置（云端保存技能与装备）
+
+普通账号/邮箱密码注册与登录开箱即用，数据存储在绑定的 `DCLONE_STATE` KV 命名空间中。
+
+- **忘记密码自助找回（方案 1）**：注册时自动签发 5 个一次性恢复码（KV 仅存 SHA-256 哈希）；消耗完最后 1 个时自动补发全新 5 个，账号安全面板中也支持随时改密与重新生成恢复码（Google 登录后可直接免旧密码设密）。
+- **管理员应急重置（方案 3）**：若用户遗失全部恢复码，管理员登录 **`/admin`** 后可在用户列表一键为其生成 15 分钟一次性应急重置码（也继续兼容 `Bearer MANUAL_TRIGGER_TOKEN` 调用 `POST /api/auth/admin/reset-token`）。
+
+如需开启 **Google 账号一键登录**：
+
+1. 在 Google Cloud Console 创建 OAuth 2.0 Web 应用客户端，添加已授权的重定向 URI：
+   `https://<你的 Worker 域名>/api/auth/google/callback`
+2. 配置以下两个 Cloudflare Worker Secret：
+
+```bash
+npx wrangler secret put GOOGLE_CLIENT_ID
+npx wrangler secret put GOOGLE_CLIENT_SECRET
+```
+
+如需指定自定义回调域名，也可额外设置环境变量 `GOOGLE_REDIRECT_URI`。
+
 测试并部署：
 
 ```bash

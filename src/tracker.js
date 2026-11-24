@@ -6,7 +6,10 @@ import {
 
 const STATE_KEY = "diablo-clone-state-v1";
 const SETTINGS_KEY = "diablo-clone-settings-v1";
+const SYSTEM_CONFIG_KEY = "diablo-clone-system-config-v1";
 const DEFAULT_PULL_INTERVAL_MINUTES = 5;
+const DEFAULT_PAGE_REFRESH_ENABLED = true;
+const DEFAULT_PAGE_REFRESH_MINUTES = 1;
 const MAX_PULL_INTERVAL_MINUTES = 1440;
 
 const PROGRESS_LABELS = {
@@ -156,6 +159,72 @@ export async function setPullInterval(env, value) {
     JSON.stringify({ pullIntervalMinutes })
   );
   return { pullIntervalMinutes };
+}
+
+export async function getSystemConfig(env) {
+  const [trackerSettings, stored] = await Promise.all([
+    getTrackerSettings(env),
+    env.DCLONE_STATE.get(SYSTEM_CONFIG_KEY, "json")
+  ]);
+  const rawMinutes = Number(stored?.pageAutoRefreshMinutes);
+  const pageAutoRefreshMinutes =
+    Number.isInteger(rawMinutes) &&
+    rawMinutes >= 1 &&
+    rawMinutes <= MAX_PULL_INTERVAL_MINUTES
+      ? rawMinutes
+      : DEFAULT_PAGE_REFRESH_MINUTES;
+  const pageAutoRefreshEnabled =
+    typeof stored?.pageAutoRefreshEnabled === "boolean"
+      ? stored.pageAutoRefreshEnabled
+      : DEFAULT_PAGE_REFRESH_ENABLED;
+
+  return {
+    pullIntervalMinutes: trackerSettings.pullIntervalMinutes,
+    pageAutoRefreshEnabled,
+    pageAutoRefreshMinutes
+  };
+}
+
+export async function updateSystemConfig(env, patch = {}) {
+  const current = await getSystemConfig(env);
+  let pullIntervalMinutes = current.pullIntervalMinutes;
+  let pageAutoRefreshEnabled = current.pageAutoRefreshEnabled;
+  let pageAutoRefreshMinutes = current.pageAutoRefreshMinutes;
+
+  if (patch.pullIntervalMinutes !== undefined) {
+    const saved = await setPullInterval(env, patch.pullIntervalMinutes);
+    pullIntervalMinutes = saved.pullIntervalMinutes;
+  }
+
+  if (patch.pageAutoRefreshEnabled !== undefined) {
+    if (typeof patch.pageAutoRefreshEnabled !== "boolean") {
+      throw new Error("页面自动刷新开关必须为布尔值");
+    }
+    pageAutoRefreshEnabled = patch.pageAutoRefreshEnabled;
+  }
+
+  if (patch.pageAutoRefreshMinutes !== undefined) {
+    const m = Number(patch.pageAutoRefreshMinutes);
+    if (!Number.isInteger(m) || m < 1 || m > MAX_PULL_INTERVAL_MINUTES) {
+      throw new Error("页面自动刷新间隔必须是 1 至 1440 之间的整数分钟");
+    }
+    pageAutoRefreshMinutes = m;
+  }
+
+  await env.DCLONE_STATE.put(
+    SYSTEM_CONFIG_KEY,
+    JSON.stringify({
+      pageAutoRefreshEnabled,
+      pageAutoRefreshMinutes,
+      updatedAt: new Date().toISOString()
+    })
+  );
+
+  return {
+    pullIntervalMinutes,
+    pageAutoRefreshEnabled,
+    pageAutoRefreshMinutes
+  };
 }
 
 export function isPullDue(pullIntervalMinutes, now = Date.now()) {

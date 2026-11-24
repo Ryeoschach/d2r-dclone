@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
+import fs from "node:fs";
 import test from "node:test";
 
 import {
@@ -13,7 +15,13 @@ import {
   setPullInterval,
   validateServerCombinations
 } from "../src/tracker.js";
-import { renderDashboard } from "../src/dashboard.js";
+import {
+  DASHBOARD_CSS_VERSION,
+  DASHBOARD_JS_VERSION,
+  renderDashboard
+} from "../src/dashboard.js";
+import { SKILL_CLASSES } from "../src/skills-catalog.js";
+import { renderAdminDashboard } from "../src/admin-dashboard.js";
 
 const server = {
   server: "ladderSoftcoreAsiaRotw",
@@ -106,7 +114,19 @@ test("毁灭之王 HC 映射正确", () => {
 });
 
 test("仪表盘包含完整分组和筛选入口", () => {
-  const html = renderDashboard();
+  const pageHtml = renderDashboard();
+  const dashboardCss = fs.readFileSync(new URL("../public/assets/dashboard.css", import.meta.url), "utf8");
+  const dashboardJs = fs.readFileSync(new URL("../public/assets/dashboard.js", import.meta.url), "utf8");
+  const expectedCssVer = crypto.createHash("sha256").update(dashboardCss).digest("hex").slice(0, 10);
+  const expectedJsVer = crypto.createHash("sha256").update(dashboardJs).digest("hex").slice(0, 10);
+  assert.equal(DASHBOARD_CSS_VERSION, expectedCssVer, "DASHBOARD_CSS_VERSION 须与 public/assets/dashboard.css 哈希一致（可运行 npm run sync:assets）");
+  assert.equal(DASHBOARD_JS_VERSION, expectedJsVer, "DASHBOARD_JS_VERSION 须与 public/assets/dashboard.js 哈希一致（可运行 npm run sync:assets）");
+  assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="/assets/dashboard\\.css\\?v=${expectedCssVer}">`));
+  assert.match(pageHtml, new RegExp(`<script src="/assets/dashboard\\.js\\?v=${expectedJsVer}" defer></script>`));
+  assert.doesNotMatch(pageHtml, /<style>/, "仪表盘 CSS 应已拆分至 public/assets/dashboard.css");
+  assert.doesNotMatch(pageHtml, /<script>\s*\n/, "仪表盘主脚本应已拆分至 public/assets/dashboard.js");
+
+  const html = pageHtml + "\n" + dashboardCss + "\n" + dashboardJs;
   assert.match(html, /暗黑 2 重置版 · 庇护之地实时战报/);
   assert.match(html, /Diablo II: Resurrected · Sanctuary Live/);
   assert.match(html, /实时掌握恐怖地带异动与迪亚波罗克隆入侵进度/);
@@ -115,14 +135,25 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /非天梯 SC/);
   assert.match(html, /天梯 HC/);
   assert.match(html, /4 阶以上/);
-  assert.match(html, /页面数据自动刷新/);
-  assert.match(html, /DC 后台接口拉取/);
+  assert.doesNotMatch(html, /id="settings-drawer"/, "系统设置抽屉应已迁移至管理后台");
+  assert.doesNotMatch(html, /id="pull-interval"/, "后台拉取设置应已迁移至管理后台");
+  assert.doesNotMatch(html, /id="admin-token"/, "管理令牌输入框应已迁移至管理后台");
+  assert.match(html, /id="admin-entry-link"/);
+  assert.match(html, /\/api\/system-config/);
   assert.match(html, /展示数据最近变更/);
-  assert.match(html, /不会整页重载/);
-  assert.match(html, /切换待确认时每 15 秒读取一次/);
   assert.match(html, /isAwaitingTerrorConfirmation/);
   assert.match(html, /15 \* 1000/);
-  assert.match(html, /恐怖区域仍按整点、半点独立同步/);
+
+  const adminHtml = renderAdminDashboard();
+  assert.match(adminHtml, /页面数据自动刷新/);
+  assert.match(adminHtml, /DC 后台接口拉取/);
+  assert.match(adminHtml, /不会整页重载/);
+  assert.match(adminHtml, /切换待确认时每 15 秒读取一次/);
+  assert.match(adminHtml, /恐怖区域仍按整点、半点独立同步/);
+  assert.match(adminHtml, /settings-module/);
+  const adminScriptMatch = adminHtml.match(/<script>([\s\S]*?)<\/script>/);
+  assert.ok(adminScriptMatch, "管理后台应当包含内联脚本");
+  assert.doesNotThrow(() => new Function(adminScriptMatch[1]), "管理后台内联脚本语法必须合法");
   assert.match(html, /当前恐怖区域/);
   assert.match(html, /下一阶段恐怖区域/);
   assert.match(html, /terror-countdown/);
@@ -139,7 +170,6 @@ test("仪表盘包含完整分组和筛选入口", () => {
   );
   assert.match(html, /terror-module/);
   assert.match(html, /dclone-module/);
-  assert.match(html, /settings-module/);
   assert.match(html, /main-nav-tabs/);
   assert.match(html, /main-tab-terror/);
   assert.match(html, /main-tab-dclone/);
@@ -165,7 +195,23 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /main-panel-skills/);
   assert.match(html, /\/api\/skills/);
   assert.match(html, /sk-trees-wrap/);
+  assert.match(html, /sk-tree-legend/);
+  assert.match(html, /sk-links-svg/);
+  assert.match(html, /drawSkillTreeLinks/);
+  assert.match(html, /applySkillRelationHighlight/);
+  assert.match(html, /getSkillNodeIconHtml/);
   assert.match(html, /sk-inspector/);
+  let skillIconCount = 0;
+  for (const cls of SKILL_CLASSES) {
+    for (const sk of cls.skills) {
+      assert.match(sk.icon || "", /^\/images\/skills\/[a-z]+\/\d+\.webp$/, `技能 ${cls.id}:${sk.key} 应映射游戏内高清图标`);
+      assert.ok(fs.existsSync(new URL("../public" + sk.icon, import.meta.url)), `技能图标文件必须存在: public${sk.icon}`);
+      skillIconCount += 1;
+    }
+  }
+  assert.equal(skillIconCount, 240, "全部 8 职业 240 个技能图标应完整存在");
+  assert.ok(fs.existsSync(new URL("../public/images/ui/skilltree_col_bg.webp", import.meta.url)), "技能树石板背景图应存在");
+  assert.match(dashboardCss, /skilltree_col_bg\.webp/);
   assert.match(html, /\/api\/drops/);
   assert.match(html, /it-drops-console/);
   assert.match(html, /tz-jump-drops-btn/);
@@ -245,6 +291,41 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /游戏 C 键面板攻击力/);
   assert.match(html, /实战真实单次/);
   assert.match(html, /自带技能与光环/);
+  assert.match(html, /bp-paperdoll-sync-bar/);
+  assert.match(html, /bp-auto-sync-toggle/);
+  assert.match(html, /bp-sync-source-badge/);
+  assert.match(html, /bp-sync-now-btn/);
+  assert.match(html, /bp-back-pd-btn/);
+  assert.match(html, /pd-jump-bp-btn/);
+  assert.match(html, /evalIasBreakpoints/);
+  assert.match(html, /syncPaperdollToBreakpoints/);
+  assert.match(html, /pdLastBreakpointSnapshot/);
+  assert.match(html, /bd-share-dialog/);
+  assert.match(html, /pd-share-bd-btn/);
+  assert.match(html, /sk-share-full-bd-btn/);
+  assert.match(html, /importSharedBuildById/);
+  assert.match(html, /\/api\/builds\/share/);
+  assert.match(html, /pd-swap-bar/);
+  assert.match(html, /pd-wset-1/);
+  assert.match(html, /pd-wset-2/);
+  assert.match(html, /pd-wset-toggle-btn/);
+  assert.match(html, /pd-swap-preset-cta/);
+  assert.match(html, /pd-swap-preset-mf/);
+  assert.match(html, /switchPaperdollWeaponSet/);
+  assert.match(html, /computeRealCtaBoStats/);
+  assert.match(html, /alert-open-btn/);
+  assert.match(html, /alert-dialog/);
+  assert.match(html, /evaluatePersonalAlerts/);
+  assert.match(html, /playAlertChime/);
+  assert.match(html, /toggleFavoriteTzZone/);
+  assert.match(html, /d2s-import-dialog/);
+  assert.match(html, /sk-import-d2s-btn/);
+  assert.match(html, /pd-import-d2s-btn/);
+  assert.match(html, /applyMappedD2sImport/);
+  assert.match(html, /\/assets\/d2s-parser\.js/);
+  assert.equal((pageHtml.match(/class="auth-dlg-head"/g) || []).length, 4, "全部 4 个前台原生弹窗均应使用统一的 auth-dlg-head 顶栏布局");
+  assert.equal((pageHtml.match(/class="auth-dlg-body"/g) || []).length, 4, "全部 4 个前台原生弹窗均应使用统一的 auth-dlg-body 内边距容器");
+  assert.doesNotMatch(pageHtml, /class="auth-dialog-(head|body|title|sub)"/, "不应存在失配的 auth-dialog-* 旧类名");
   const subtabsMatch = html.match(/id="sk-view-subtabs"[\s\S]*?<\/div>/);
   assert.ok(subtabsMatch, "应包含技能子标签页容器");
   assert.ok(
@@ -258,9 +339,7 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /sim-base-select/);
   assert.match(html, /rollSimulatedItem/);
 
-  const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
-  assert.ok(scriptMatch, "仪表盘应当包含内联脚本");
-  assert.doesNotThrow(() => new Function(scriptMatch[1]), "仪表盘内联脚本语法必须合法");
+  assert.doesNotThrow(() => new Function(dashboardJs), "仪表盘静态脚本 public/assets/dashboard.js 语法必须合法");
   assert.match(html, /符文之语 100% 记事/);
   assert.match(html, /\/api\/runewords/);
   assert.match(html, /rw-rune-grid/);
@@ -283,8 +362,14 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /\/api\/terror-zones/);
   assert.match(html, /storedAutoRefresh === null/);
   assert.match(html, /updateSyncAge/);
-  assert.match(html, /data-auto-minutes="5"/);
-  assert.match(html, /\/api\/settings/);
+  assert.match(html, /auth-profile-edit-form/);
+  assert.match(html, /\/api\/user\/profile/);
+  assert.match(adminHtml, /data-auto-min="5"/);
+  assert.match(adminHtml, /\/api\/admin\/settings/);
+  assert.match(adminHtml, /adm-audit-section/);
+  assert.match(adminHtml, /adm-audit-refresh-btn/);
+  assert.match(adminHtml, /loadAdminAuditLogs/);
+  assert.match(adminHtml, /\/api\/admin\/audit-logs/);
   assert.match(html, /\/api\/status/);
 });
 

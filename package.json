@@ -6,7 +6,10 @@
   "scripts": {
     "test": "node --test",
     "dev": "wrangler dev --test-scheduled",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "init-admin": "node scripts/init-admin.mjs",
+    "sync:assets": "node scripts/sync-asset-versions.mjs",
+    "start:linux": "node scripts/linux-server.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

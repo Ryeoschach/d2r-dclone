@@ -1,7 +1,9 @@
 import { renderDashboard } from "./dashboard.js";
+import { renderAdminDashboard } from "./admin-dashboard.js";
 import {
   checkForUpdates,
   getStoredState,
+  getSystemConfig,
   getTrackerSettings,
   isPullDue,
   setPullInterval,
@@ -15,13 +17,22 @@ import { getItemsCatalog } from "./items-metadata.js";
 import { getSkillsCatalog } from "./skills-catalog.js";
 import { getDropCalculatorData } from "./drop-calculator.js";
 import { getPaperdollCatalog } from "./paperdoll-data.js";
+import {
+  getAuthenticatedAdmin,
+  handleAuthOrUserRequest,
+  resolveInitialAuthContext
+} from "./auth.js";
+import { handleAdminApiRequest } from "./admin-api.js";
+import { handleSharedBuildRequest } from "./shared-builds.js";
+import { resolveStorageEnv } from "./storage.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store"
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff"
     }
   });
 }
@@ -30,9 +41,14 @@ function html(content) {
   return new Response(content, {
     headers: {
       "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store, no-cache, must-revalidate",
+      "cache-control": "private, no-store, no-cache, must-revalidate",
+      vary: "Cookie",
       "x-content-type-options": "nosniff",
-      "referrer-policy": "no-referrer"
+      "x-frame-options": "DENY",
+      "content-security-policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
+      "cross-origin-opener-policy": "same-origin-allow-popups",
+      "cross-origin-resource-policy": "same-origin",
+      "referrer-policy": "strict-origin-when-cross-origin"
     }
   });
 }
@@ -94,16 +110,63 @@ async function runScheduled(env) {
   return result;
 }
 
+async function runManualSync(env) {
+  let terrorZone = null;
+  try {
+    terrorZone = await fetchTerrorZone(env);
+  } catch (error) {
+    console.error("手动同步恐怖区域失败", error);
+  }
+  const clone = await run(env, { terrorZone });
+  return { ...clone, terrorZone };
+}
+
 export default {
-  async scheduled(_controller, env, ctx) {
+  async scheduled(_controller, rawEnv, ctx) {
+    const env = resolveStorageEnv(rawEnv);
     ctx.waitUntil(runScheduled(env));
   },
 
-  async fetch(request, env) {
+  async fetch(request, rawEnv) {
+    const env = resolveStorageEnv(rawEnv);
     const url = new URL(request.url);
 
+    if (url.pathname.startsWith("/api/admin/")) {
+      const adminResponse = await handleAdminApiRequest(request, env, url, {
+        runManualSync
+      });
+      if (adminResponse) return adminResponse;
+    }
+
+    if (url.pathname.startsWith("/api/auth/") || url.pathname.startsWith("/api/user/")) {
+      const authResponse = await handleAuthOrUserRequest(request, env, url);
+      if (authResponse) return authResponse;
+    }
+
+    if (
+      url.pathname === "/api/builds/share" ||
+      url.pathname.startsWith("/api/builds/share/") ||
+      url.pathname.startsWith("/build/")
+    ) {
+      const shareResponse = await handleSharedBuildRequest(request, env, url);
+      if (shareResponse) return shareResponse;
+    }
+
+    if (
+      request.method === "GET" &&
+      (url.pathname === "/admin" ||
+        url.pathname === "/admin/" ||
+        url.pathname === "/admin/users" ||
+        url.pathname === "/admin/users/")
+    ) {
+      const initialAuth = await resolveInitialAuthContext(request, env);
+      const activePage = url.pathname.startsWith("/admin/users") ? "users" : "settings";
+      return html(renderAdminDashboard({ initialAuth, activePage }));
+    }
+
     if (request.method === "GET" && url.pathname === "/") {
-      return html(renderDashboard());
+      const initialAuth = await resolveInitialAuthContext(request, env);
+      return html(renderDashboard({ initialAuth }));
     }
 
     if (request.method === "GET" && url.pathname === "/api/terror-zones") {
@@ -145,16 +208,23 @@ export default {
       return json(state);
     }
 
+    if (request.method === "GET" && url.pathname === "/api/system-config") {
+      return json({ ok: true, ...(await getSystemConfig(env)) });
+    }
+
     if (request.method === "GET" && url.pathname === "/api/settings") {
       return json(await getTrackerSettings(env));
     }
 
     if (request.method === "POST" && url.pathname === "/api/settings") {
-      if (!env.MANUAL_TRIGGER_TOKEN) {
-        return json({ ok: false, error: "未配置管理令牌" }, 503);
-      }
-      if (!isAuthorized(request, env)) {
-        return json({ ok: false, error: "未授权" }, 401);
+      const adminAuth = await getAuthenticatedAdmin(request, env);
+      if (!adminAuth) {
+        if (!env.MANUAL_TRIGGER_TOKEN) {
+          return json({ ok: false, error: "未配置管理令牌" }, 503);
+        }
+        if (!isAuthorized(request, env)) {
+          return json({ ok: false, error: "未授权" }, 401);
+        }
       }
 
       try {
@@ -169,23 +239,19 @@ export default {
     }
 
     if (request.method === "POST" && url.pathname === "/run") {
-      if (!env.MANUAL_TRIGGER_TOKEN) {
-        return json({ ok: false, error: "未配置手动触发令牌" }, 503);
-      }
-
-      if (!isAuthorized(request, env)) {
-        return json({ ok: false, error: "未授权" }, 401);
+      const adminAuth = await getAuthenticatedAdmin(request, env);
+      if (!adminAuth) {
+        if (!env.MANUAL_TRIGGER_TOKEN) {
+          return json({ ok: false, error: "未配置手动触发令牌" }, 503);
+        }
+        if (!isAuthorized(request, env)) {
+          return json({ ok: false, error: "未授权" }, 401);
+        }
       }
 
       try {
-        let terrorZone = null;
-        try {
-          terrorZone = await fetchTerrorZone(env);
-        } catch (error) {
-          console.error("手动同步恐怖区域失败", error);
-        }
-        const clone = await run(env, { terrorZone });
-        return json({ ok: true, ...clone, terrorZone });
+        const synced = await runManualSync(env);
+        return json({ ok: true, ...synced });
       } catch (error) {
         return json({ ok: false, error: error.message }, 502);
       }
