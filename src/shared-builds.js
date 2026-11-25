@@ -4,9 +4,12 @@ import { getSkillsCatalog } from "./skills-catalog.js";
 import { getItemsCatalog } from "./items-metadata.js";
 import { getRunewordsCatalog } from "./runewords-metadata.js";
 import { getPaperdollCatalog } from "./paperdoll-data.js";
+import { DASHBOARD_THEME_VERSION } from "./dashboard.js";
 
 const KEY_SHARE_BUILD_PREFIX = "share:build:";
 const KEY_SHARE_RL_PREFIX = "share:rl:";
+const KEY_USER_SHARES_PREFIX = "user:shares:";
+const MAX_USER_SHARES = 50;
 const MAX_SHARE_BODY_BYTES = 64 * 1024;
 const SHARE_RL_WINDOW_SECONDS = 600;
 const SHARE_RL_MAX_CREATES = 20;
@@ -96,6 +99,21 @@ const MERC_VARIANT_LABELS = {
   "a3-cold": "第三幕 · 东方铁狼法师（冰尖柱 + 寒冰装甲）",
   "a5-frenzy": "第五幕 · 野蛮人狂乱双刀（狂乱 + 嘲讽）",
   "a5-bash": "第五幕 · 野蛮人重击双手（重击 + 晕眩）"
+};
+
+const MERC_BASE_PROFILES = {
+  "a2-might": { baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res4: 4, skills: [{ name: "戳刺 Jab", base: 23, per32: 0 }, { name: "力量灵气 Might", base: 15, per32: 8, auraDesc: (l) => `全队物理伤害 +${30 + l * 10}%` }] },
+  "a2-hf": { baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res4: 4, skills: [{ name: "戳刺 Jab", base: 23, per32: 0 }, { name: "神圣冰冻 Holy Freeze", base: 16, per32: 0, auraDesc: (l) => `大范围冰冷控场减速 ${Math.min(58, 25 + l * 2)}%` }] },
+  "a2-prayer": { baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res4: 4, skills: [{ name: "戳刺 Jab", base: 24, per32: 10 }, { name: "祈祷灵气 Prayer", base: 18, per32: 0, auraDesc: (l) => `单层每秒回血 +${l * 2 - 5}` }] },
+  "a2-defiance": { baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res4: 4, skills: [{ name: "戳刺 Jab", base: 24, per32: 0 }, { name: "反抗灵气 Defiance", base: 18, per32: 0, auraDesc: (l) => `全队防御 +${60 + l * 10}%` }] },
+  "a2-ba": { baseLvl: 75, hp: 1430, hpLvl: 40, str: 173, str8: 14, dex: 139, dex8: 12, def: 1027, defLvl: 28, res: 142, res4: 4, skills: [{ name: "戳刺 Jab", base: 24, per32: 0 }, { name: "祝福瞄准 Blessed Aim", base: 18, per32: 0, auraDesc: (l) => `全队命中率 +${60 + l * 15}%` }] },
+  "a1-cold": { baseLvl: 67, hp: 900, hpLvl: 30, str: 116, str8: 10, dex: 173, dex8: 16, def: 744, defLvl: 23, res: 121, res4: 5, skills: [{ name: "内视 Inner Sight", base: 22, per32: 10, auraDesc: (l) => `降敌防御 -${40 + l * 45}` }, { name: "冰冷箭 Cold Arrow", base: 22, per32: 10 }, { name: "冻结箭 Freezing Arrow", base: 7, per32: 3 }] },
+  "a1-fire": { baseLvl: 67, hp: 900, hpLvl: 30, str: 116, str8: 10, dex: 173, dex8: 16, def: 744, defLvl: 23, res: 121, res4: 5, skills: [{ name: "内视 Inner Sight", base: 22, per32: 10 }, { name: "火焰箭 Fire Arrow", base: 22, per32: 10 }, { name: "爆裂箭 Exploding Arrow", base: 12, per32: 5 }] },
+  "a3-fire": { baseLvl: 79, hp: 1224, hpLvl: 34, str: 130, str8: 10, dex: 104, dex8: 8, def: 907, defLvl: 25, res: 155, res4: 5, skills: [{ name: "火焰强化 Enchant", base: 26, per32: 20, auraDesc: (l) => `附加火伤与 +${20 + l * 9}% 命中` }, { name: "火球术 Fire Ball", base: 25, per32: 10 }, { name: "火焰弹 Fire Bolt", base: 27, per32: 10 }] },
+  "a3-ltng": { baseLvl: 79, hp: 1224, hpLvl: 34, str: 130, str8: 10, dex: 104, dex8: 8, def: 907, defLvl: 25, res: 155, res4: 5, skills: [{ name: "静电力场 Static Field", base: 18, per32: 8, auraDesc: (l) => `削减怪物 25% 当前生命` }, { name: "闪电 Lightning", base: 24, per32: 10 }, { name: "充能弹 Charged Bolt", base: 25, per32: 10 }] },
+  "a3-cold": { baseLvl: 79, hp: 1224, hpLvl: 34, str: 130, str8: 10, dex: 104, dex8: 8, def: 907, defLvl: 25, res: 155, res4: 5, skills: [{ name: "冰尖柱 Glacial Spike", base: 22, per32: 10, auraDesc: () => "群体冻结控场" }, { name: "寒冰装甲 Chilling Armor", base: 27, per32: 15 }, { name: "冰风暴 Ice Blast", base: 27, per32: 10 }] },
+  "a5-frenzy": { baseLvl: 80, hp: 1680, hpLvl: 45, str: 200, str8: 15, dex: 129, dex8: 10, def: 1332, defLvl: 35, res: 148, res4: 4, skills: [{ name: "狂乱 Frenzy", base: 13, per32: 7, auraDesc: (l) => `攻速与移速叠加 (Lv.${l})` }, { name: "钢铁皮肤 Iron Skin", base: 12, per32: 6 }, { name: "嘲讽 Taunt", base: 17, per32: 6 }] },
+  "a5-bash": { baseLvl: 80, hp: 1680, hpLvl: 45, str: 200, str8: 15, dex: 129, dex8: 10, def: 1332, defLvl: 35, res: 148, res4: 4, skills: [{ name: "战吼 Battle Cry", base: 19, per32: 8, auraDesc: (l) => `降敌防御 -${48 + l * 2}% 与伤害 -${24 + l}%` }, { name: "猛击 Bash", base: 25, per32: 10 }, { name: "击晕 Stun", base: 20, per32: 8 }] }
 };
 
 const CHAR_AURA_LABELS = {
@@ -432,6 +450,16 @@ function sanitizeBag(raw) {
       if (typeof b.affixes.suf === "string") cleanAff.suf = sanitizeText(b.affixes.suf, 48);
       if (Object.keys(cleanAff).length) entry.affixes = cleanAff;
     }
+    if (Array.isArray(b.prefixes) && b.prefixes.length) {
+      entry.prefixes = b.prefixes.slice(0, 3).map((p) => (p && typeof p === "object"
+        ? { id: sanitizeText(p.id, 48), nameZh: sanitizeText(p.nameZh, 48), range: sanitizeText(p.range, 96) }
+        : null)).filter(Boolean);
+    }
+    if (Array.isArray(b.suffixes) && b.suffixes.length) {
+      entry.suffixes = b.suffixes.slice(0, 3).map((s) => (s && typeof s === "object"
+        ? { id: sanitizeText(s.id, 48), nameZh: sanitizeText(s.nameZh, 48), range: sanitizeText(s.range, 96) }
+        : null)).filter(Boolean);
+    }
     out.push(entry);
   }
   return out;
@@ -464,6 +492,7 @@ function sanitizePaperdollSnapshot(raw) {
     mercEnabled: raw.mercEnabled !== undefined ? Boolean(raw.mercEnabled) : true,
     mercAuraOn: raw.mercAuraOn !== undefined ? Boolean(raw.mercAuraOn) : true,
     ctaOn: raw.ctaOn !== undefined ? Boolean(raw.ctaOn) : true,
+    holyShieldOn: raw.holyShieldOn !== undefined ? Boolean(raw.holyShieldOn) : true,
     charAura: sanitizeText(raw.charAura, 32) || "none",
     demonAura: sanitizeText(raw.demonAura, 32) || "none",
     demonMlvl: sanitizeInt(raw.demonMlvl, 1, 99, 96),
@@ -474,8 +503,54 @@ function sanitizePaperdollSnapshot(raw) {
   };
 }
 
+function sanitizeMercSummary(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const hpMultRaw = Number(raw.hpMult);
+  const hpMult = Number.isFinite(hpMultRaw) ? Math.min(10, Math.max(1, Math.round(hpMultRaw * 100) / 100)) : 1;
+  const apsRaw = Number(raw.aps);
+  const aps = Number.isFinite(apsRaw) ? Math.min(10, Math.max(0, Math.round(apsRaw * 100) / 100)) : 0;
+  return {
+    enabled: raw.enabled !== undefined ? Boolean(raw.enabled) : true,
+    innateAuraOn: raw.innateAuraOn !== undefined ? Boolean(raw.innateAuraOn) : true,
+    variant: sanitizeText(raw.variant, 32) || "a2-might",
+    lvl: sanitizeInt(raw.lvl, 1, 98, 90),
+    hp: sanitizeInt(raw.hp, 0, 999999, 0),
+    hpMult,
+    def: sanitizeInt(raw.def, 0, 999999, 0),
+    dmgMin: sanitizeInt(raw.dmgMin, 0, 999999, 0),
+    dmgMax: sanitizeInt(raw.dmgMax, 0, 999999, 0),
+    ar: sanitizeInt(raw.ar, 0, 999999, 0),
+    str: sanitizeInt(raw.str, 0, 1500, 0),
+    baseStr: sanitizeInt(raw.baseStr, 0, 1500, 0),
+    dex: sanitizeInt(raw.dex, 0, 1500, 0),
+    baseDex: sanitizeInt(raw.baseDex, 0, 1500, 0),
+    reqStr: sanitizeInt(raw.reqStr, 0, 1500, 0),
+    reqDex: sanitizeInt(raw.reqDex, 0, 1500, 0),
+    reqOk: raw.reqOk !== undefined ? Boolean(raw.reqOk) : true,
+    allSkills: sanitizeInt(raw.allSkills, 0, 30, 0),
+    resF: sanitizeInt(raw.resF, -100, 95, 0),
+    resC: sanitizeInt(raw.resC, -100, 95, 0),
+    resL: sanitizeInt(raw.resL, -100, 95, 0),
+    resP: sanitizeInt(raw.resP, -100, 95, 0),
+    baseResHell: sanitizeInt(raw.baseResHell, -100, 95, 0),
+    ias: sanitizeInt(raw.ias, 0, 500, 0),
+    wsm: sanitizeInt(raw.wsm, -60, 60, 0),
+    fanaEias: sanitizeInt(raw.fanaEias, 0, 100, 0),
+    atkFrame: sanitizeInt(raw.atkFrame, 0, 30, 0),
+    aps,
+    ll: sanitizeInt(raw.ll, 0, 200, 0),
+    cb: sanitizeInt(raw.cb, 0, 200, 0),
+    ds: sanitizeInt(raw.ds, 0, 200, 0),
+    dr: sanitizeInt(raw.dr, 0, 50, 0),
+    cbf: Boolean(raw.cbf),
+    skills: sanitizeText(raw.skills, 220),
+    gearAuras: sanitizeText(raw.gearAuras, 120)
+  };
+}
+
 function sanitizeSummary(raw) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const merc = sanitizeMercSummary(raw.merc);
   return {
     hp: sanitizeInt(raw.hp, 0, 999999, 0),
     mana: sanitizeInt(raw.mana, 0, 999999, 0),
@@ -505,7 +580,8 @@ function sanitizeSummary(raw) {
     skillDmg: sanitizeText(raw.skillDmg, 64),
     dps: sanitizeInt(raw.dps, 0, 99999999, 0),
     weaponName: sanitizeText(raw.weaponName, 80),
-    shieldName: sanitizeText(raw.shieldName, 80)
+    shieldName: sanitizeText(raw.shieldName, 80),
+    ...(merc ? { merc } : {})
   };
 }
 
@@ -995,12 +1071,14 @@ function layoutSharedInventoryBag(bagRaw, idx, cls) {
     const w = Math.max(1, Math.min(2, Number(def?.w || 1)));
     const h = Math.max(1, Math.min(3, Number(def?.h || 1)));
     let label = def ? def.nameZh : b.charmId;
-    let shortTag = def?.shortTag || (h === 3 ? "大板" : h === 2 ? "中板" : "小符");
+    let shortTag = def?.shortZh || def?.shortTag || (h === 3 ? "大板" : h === 2 ? "中板" : "小符");
+    let tabLabel = "";
     if (b.tabPage > 0 && cls && Array.isArray(cls.tabs)) {
       const tObj = cls.tabs.find((t) => t.page === b.tabPage);
       if (tObj) {
-        label += ` (${tObj.zhCN})`;
-        shortTag = (tObj.zhCN || "").slice(0, 2) + "+1";
+        tabLabel = tObj.zhCN || tObj.enUS || "";
+        label += ` (${tabLabel})`;
+        shortTag = tabLabel.slice(0, 2) + "+1";
       }
     }
     const kind = def?.unique ? "is-unique" : (def?.util ? "is-util" : "");
@@ -1010,6 +1088,7 @@ function layoutSharedInventoryBag(bagRaw, idx, cls) {
       w,
       h,
       label,
+      tabLabel,
       shortTag,
       kind,
       icon: def?.icon || "/images/items/misc/charm/charm_small.webp"
@@ -1097,21 +1176,34 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
   const shareUrl = origin ? `${origin.replace(/\/$/, "")}${sharePath}` : sharePath;
   const importPath = `/?import_build=${encodeURIComponent(build.id)}#skills`;
 
-  // Skills breakdown by 3 trees
+  // Skills breakdown by 3 trees (both compact list & full 3x6 visual tree)
   const skillsMap = build.skills || {};
   let totalSkillPts = 0;
   const treeBlocks = [];
   if (cls && Array.isArray(cls.tabs)) {
     for (const tab of cls.tabs) {
-      const tabSkills = (cls.skills || [])
-        .filter((sk) => sk.page === tab.page && Number(skillsMap[sk.key] || 0) > 0)
+      const pageAll = (cls.skills || [])
+        .filter((sk) => sk.page === tab.page)
         .sort((a, b) => (a.row - b.row) || (a.col - b.col));
+      const tabSkills = pageAll.filter((sk) => Number(skillsMap[sk.key] || 0) > 0);
       const tabSum = tabSkills.reduce((acc, sk) => acc + Number(skillsMap[sk.key] || 0), 0);
       totalSkillPts += tabSum;
       treeBlocks.push({
+        page: tab.page,
         title: tab.zhCN || tab.enUS || `系别 ${tab.page}`,
         pts: tabSum,
         items: tabSkills.map((sk) => ({
+          key: sk.key,
+          nameZh: sk.nameZh || sk.key,
+          nameEn: sk.nameEn || sk.key,
+          icon: sk.icon || "",
+          pts: Number(skillsMap[sk.key] || 0)
+        })),
+        allSkills: pageAll.map((sk) => ({
+          key: sk.key,
+          row: Number(sk.row) || 1,
+          col: Number(sk.col) || 1,
+          reqs: Array.isArray(sk.reqs) ? sk.reqs : [],
           nameZh: sk.nameZh || sk.key,
           nameEn: sk.nameEn || sk.key,
           icon: sk.icon || "",
@@ -1120,6 +1212,53 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
       });
     }
   }
+
+  const renderSharedSkillTreeStageHtml = (tb) => {
+    const byKey = new Map(tb.allSkills.map((s) => [s.key, s]));
+    const cellX = (c) => (c - 0.5) * 100;
+    const cellY = (r) => (r - 0.5) * 100;
+    const paths = [];
+    for (const dst of tb.allSkills) {
+      for (const rk of dst.reqs) {
+        const src = byKey.get(rk);
+        if (!src) continue;
+        const sx = cellX(src.col);
+        const sy = cellY(src.row);
+        const dx = cellX(dst.col);
+        const dy = cellY(dst.row);
+        const dr = dst.row - src.row;
+        const dc = dst.col - src.col;
+        let d = "";
+        if (dr === 0 && dc !== 0) {
+          const x1 = dc > 0 ? sx + 32 : sx - 32;
+          const x2 = dc > 0 ? dx - 34 : dx + 34;
+          d = `M ${x1} ${sy} L ${x2} ${dy}`;
+        } else if (dc === 0) {
+          d = `M ${sx} ${sy + 34} L ${dx} ${dy - 36}`;
+        } else {
+          const midY = dy - 50;
+          d = `M ${sx} ${sy + 34} L ${sx} ${midY} L ${dx} ${midY} L ${dx} ${dy - 36}`;
+        }
+        const active = src.pts > 0 && dst.pts > 0;
+        paths.push(`<path class="bd-sk-edge${active ? " is-active" : ""}" d="${d}" />`);
+      }
+    }
+    const nodes = tb.allSkills.map((sk) => {
+      const invested = sk.pts > 0;
+      const tip = `${sk.nameZh} (${sk.nameEn}) · ${sk.pts} / 20 点`;
+      return `<div class="bd-sk-node${invested ? " is-invested" : ""}" style="grid-column:${sk.col};grid-row:${sk.row}" title="${escapeHtml(tip)}">
+        <div class="bd-sk-node-ico-wrap">
+          ${sk.icon ? `<img class="bd-sk-node-ico" src="${escapeHtml(sk.icon)}" alt="${escapeHtml(sk.nameZh)}" loading="lazy" />` : `<span class="bd-sk-node-ph"></span>`}
+          ${invested ? `<span class="bd-sk-node-badge">${sk.pts}</span>` : ""}
+        </div>
+        <span class="bd-sk-node-name">${escapeHtml(sk.nameZh)}</span>
+      </div>`;
+    }).join("");
+    return `<div class="bd-sk-stage">
+      <svg class="bd-sk-svg" viewBox="0 0 300 600" preserveAspectRatio="none" aria-hidden="true">${paths.join("")}</svg>
+      <div class="bd-sk-grid">${nodes}</div>
+    </div>`;
+  };
 
   // Count worn set pieces per set name so Set Bonuses display accurate progress
   const countWornSets = (loadout) => {
@@ -1183,8 +1322,14 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
 
   const buffBadges = [];
   if (pd?.ctaOn) buffBadges.push("⚔️ 战争召唤 CTA (+1 全技能 · +65% 血/蓝)");
+  if (build.classId === "pal" && pd?.holyShieldOn !== false && Number(build.skills?.["Holy Shield"] || 0) > 0) {
+    buffBadges.push(`🛡️ 神圣之盾 Holy Shield（已开启 · 基础 ${Number(build.skills["Holy Shield"])} 点）`);
+  }
   if (pd?.charAura && pd.charAura !== "none") {
     buffBadges.push(`🌟 主动灵气：${CHAR_AURA_LABELS[pd.charAura] || pd.charAura}`);
+  }
+  if (mercEnabled) {
+    buffBadges.push(pd?.mercAuraOn !== false ? "🧭 佣兵自带光环：野外激活" : "⏸ 佣兵自带光环：城镇未激活");
   }
   if (build.classId === "war" && pd?.demonAura && pd.demonAura !== "none") {
     buffBadges.push(`🔥 束缚恶魔：${DEMON_AURA_LABELS[pd.demonAura] || pd.demonAura} (mlvl ${pd.demonMlvl || 96})`);
@@ -1346,6 +1491,72 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     .map((entry) => renderInspectorPane(entry, "merc", "", defaultMercKey))
     .join("");
 
+  const resolveDisplayBagItem = (p) => {
+    const def = p.def;
+    const b = p.b || {};
+    const rawStatLines = [];
+    if (def && def.stats) {
+      let st = String(def.stats);
+      if (p.tabLabel && /单系技能|本系技能/.test(st)) {
+        st = st.replace(/(\+1\s*)(?:单系技能|本系技能)/g, `$1${p.tabLabel} 技能`);
+      }
+      rawStatLines.push(st);
+    }
+    if (Array.isArray(b.prefixes)) {
+      b.prefixes.forEach((pr) => { if (pr && pr.range) rawStatLines.push(pr.range); });
+    }
+    if (Array.isArray(b.suffixes)) {
+      b.suffixes.forEach((sf) => { if (sf && sf.range) rawStatLines.push(sf.range); });
+    }
+    if (b.affixes && typeof b.affixes === "object") {
+      rawStatLines.push(...resolveAffixLines(b.affixes, idx));
+    }
+    const statLines = applyRollsToStatLines(rawStatLines, b.rolls);
+    const quality = def?.unique ? "unique" : (def?.util ? "base" : "magic");
+    const qualityLabel = def?.unique ? "暗金咒符" : (def?.util ? "实用物品" : "魔法咒符");
+    const sizeText = `${p.w}×${p.h}` + (def?.size ? ` (${def.size})` : "");
+    const tags = [`占格 ${sizeText}`];
+    if (p.tabLabel) tags.push(`专精系别：${p.tabLabel}`);
+    return {
+      titleZh: p.label,
+      titleEn: def?.nameEn || "",
+      icon: p.icon,
+      quality,
+      qualityLabel,
+      runeFormula: "",
+      reqLvl: 0,
+      baseSummary: def?.isBlankMagic && !statLines.length
+        ? "空白蓝装咒符（未配置自定义前后缀）"
+        : `角色背包咒符 · 占格 ${sizeText}`,
+      statLines,
+      setInfo: null,
+      note: "",
+      eth: false,
+      baseNameZh: "",
+      tags,
+      sockets: [],
+      socketDetails: []
+    };
+  };
+
+  const bagEntries = bagPlaced.map((p, i) => ({
+    slotId: String(i),
+    paneKey: `bag-${i}`,
+    slotLabel: p.def?.size ? `背包咒符 · ${p.def.size}` : "背包咒符",
+    placed: p,
+    item: resolveDisplayBagItem(p)
+  }));
+  const defaultBagKey = bagEntries.length ? bagEntries[0].paneKey : "";
+
+  const bagInspectorPanesHtml = bagEntries
+    .map((entry) => renderInspectorPane(
+      { slotId: entry.slotId, slotLabel: entry.slotLabel, item: entry.item },
+      "bag",
+      "",
+      defaultBagKey
+    ))
+    .join("");
+
   const renderBagGridHtml = () => {
     let cells = "";
     for (let r = 1; r <= 4; r += 1) {
@@ -1353,15 +1564,79 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
         cells += `<div class="pd-inv-cell" style="grid-column:${c};grid-row:${r}"></div>`;
       }
     }
-    const itemsHtml = bagPlaced.map((p) => {
+    const itemsHtml = bagEntries.map((entry) => {
+      const p = entry.placed;
+      const isSel = entry.paneKey === defaultBagKey;
       const style = `grid-column:${p.col} / span ${p.w};grid-row:${p.row} / span ${p.h};`;
-      return `<div class="pd-inv-item ${p.kind}" style="${style}" title="${escapeHtml(p.label)}">
+      const tip = entry.item.statLines.length
+        ? `${p.label}：${entry.item.statLines.join(" · ")}`
+        : p.label;
+      return `<button type="button" class="pd-inv-item ${p.kind}${isSel ? " is-selected" : ""}" data-bd-slot="${escapeHtml(entry.paneKey)}" data-bd-target="bag" style="${style}" title="${escapeHtml(tip)}">
         <img src="${escapeHtml(p.icon)}" alt="${escapeHtml(p.label)}" loading="lazy" />
         <span class="pd-inv-item-tag">${escapeHtml(p.shortTag)}</span>
-      </div>`;
+      </button>`;
     }).join("");
     return `<div class="pd-inv-grid" aria-label="10×4 角色背包格">${cells}${itemsHtml}</div>`;
   };
+
+  const renderMercStatsHtml = () => {
+    if (!mercEnabled) return "";
+    const ms = sum?.merc && typeof sum.merc === "object" ? sum.merc : null;
+    if (ms && ms.hp > 0) {
+      const reqBanner = ms.reqOk
+        ? `<div class="merc-req-banner is-ok">✓ <strong>佣兵属性达标可穿戴全部装备</strong>（总力量 <strong>${ms.str}</strong> / 需 ${ms.reqStr} · 总敏捷 <strong>${ms.dex}</strong> / 需 ${ms.reqDex}）</div>`
+        : `<div class="merc-req-banner is-warn">⚠️ <strong>佣兵穿戴属性不足</strong>（总力量 <strong>${ms.str}</strong> / 需 ${ms.reqStr} · 总敏捷 <strong>${ms.dex}</strong> / 需 ${ms.reqDex}）</div>`;
+      const hpMultTxt = ms.hpMult > 1 ? ` <span class="merc-sub">(含团队增益 ×${ms.hpMult.toFixed(2)})</span>` : "";
+      const fanaTxt = ms.fanaEias > 0 ? ` +狂热${ms.fanaEias}%` : "";
+      const atkTxt = ms.atkFrame > 0
+        ? `IAS ${ms.ias}%${fanaTxt} [WSM ${ms.wsm}] → <strong>${ms.atkFrame} 帧</strong> (${ms.aps.toFixed(2)} 次/秒)`
+        : `IAS ${ms.ias}%`;
+      const gearAuraTxt = ms.gearAuras && ms.gearAuras !== "无"
+        ? `${ms.gearAuras}（装备光环在城里常驻生效）`
+        : "无";
+      return `<div class="merc-stats-wrap" aria-label="佣兵完整属性面板">
+        ${reqBanner}
+        <div class="stat-grid merc-stat-grid">
+          <div class="stat-box"><span class="stat-k">生命值 / 总防御</span><strong class="stat-v"><span style="color:#ff8a75">${ms.hp.toLocaleString()}</span>${hpMultTxt} · ${ms.def.toLocaleString()}</strong></div>
+          <div class="stat-box"><span class="stat-k">面板伤害 / 准确率 AR</span><strong class="stat-v">${ms.dmgMin.toLocaleString()}–${ms.dmgMax.toLocaleString()} · <span style="color:#78b7ff">AR ${ms.ar.toLocaleString()}</span></strong></div>
+          <div class="stat-box"><span class="stat-k">力量 / 敏捷 / 全技能</span><strong class="stat-v">力 ${ms.str} <span class="merc-sub">(裸${ms.baseStr})</span> · 敏 ${ms.dex} <span class="merc-sub">(裸${ms.baseDex})</span> · +${ms.allSkills}</strong></div>
+          <div class="stat-box"><span class="stat-k">地狱四抗 (火/冰/电/毒)</span><strong class="stat-v">${ms.resF}% / ${ms.resC}% / ${ms.resL}% / ${ms.resP}% <span class="merc-sub">(裸抗 ${ms.baseResHell}%)</span></strong></div>
+          <div class="stat-box stat-box-span2"><span class="stat-k">攻击速度档位</span><strong class="stat-v">${atkTxt}</strong></div>
+          <div class="stat-box stat-box-span2"><span class="stat-k">战斗特效 (LL / CB / DS / DR / CBF)</span><strong class="stat-v">吸血 ${ms.ll}% · 压碎 ${ms.cb}% · 致命 ${ms.ds}% · 物免 ${ms.dr}% · 无法冰冻 ${ms.cbf ? "✓" : "✗"}</strong></div>
+          ${ms.skills ? `<div class="stat-box stat-box-span2"><span class="stat-k">自带技能与光环</span><strong class="stat-v" style="color:#8af49f">${escapeHtml(ms.skills)}</strong></div>` : ""}
+          <div class="stat-box stat-box-span2"><span class="stat-k">装备赋予光环</span><strong class="stat-v" style="color:#e284db">${escapeHtml(gearAuraTxt)}</strong></div>
+        </div>
+      </div>`;
+    }
+    // Graceful fallback for older shares created before summary.merc existed
+    const mLvl = pd?.mercLvl || 90;
+    const prof = MERC_BASE_PROFILES[pd?.mercVariant || "a2-might"] || MERC_BASE_PROFILES["a2-might"];
+    const dLvl = Math.max(0, mLvl - prof.baseLvl);
+    const bStr = prof.str + Math.floor((dLvl * prof.str8) / 8);
+    const bDex = prof.dex + Math.floor((dLvl * prof.dex8) / 8);
+    const bHp = prof.hp + dLvl * prof.hpLvl;
+    const bDef = prof.def + dLvl * prof.defLvl;
+    const bResHell = prof.res + Math.floor((dLvl * prof.res4) / 4) - 100;
+    const ctaBonus = pd?.ctaOn ? 1 : 0;
+    const skillStr = prof.skills.map((sk) => {
+      const effL = sk.base + Math.floor((dLvl * sk.per32) / 32) + ctaBonus;
+      return sk.auraDesc
+        ? `${sk.name} Lv.${effL}（${sk.auraDesc(effL)}${pd?.mercAuraOn === false ? " · 城镇未激活" : ""}）`
+        : `${sk.name} Lv.${effL}`;
+    }).join(" · ");
+    const mercEquippedCount = mercGearCards.filter((x) => x.item).length;
+    return `<div class="merc-stats-wrap" aria-label="佣兵基础属性面板">
+      <div class="merc-req-banner is-info">ℹ️ <strong>佣兵基础面板（Lv.${mLvl} · 已穿戴 ${mercEquippedCount}/4 件装备）</strong> · 此旧版分享未含装备联动快照，点击右上角「导入到我的模拟器」可实时查看完整加成</div>
+      <div class="stat-grid merc-stat-grid">
+        <div class="stat-box"><span class="stat-k">基础生命 / 基础防御</span><strong class="stat-v"><span style="color:#ff8a75">${bHp.toLocaleString()}</span> · ${bDef.toLocaleString()}</strong></div>
+        <div class="stat-box"><span class="stat-k">裸力量 / 裸敏捷</span><strong class="stat-v">力 ${bStr} · 敏 ${bDex}</strong></div>
+        <div class="stat-box"><span class="stat-k">地狱基础四抗</span><strong class="stat-v">${Math.min(75, bResHell)}% / ${Math.min(75, bResHell)}% / ${Math.min(75, bResHell)}% / ${Math.min(75, bResHell)}%</strong></div>
+        <div class="stat-box"><span class="stat-k">自带光环状态</span><strong class="stat-v">${pd?.mercAuraOn !== false ? "野外激活" : "城镇未激活"}</strong></div>
+        <div class="stat-box stat-box-wide"><span class="stat-k">自带技能与光环（不含装备技能加成）</span><strong class="stat-v" style="color:#8af49f">${escapeHtml(skillStr)}</strong></div>
+      </div>
+    </div>`;
+  };
+  const mercStatsHtml = renderMercStatsHtml();
 
   const summaryHtml = sum
     ? `<section class="panel" aria-label="核心面板与档位总览">
@@ -1391,6 +1666,8 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
   <meta property="og:title" content="${escapeHtml(build.title)} · 庇护之地 D2R 3.4" />
   <meta property="og:description" content="${escapeHtml(ogDescription)}" />
   <meta property="og:url" content="${escapeHtml(shareUrl)}" />
+  <meta name="theme-color" content="#090809" />
+  <script src="/assets/theme-init.js?v=${DASHBOARD_THEME_VERSION}"></script>
   <style>
     :root {
       --bg: #0c0a0b;
@@ -1400,6 +1677,9 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
       --text: #f3ece2;
       --muted: #ada398;
     }
+    .bd-theme-bar { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.34); }
+    .bd-theme-btn { border: 0; border-radius: 999px; padding: 4px 8px; background: transparent; color: var(--muted); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .bd-theme-btn.active { background: linear-gradient(180deg, rgba(213, 167, 72, 0.36), rgba(145, 98, 28, 0.36)); color: #ffe7ad; box-shadow: inset 0 0 0 1px rgba(246, 206, 118, 0.52); }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -1451,9 +1731,16 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     .panel-title { margin: 0 0 16px; font-size: 16.5px; font-weight: 800; color: #f5d287; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
     .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
     .stat-box { padding: 11px 13px; border-radius: 10px; background: rgba(0, 0, 0, 0.34); border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 3px; }
+    .stat-box-span2 { grid-column: span 2; }
     .stat-box-wide { grid-column: 1 / -1; }
     .stat-k { font-size: 11.5px; color: var(--muted); }
     .stat-v { font-size: 14px; font-variant-numeric: tabular-nums; color: #f6efe6; }
+    .merc-stats-wrap { margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .merc-req-banner { padding: 8px 12px; border-radius: 9px; font-size: 12.5px; border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(0, 0, 0, 0.32); }
+    .merc-req-banner.is-ok { border-color: rgba(103, 232, 122, 0.45); background: rgba(18, 52, 28, 0.42); color: #9af4a8; }
+    .merc-req-banner.is-warn { border-color: rgba(255, 138, 117, 0.55); background: rgba(74, 22, 18, 0.48); color: #ffb3a6; }
+    .merc-req-banner.is-info { border-color: rgba(120, 183, 255, 0.42); background: rgba(18, 36, 58, 0.45); color: #b7d7ff; }
+    .merc-sub { font-size: 11px; font-weight: 500; color: var(--muted); }
 
     /* Authentic D2R Paperdoll Showcase Layout */
     .pd-showcase {
@@ -1845,10 +2132,14 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
       border-color: rgba(160, 165, 175, 0.55);
       background: linear-gradient(180deg, rgba(36, 37, 42, 0.94), rgba(18, 19, 22, 0.98));
     }
+    .pd-inv-item { cursor: pointer; font: inherit; color: inherit; transition: border-color 140ms ease, transform 120ms ease, box-shadow 140ms ease; }
+    .pd-inv-item:hover { border-color: #ffd573; transform: translateY(-1px); z-index: 3; }
+    .pd-inv-item.is-selected { outline: 2px solid #ff8a75; outline-offset: 1px; box-shadow: 0 0 12px rgba(255, 138, 117, 0.55); z-index: 4; }
     .pd-inv-item img { max-width: 86%; max-height: 62%; object-fit: contain; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.95)); }
     .pd-inv-item-tag { font-size: 9px; font-weight: 800; line-height: 1.05; color: #b7d7ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .pd-inv-item.is-unique .pd-inv-item-tag { color: #ffd573; }
-    .bag-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 9px; background: rgba(0, 0, 0, 0.36); border: 1px solid rgba(182, 146, 86, 0.35); font-size: 12.5px; }
+    .bag-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 9px; background: rgba(0, 0, 0, 0.36); border: 1px solid rgba(182, 146, 86, 0.35); font: inherit; font-size: 12.5px; color: inherit; cursor: pointer; transition: border-color 140ms ease, background 140ms ease; }
+    .bag-chip:hover, .bag-chip.is-selected { border-color: rgba(255, 213, 115, 0.85); background: rgba(213, 167, 72, 0.16); }
     .bag-chip img { width: 22px; height: 22px; object-fit: contain; }
     .trees-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .tree-col { padding: 13px; border-radius: 12px; background: rgba(12, 10, 12, 0.86); border: 1px solid rgba(213, 167, 72, 0.24); display: flex; flex-direction: column; gap: 8px; }
@@ -1857,6 +2148,25 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     .sk-row-l { display: flex; align-items: center; gap: 7px; min-width: 0; }
     .sk-icon { width: 24px; height: 24px; border-radius: 5px; object-fit: cover; flex-shrink: 0; }
     .sk-pts { font-weight: 800; color: #f5cf7b; white-space: nowrap; }
+    .bd-sk-head-r { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .bd-sk-view-tabs { display: inline-flex; gap: 4px; padding: 3px; border-radius: 9px; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(213, 167, 72, 0.28); }
+    .bd-sk-tab { border: 0; border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); transition: all 140ms ease; }
+    .bd-sk-tab.active { background: linear-gradient(180deg, rgba(213, 167, 72, 0.34), rgba(145, 98, 28, 0.34)); color: #ffe7ad; box-shadow: inset 0 0 0 1px rgba(246, 206, 118, 0.52); }
+    .bd-sk-stage { position: relative; width: 100%; height: 432px; border-radius: 10px; background: rgba(7, 6, 8, 0.65); border: 1px solid rgba(213, 167, 72, 0.16); overflow: hidden; }
+    .bd-sk-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    .bd-sk-edge { fill: none; stroke: rgba(164, 150, 128, 0.34); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .bd-sk-edge.is-active { stroke: rgba(245, 207, 123, 0.88); stroke-width: 2.8; }
+    .bd-sk-grid { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(6, 72px); width: 100%; height: 100%; }
+    .bd-sk-node { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 2px; opacity: 0.42; filter: grayscale(0.55); transition: opacity 140ms ease, transform 140ms ease; }
+    .bd-sk-node:hover { opacity: 0.92; filter: none; }
+    .bd-sk-node.is-invested { opacity: 1; filter: none; }
+    .bd-sk-node-ico-wrap { position: relative; width: 38px; height: 38px; border-radius: 6px; border: 1px solid rgba(182, 152, 98, 0.36); background: rgba(18, 14, 12, 0.9); display: flex; align-items: center; justify-content: center; overflow: visible; }
+    .bd-sk-node.is-invested .bd-sk-node-ico-wrap { border-color: rgba(255, 213, 115, 0.92); box-shadow: 0 0 12px rgba(240, 184, 76, 0.42); }
+    .bd-sk-node-ico { width: 34px; height: 34px; border-radius: 4px; object-fit: cover; display: block; }
+    .bd-sk-node-ph { width: 34px; height: 34px; border-radius: 4px; background: rgba(255,255,255,0.06); }
+    .bd-sk-node-badge { position: absolute; right: -6px; bottom: -5px; min-width: 18px; height: 16px; padding: 0 4px; border-radius: 999px; background: linear-gradient(180deg, #ffdd8a, #c98a24); color: #191006; font-size: 10px; font-weight: 900; line-height: 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.85); }
+    .bd-sk-node-name { font-size: 10px; line-height: 1.1; color: #ddd2be; max-width: 96%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+    .bd-sk-node.is-invested .bd-sk-node-name { color: #ffe7ad; font-weight: 700; }
     @media (max-width: 960px) {
       .pd-showcase { grid-template-columns: 1fr; }
       .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1865,6 +2175,132 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     @media (max-width: 640px) {
       .gear-grid { grid-template-columns: 1fr; }
     }
+
+    /* 浅色模式完整覆写（置于样式表最末，确保同权重下严格生效） */
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f1e8d4;
+      --panel: #faf4e6;
+      --border: rgba(154, 114, 52, 0.42);
+      --gold: #7c4d0e;
+      --text: #271d14;
+      --muted: #665541;
+    }
+    :root[data-theme="light"] body { background: radial-gradient(circle at 20% 0%, rgba(196, 146, 68, 0.22), transparent 54%), var(--bg); }
+    :root[data-theme="light"] .hero { background: linear-gradient(135deg, #fbf6ea, #ede0c4); border-color: rgba(154, 114, 52, 0.45); box-shadow: 0 8px 24px rgba(74, 52, 22, 0.12); }
+    :root[data-theme="light"] .hero-avatar { background: #efe3c8; border-color: rgba(154, 114, 52, 0.52); box-shadow: 0 4px 12px rgba(74, 52, 22, 0.16); }
+    :root[data-theme="light"] .hero-title,
+    :root[data-theme="light"] .panel-title { color: #6b3f08; }
+    :root[data-theme="light"] .hero-notes,
+    :root[data-theme="light"] .stat-box,
+    :root[data-theme="light"] .tree-col,
+    :root[data-theme="light"] .bag-chip { background: #f2e7cf; border-color: rgba(154, 114, 52, 0.36); color: #271d14; }
+    :root[data-theme="light"] .bag-chip:hover,
+    :root[data-theme="light"] .bag-chip.is-selected { background: #e9d9b6; border-color: #9b6516; }
+    :root[data-theme="light"] .stat-v,
+    :root[data-theme="light"] .sk-row { color: #241a10; }
+    :root[data-theme="light"] .stat-v[style*="color:#ffd573"] { color: #7a4805 !important; }
+    :root[data-theme="light"] .stat-v[style*="color:#8af49f"] { color: #11692a !important; }
+    :root[data-theme="light"] .stat-v[style*="color:#e284db"] { color: #7d1f76 !important; }
+    :root[data-theme="light"] .stat-v [style*="color:#ff8a75"] { color: #a82418 !important; }
+    :root[data-theme="light"] .stat-v [style*="color:#78b7ff"] { color: #1548a8 !important; }
+    :root[data-theme="light"] .merc-req-banner.is-ok { background: #e8f5e7; border-color: rgba(24, 132, 58, 0.46); color: #105e24; }
+    :root[data-theme="light"] .merc-req-banner.is-warn { background: #fdece8; border-color: rgba(186, 46, 28, 0.48); color: #9c1f14; }
+    :root[data-theme="light"] .merc-req-banner.is-info { background: #e9f1fc; border-color: rgba(24, 82, 178, 0.42); color: #1548a8; }
+    :root[data-theme="light"] .sk-pts,
+    :root[data-theme="light"] .tree-head,
+    :root[data-theme="light"] .tree-head span,
+    :root[data-theme="light"] .bag-chip strong { color: #7a4805 !important; }
+    :root[data-theme="light"] .readonly-pill { color: #11692a; background: rgba(20, 128, 52, 0.12); border-color: rgba(20, 128, 52, 0.4); }
+    :root[data-theme="light"] .buff-pill { background: #efe3c8; border-color: rgba(154, 114, 52, 0.38); color: #2b2016; }
+    :root[data-theme="light"] .btn-secondary { background: #f3e8d0; color: #2b2016; border-color: rgba(154, 114, 52, 0.45); }
+    :root[data-theme="light"] .bd-theme-bar { background: #efe3c8; }
+    :root[data-theme="light"] .bd-theme-btn.active { background: #9b6516; color: #fffaf0; box-shadow: none; }
+    :root[data-theme="light"] .bd-sk-view-tabs { background: #e9dcc0; border-color: rgba(154, 114, 52, 0.4); }
+    :root[data-theme="light"] .bd-sk-tab.active { background: #9b6516; color: #fffaf0; box-shadow: none; }
+    :root[data-theme="light"] .pd-swap-bar { background: #f2e7cf; border-color: rgba(154, 114, 52, 0.42); }
+    :root[data-theme="light"] .pd-swap-tab { background: #faf4e6; border-color: rgba(154, 114, 52, 0.36); color: #5c4b37; }
+    :root[data-theme="light"] .pd-swap-tab.active[data-set="1"] { background: #9b6516; border-color: #7a4b06; color: #fffaf0; }
+    :root[data-theme="light"] .pd-swap-tab.active[data-set="2"] { background: #1e57a8; border-color: #143f7d; color: #fffaf0; }
+    :root[data-theme="light"] .pd-swap-hint kbd { background: #fffdf8; border-color: rgba(154, 114, 52, 0.48); color: #6b3f08; }
+    :root[data-theme="light"] .pd-doll-grid { background: radial-gradient(circle at 50% 35%, #eee1c6, #dfd0ae); border-color: rgba(154, 114, 52, 0.5); box-shadow: inset 0 0 18px rgba(96, 68, 28, 0.14); }
+    :root[data-theme="light"] .pd-merc-grid { background: radial-gradient(circle at 50% 35%, #e3ecde, #d1dfca); border-color: rgba(42, 128, 68, 0.48); box-shadow: inset 0 0 18px rgba(28, 86, 44, 0.12); }
+    :root[data-theme="light"] .pd-slot { background-color: #f6eedc; border-color: rgba(154, 114, 52, 0.48); color: #2b2016; }
+    :root[data-theme="light"] .pd-slot:not(.equipped) { background-image: none !important; border-style: dashed; background-color: #f4ebd7; }
+    :root[data-theme="light"] .pd-slot:not(.equipped) .pd-slot-name { color: #68553f; font-weight: 700; }
+    :root[data-theme="light"] .pd-slot.is-selected { outline-color: #c43824; box-shadow: 0 0 12px rgba(196, 56, 36, 0.28); }
+    :root[data-theme="light"] .pd-slot.equipped { background-color: #fdf5e2; border-color: rgba(176, 124, 34, 0.72); }
+    :root[data-theme="light"] .pd-slot.equipped.q-set { background-color: #e8f5e7; border-color: rgba(36, 136, 62, 0.72); }
+    :root[data-theme="light"] .pd-slot.equipped.q-rw { background-color: #fcecd9; border-color: rgba(196, 108, 34, 0.78); }
+    :root[data-theme="light"] .pd-slot.equipped.q-magic { background-color: #e8f0fc; border-color: rgba(53, 104, 204, 0.76); }
+    :root[data-theme="light"] .pd-slot.equipped.q-rare { background-color: #faf3d0; border-color: rgba(176, 138, 20, 0.8); }
+    :root[data-theme="light"] .pd-slot.equipped.q-craft { background-color: #fbe8d6; border-color: rgba(194, 86, 16, 0.8); }
+    :root[data-theme="light"] .pd-slot-label { color: #5c4b37; }
+    :root[data-theme="light"] .pd-slot-sock { color: #1548a8; }
+    :root[data-theme="light"] .pd-slot-name { color: #594734; }
+    :root[data-theme="light"] .pd-slot.equipped .pd-slot-name { color: #754504; }
+    :root[data-theme="light"] .pd-slot.q-set .pd-slot-name { color: #105e24; }
+    :root[data-theme="light"] .pd-slot.q-rw .pd-slot-name { color: #8f3f06; }
+    :root[data-theme="light"] .pd-slot.q-craft .pd-slot-name { color: #8c3704; }
+    :root[data-theme="light"] .pd-slot.q-magic .pd-slot-name { color: #144099; }
+    :root[data-theme="light"] .pd-slot.q-rare .pd-slot-name { color: #6e4e00; }
+    :root[data-theme="light"] .pd-slot-img { filter: drop-shadow(0 2px 5px rgba(34, 20, 8, 0.45)); }
+    :root[data-theme="light"] .pd-inv-grid { background: #e7d9bc; border-color: rgba(154, 114, 52, 0.48); }
+    :root[data-theme="light"] .pd-inv-cell { border-color: rgba(145, 108, 52, 0.28); background: rgba(252, 247, 236, 0.45); }
+    :root[data-theme="light"] .pd-inv-item { background: #fcf7eb; border-color: rgba(53, 104, 204, 0.5); }
+    :root[data-theme="light"] .pd-inv-item.is-unique { background: #fdf2d6; border-color: rgba(176, 124, 34, 0.72); }
+    :root[data-theme="light"] .pd-inv-item.is-util { background: #eee3ca; border-color: rgba(138, 112, 74, 0.48); }
+    :root[data-theme="light"] .pd-inv-item.is-selected { outline-color: #c43824; box-shadow: 0 0 10px rgba(196, 56, 36, 0.32); }
+    :root[data-theme="light"] .pd-inv-item img { filter: drop-shadow(0 1px 3px rgba(34, 20, 8, 0.42)); }
+    :root[data-theme="light"] .pd-inv-item-tag { color: #1548a8; }
+    :root[data-theme="light"] .pd-inv-item.is-unique .pd-inv-item-tag { color: #7a4805; }
+    :root[data-theme="light"] .bd-inspector { background: #fcf7ec; border-color: rgba(154, 114, 52, 0.45); color: #241a10; box-shadow: 0 8px 24px rgba(74, 52, 22, 0.10); }
+    :root[data-theme="light"] .bd-insp-pane.q-set,
+    :root[data-theme="light"] .bd-insp-pane.q-rw,
+    :root[data-theme="light"] .bd-insp-pane.q-magic,
+    :root[data-theme="light"] .bd-insp-pane.q-rare,
+    :root[data-theme="light"] .bd-insp-pane.q-craft { background: transparent; }
+    :root[data-theme="light"] .bd-insp-icon-wrap { background: radial-gradient(circle at 50% 35%, #fdf7e8, #ecdcb8); border-color: rgba(176, 124, 34, 0.68); box-shadow: inset 0 1px 4px rgba(92, 64, 24, 0.12); }
+    :root[data-theme="light"] .bd-insp-icon-wrap.q-set { background: radial-gradient(circle at 50% 35%, #eef8ee, #d6ebd5); border-color: rgba(36, 136, 62, 0.68); }
+    :root[data-theme="light"] .bd-insp-icon-wrap.q-rw { background: radial-gradient(circle at 50% 35%, #fdf2e4, #f2d9bc); border-color: rgba(196, 108, 34, 0.72); }
+    :root[data-theme="light"] .bd-insp-icon-wrap.q-magic { background: radial-gradient(circle at 50% 35%, #eef4fd, #d5e4fa); border-color: rgba(53, 104, 204, 0.7); }
+    :root[data-theme="light"] .bd-insp-icon-wrap.q-rare { background: radial-gradient(circle at 50% 35%, #fcf7dc, #efe3a8); border-color: rgba(176, 138, 20, 0.74); }
+    :root[data-theme="light"] .bd-insp-icon-wrap.q-craft { background: radial-gradient(circle at 50% 35%, #fdf0e4, #f3d5b8); border-color: rgba(194, 86, 16, 0.74); }
+    :root[data-theme="light"] .bd-insp-icon { filter: drop-shadow(0 2px 5px rgba(34, 20, 8, 0.45)); }
+    :root[data-theme="light"] .bd-insp-slot-pill,
+    :root[data-theme="light"] .tag { background: #efe3c8; border-color: rgba(154, 114, 52, 0.45); color: #3a2b1c; font-weight: 700; }
+    :root[data-theme="light"] .bd-insp-q-pill { background: rgba(168, 112, 24, 0.16); border-color: rgba(168, 112, 24, 0.5); color: #7a4805; }
+    :root[data-theme="light"] .bd-insp-q-pill.q-set { background: rgba(24, 132, 58, 0.14); border-color: rgba(24, 132, 58, 0.48); color: #11692a; }
+    :root[data-theme="light"] .bd-insp-q-pill.q-rw,
+    :root[data-theme="light"] .bd-insp-q-pill.q-craft { background: rgba(188, 92, 22, 0.14); border-color: rgba(188, 92, 22, 0.48); color: #9e4308; }
+    :root[data-theme="light"] .bd-insp-q-pill.q-rare { background: rgba(176, 138, 20, 0.18); border-color: rgba(176, 138, 20, 0.5); color: #6e4e00; }
+    :root[data-theme="light"] .bd-insp-q-pill.q-magic { background: rgba(21, 72, 168, 0.13); border-color: rgba(21, 72, 168, 0.46); color: #1548a8; }
+    :root[data-theme="light"] .bd-insp-eth-pill { background: rgba(21, 72, 168, 0.14); border-color: rgba(21, 72, 168, 0.5); color: #123e94; }
+    :root[data-theme="light"] .bd-insp-name { color: #7a4805; }
+    :root[data-theme="light"] .bd-insp-pane.q-set .bd-insp-name { color: #11692a; }
+    :root[data-theme="light"] .bd-insp-pane.q-rw .bd-insp-name,
+    :root[data-theme="light"] .bd-insp-pane.q-craft .bd-insp-name { color: #9e4308; }
+    :root[data-theme="light"] .bd-insp-pane.q-magic .bd-insp-name { color: #1548a8; }
+    :root[data-theme="light"] .bd-insp-pane.q-rare .bd-insp-name { color: #6e4e00; }
+    :root[data-theme="light"] .bd-insp-runes { color: #7a4805; }
+    :root[data-theme="light"] .bd-insp-base { background: #f2e7cf; border-color: rgba(154, 114, 52, 0.34); color: #362819; }
+    :root[data-theme="light"] .bd-insp-stats li { color: #1548a8; }
+    :root[data-theme="light"] .lvl-calc-badge { background: rgba(168, 108, 20, 0.16); border-color: rgba(154, 96, 16, 0.5); color: #6b3c02; }
+    :root[data-theme="light"] .bd-insp-box.is-sock { background: rgba(24, 82, 178, 0.08); border-color: rgba(24, 82, 178, 0.3); }
+    :root[data-theme="light"] .bd-insp-box-title { color: #1548a8; }
+    :root[data-theme="light"] .bd-insp-sock-row { color: #241a10; }
+    :root[data-theme="light"] .bd-insp-box.is-set { background: rgba(20, 118, 48, 0.08); border-color: rgba(20, 118, 48, 0.32); }
+    :root[data-theme="light"] .bd-insp-box.is-set .bd-insp-box-title,
+    :root[data-theme="light"] .bd-insp-set-sub,
+    :root[data-theme="light"] .bd-insp-set-list { color: #11692a; }
+    :root[data-theme="light"] .bd-insp-set-list.is-full { color: #7a4805; }
+    :root[data-theme="light"] .bd-insp-note { background: #f4e8cd; border-color: rgba(154, 114, 52, 0.38); color: #6b3f08; }
+    :root[data-theme="light"] .bd-sk-stage { background: #efe3c8; border-color: rgba(154, 114, 52, 0.38); }
+    :root[data-theme="light"] .bd-sk-edge { stroke: rgba(120, 96, 62, 0.38); }
+    :root[data-theme="light"] .bd-sk-edge.is-active { stroke: #9b6516; }
+    :root[data-theme="light"] .bd-sk-node-ico-wrap { background: #f6eedc; border-color: rgba(154, 114, 52, 0.48); }
+    :root[data-theme="light"] .bd-sk-node-name { color: #5c4b37; }
+    :root[data-theme="light"] .bd-sk-node.is-invested .bd-sk-node-name { color: #6b3f08; }
   </style>
 </head>
 <body>
@@ -1884,6 +2320,11 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
         </div>
       </div>
       <div class="hero-actions">
+        <div class="bd-theme-bar" role="group" aria-label="深浅外观切换">
+          <button type="button" class="bd-theme-btn active" data-theme-mode="auto" aria-pressed="true" title="跟随系统自动切换">🌓 跟随</button>
+          <button type="button" class="bd-theme-btn" data-theme-mode="dark" aria-pressed="false" title="深色模式">🌙 深色</button>
+          <button type="button" class="bd-theme-btn" data-theme-mode="light" aria-pressed="false" title="浅色模式">☀ 浅色</button>
+        </div>
         <a class="btn btn-primary" id="import-build-link" href="${escapeHtml(importPath)}">📥 导入到我的模拟器</a>
         <button type="button" class="btn btn-secondary" id="copy-share-url-btn" data-url="${escapeHtml(shareUrl)}">🔗 复制分享链接</button>
         <a class="btn btn-secondary" href="/">← 返回主站</a>
@@ -1918,24 +2359,48 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     <section class="panel" aria-label="角色背包咒符清单">
       <h2 class="panel-title">
         <span>🎒 角色背包咒符（10×4）</span>
-        <span style="font-size:12px;color:var(--muted)">共 ${bagRaw.length} 件</span>
+        <span style="font-size:12px;color:var(--muted)">共 ${bagRaw.length} 件（点击左侧任意咒符查看右侧完整属性与变量）</span>
       </h2>
-      ${bagList.length
-        ? `${renderBagGridHtml()}<div class="bag-grid">${bagList.map((b) => `<div class="bag-chip"><img src="${escapeHtml(b.icon)}" alt="" loading="lazy" /><span>${escapeHtml(b.label)}</span>${b.count > 1 ? `<strong style="color:#ffd573">×${b.count}</strong>` : ""}</div>`).join("")}</div>`
+      ${bagEntries.length
+        ? `<div class="pd-showcase">
+            <div class="pd-doll-col">
+              ${renderBagGridHtml()}
+              <div class="bag-grid">${bagList.map((b) => {
+                const match = bagEntries.find((e) => e.placed.label === b.label);
+                const keyAttr = match ? ` data-bd-slot="${escapeHtml(match.paneKey)}" data-bd-target="bag"` : "";
+                return `<button type="button" class="bag-chip"${keyAttr}><img src="${escapeHtml(b.icon)}" alt="" loading="lazy" /><span>${escapeHtml(b.label)}</span>${b.count > 1 ? `<strong style="color:#ffd573">×${b.count}</strong>` : ""}</button>`;
+              }).join("")}</div>
+            </div>
+            <div class="bd-right-col">
+              <div class="bd-inspector" id="bd-bag-inspector" aria-label="选中背包咒符属性详情">${bagInspectorPanesHtml}</div>
+            </div>
+          </div>`
         : `<div style="font-size:13px;color:var(--muted)">未配置背包咒符</div>`}
     </section>
 
     <section class="panel" aria-label="职业技能树加点明细">
       <h2 class="panel-title">
         <span>✨ 技能树加点明细</span>
-        <span style="font-size:12px;color:var(--muted)">已分配 ${totalSkillPts} / 110 点</span>
+        <span class="bd-sk-head-r">
+          <span style="font-size:12px;color:var(--muted)">已分配 ${totalSkillPts} / 110 点</span>
+          <span class="bd-sk-view-tabs" role="tablist" aria-label="技能展示视图切换">
+            <button type="button" class="bd-sk-tab active" data-bd-sk-view="list" aria-selected="true">📋 紧凑列表</button>
+            <button type="button" class="bd-sk-tab" data-bd-sk-view="tree" aria-selected="false">🌳 技能树视图</button>
+          </span>
+        </span>
       </h2>
-      <div class="trees-grid">
+      <div class="trees-grid" id="bd-sk-view-list">
         ${treeBlocks.map((tb) => `<div class="tree-col">
           <div class="tree-head"><span>${escapeHtml(tb.title)}</span><span style="color:#f5cf7b">${tb.pts} 点</span></div>
           ${tb.items.length
             ? tb.items.map((sk) => `<div class="sk-row"><div class="sk-row-l">${sk.icon ? `<img class="sk-icon" src="${escapeHtml(sk.icon)}" alt="" loading="lazy" />` : ""}<span>${escapeHtml(sk.nameZh)}</span></div><span class="sk-pts">${sk.pts} / 20</span></div>`).join("")
             : `<div style="font-size:12px;color:var(--muted)">本系未投入技能点</div>`}
+        </div>`).join("")}
+      </div>
+      <div class="trees-grid" id="bd-sk-view-tree" style="display:none">
+        ${treeBlocks.map((tb) => `<div class="tree-col">
+          <div class="tree-head"><span>${escapeHtml(tb.title)}</span><span style="color:#f5cf7b">${tb.pts} 点</span></div>
+          ${renderSharedSkillTreeStageHtml(tb)}
         </div>`).join("")}
       </div>
     </section>
@@ -1946,6 +2411,7 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
         <span style="font-size:12px;color:var(--muted)">${mercEnabled ? `${escapeHtml(mercName)} · Lv.${pd?.mercLvl || 90}` : "未携带佣兵"}</span>
       </h2>
       ${buffBadges.length ? `<div class="buff-row" style="margin-bottom:14px">${buffBadges.map((b) => `<span class="buff-pill">${escapeHtml(b)}</span>`).join("")}</div>` : ""}
+      ${mercStatsHtml}
       ${mercEnabled
         ? `<div class="pd-showcase">
             <div class="pd-doll-col">
@@ -2036,6 +2502,24 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
           selectInspectKey("char", nextMode === "swap" ? "char-weapon-swap" : "char-weapon");
         });
       }
+
+      const skListEl = document.getElementById("bd-sk-view-list");
+      const skTreeEl = document.getElementById("bd-sk-view-tree");
+      const skViewTabs = document.querySelectorAll("[data-bd-sk-view]");
+      if (skListEl && skTreeEl && skViewTabs.length) {
+        skViewTabs.forEach(function (tabBtn) {
+          tabBtn.addEventListener("click", function () {
+            const view = tabBtn.getAttribute("data-bd-sk-view") === "tree" ? "tree" : "list";
+            skListEl.style.display = view === "list" ? "grid" : "none";
+            skTreeEl.style.display = view === "tree" ? "grid" : "none";
+            skViewTabs.forEach(function (b) {
+              const on = b.getAttribute("data-bd-sk-view") === view;
+              b.classList.toggle("active", on);
+              b.setAttribute("aria-selected", on ? "true" : "false");
+            });
+          });
+        });
+      }
     })();
   </script>
 </body>
@@ -2107,6 +2591,17 @@ async function handleCreateSharedBuild(request, env, url) {
 
   await env.DCLONE_STATE.put(`${KEY_SHARE_BUILD_PREFIX}${shareId}`, JSON.stringify(record));
   await recordShareCreate(env, rl.rlKey, rl.count);
+  if (authorUserId) {
+    await appendUserShareIndex(env, authorUserId, {
+      id: shareId,
+      title: record.title,
+      classId: record.classId,
+      className: CLASS_FALLBACK_NAMES[record.classId] || record.classId,
+      charLvl: Number(record.paperdoll?.charLvl) || 90,
+      sharePath: `/build/${shareId}`,
+      createdAt: now
+    });
+  }
 
   const sharePath = `/build/${shareId}`;
   const shareUrl = `${url.origin}${sharePath}`;
@@ -2114,6 +2609,92 @@ async function handleCreateSharedBuild(request, env, url) {
   delete publicBuild.authorUserId;
 
   return authJson({ ok: true, id: shareId, sharePath, shareUrl, build: publicBuild }, 201);
+}
+
+async function appendUserShareIndex(env, userId, entry) {
+  if (!env?.DCLONE_STATE || !userId || !entry?.id) return;
+  const key = `${KEY_USER_SHARES_PREFIX}${userId}`;
+  try {
+    const existing = await env.DCLONE_STATE.get(key, "json");
+    const list = Array.isArray(existing) ? existing.filter((x) => x && x.id && x.id !== entry.id) : [];
+    list.unshift(entry);
+    await env.DCLONE_STATE.put(key, JSON.stringify(list.slice(0, MAX_USER_SHARES)));
+  } catch {
+    // Non-fatal: share record itself is already persisted
+  }
+}
+
+async function removeUserShareIndex(env, userId, shareId) {
+  if (!env?.DCLONE_STATE || !userId || !shareId) return;
+  const key = `${KEY_USER_SHARES_PREFIX}${userId}`;
+  try {
+    const existing = await env.DCLONE_STATE.get(key, "json");
+    if (!Array.isArray(existing)) return;
+    const next = existing.filter((x) => x && x.id !== shareId);
+    await env.DCLONE_STATE.put(key, JSON.stringify(next));
+  } catch {
+    // ignore
+  }
+}
+
+async function handleListUserShares(request, env, url) {
+  if (!env?.DCLONE_STATE) {
+    return authJson({ ok: false, error: "KV 存储未绑定" }, 503);
+  }
+  const auth = await getAuthenticatedUser(request, env);
+  if (!auth?.user?.id) {
+    return authJson({ ok: false, error: "请先登录账号" }, 401);
+  }
+  const raw = await env.DCLONE_STATE.get(`${KEY_USER_SHARES_PREFIX}${auth.user.id}`, "json");
+  const list = Array.isArray(raw) ? raw : [];
+  const shares = list
+    .filter((item) => item && typeof item === "object" && SHARE_ID_PATTERN.test(String(item.id || "")))
+    .map((item) => ({
+      id: item.id,
+      title: String(item.title || "未命名 BD"),
+      classId: String(item.classId || "sor"),
+      className: String(item.className || CLASS_FALLBACK_NAMES[item.classId] || item.classId || ""),
+      charLvl: Number(item.charLvl) || 90,
+      createdAt: String(item.createdAt || ""),
+      sharePath: `/build/${item.id}`,
+      shareUrl: `${url.origin}/build/${item.id}`
+    }));
+  return authJson({ ok: true, shares }, 200);
+}
+
+async function handleDeleteSharedBuild(request, env, url, rawId) {
+  if (!checkSameOriginCsrf(request, url)) {
+    return authJson({ ok: false, error: "跨站请求被拦截" }, 403);
+  }
+  if (!env?.DCLONE_STATE) {
+    return authJson({ ok: false, error: "KV 存储未绑定" }, 503);
+  }
+  if (!SHARE_ID_PATTERN.test(rawId)) {
+    return authJson({ ok: false, error: "无效的分享编号" }, 400);
+  }
+  const auth = await getAuthenticatedUser(request, env);
+  if (!auth?.user?.id) {
+    return authJson({ ok: false, error: "请先登录账号" }, 401);
+  }
+  const key = `${KEY_SHARE_BUILD_PREFIX}${rawId}`;
+  const record = await env.DCLONE_STATE.get(key, "json");
+  if (!record || typeof record !== "object") {
+    await removeUserShareIndex(env, auth.user.id, rawId);
+    return authJson({ ok: false, error: "未找到该分享 BD 或已被撤销" }, 404);
+  }
+  const isOwner = Boolean(record.authorUserId && record.authorUserId === auth.user.id);
+  const isAdmin = auth.user.role === "admin";
+  if (!isOwner && !isAdmin) {
+    return authJson({ ok: false, error: "无权撤销他人的分享链接" }, 403);
+  }
+  await env.DCLONE_STATE.delete(key);
+  if (record.authorUserId) {
+    await removeUserShareIndex(env, record.authorUserId, rawId);
+  }
+  if (auth.user.id !== record.authorUserId) {
+    await removeUserShareIndex(env, auth.user.id, rawId);
+  }
+  return authJson({ ok: true, id: rawId, deleted: true }, 200);
 }
 
 async function getSharedBuildById(env, shareId) {
@@ -2128,8 +2709,17 @@ async function getSharedBuildById(env, shareId) {
 export async function handleSharedBuildRequest(request, env, url) {
   const path = url.pathname;
 
+  if (request.method === "GET" && path === "/api/user/shares") {
+    return handleListUserShares(request, env, url);
+  }
+
   if (request.method === "POST" && path === "/api/builds/share") {
     return handleCreateSharedBuild(request, env, url);
+  }
+
+  if (request.method === "DELETE" && path.startsWith("/api/builds/share/")) {
+    const rawId = path.slice("/api/builds/share/".length).replace(/\/+$/, "").toLowerCase();
+    return handleDeleteSharedBuild(request, env, url, rawId);
   }
 
   if (request.method === "GET" && path.startsWith("/api/builds/share/")) {

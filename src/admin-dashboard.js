@@ -1,3 +1,5 @@
+import { DASHBOARD_THEME_VERSION } from "./dashboard.js";
+
 function escapeAdmHtml(str) {
   return String(str ?? "")
     .replace(/&/g, "&amp;")
@@ -46,6 +48,8 @@ export function renderAdminDashboard(options = {}) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${pageTitle}</title>
+  <meta name="theme-color" content="#090809">
+  <script src="/assets/theme-init.js?v=${DASHBOARD_THEME_VERSION}"></script>
   <style>
     :root {
       --bg: #0f0c09;
@@ -58,6 +62,30 @@ export function renderAdminDashboard(options = {}) {
       --ok: #67e87a;
       --danger: #f06d5b;
     }
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f1e8d4;
+      --panel: #faf4e6;
+      --line: rgba(154, 114, 52, 0.42);
+      --gold: #8c5912;
+      --gold-bright: #5e3806;
+      --text: #271d14;
+      --muted: #665541;
+      --ok: #1b7a36;
+      --danger: #b82f20;
+    }
+    :root[data-theme="light"] body { background: radial-gradient(circle at 20% 0%, #f9f2e2 0%, var(--bg) 52%); }
+    :root[data-theme="light"] .adm-header { background: linear-gradient(135deg, #fbf6ea, #ede0c4); }
+    :root[data-theme="light"] .adm-card,
+    :root[data-theme="light"] .adm-stat { background: #fbf6ea; }
+    :root[data-theme="light"] .adm-input,
+    :root[data-theme="light"] .adm-btn,
+    :root[data-theme="light"] .adm-link-btn { background: #f3e8d0; color: #271d14; border-color: rgba(154, 114, 52, 0.44); }
+    .adm-theme-bar { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.28); }
+    :root[data-theme="light"] .adm-theme-bar { background: #efe3c8; }
+    .adm-theme-btn { border: 0; border-radius: 999px; padding: 4px 8px; background: transparent; color: var(--muted); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .adm-theme-btn.active { background: linear-gradient(180deg, rgba(213, 167, 72, 0.34), rgba(145, 98, 28, 0.36)); color: var(--gold-bright); }
+    :root[data-theme="light"] .adm-theme-btn.active { background: #9b6516; color: #fffaf0; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -407,6 +435,11 @@ export function renderAdminDashboard(options = {}) {
         <h1 class="adm-title">🛡 庇护之地管理后台</h1>
       </div>
       <div class="adm-head-actions">
+        <div class="adm-theme-bar" role="group" aria-label="深浅外观切换">
+          <button type="button" class="adm-theme-btn active" data-theme-mode="auto" aria-pressed="true" title="跟随系统自动切换">🌓 跟随</button>
+          <button type="button" class="adm-theme-btn" data-theme-mode="dark" aria-pressed="false" title="深色模式">🌙 深色</button>
+          <button type="button" class="adm-theme-btn" data-theme-mode="light" aria-pressed="false" title="浅色模式">☀ 浅色</button>
+        </div>
         <span class="adm-badge" id="adm-user-badge" style="display:${ssrUser ? "inline-flex" : "none"}">${ssrUserLabel}</span>
         <a class="adm-link-btn" href="/">← 返回主仪表盘</a>
         <button class="adm-btn adm-btn-danger" id="adm-logout-btn" type="button" style="display:${ssrUser ? "inline-flex" : "none"}">退出登录</button>

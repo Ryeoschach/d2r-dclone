@@ -2246,15 +2246,15 @@ h1 {
 .it-card.it-rare { border-color: rgba(247, 223, 116, 0.32); }
 .it-card-head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
 }
 .it-card-title-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
+  width: 100%;
   min-width: 0;
 }
 .it-card-title-row > div:not(.it-thumb-wrap) {
@@ -2262,8 +2262,16 @@ h1 {
   min-width: 0;
 }
 .it-card-head .af-card-badges {
-  flex-shrink: 0;
-  justify-content: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+  padding-top: 2px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+:root[data-theme="light"] .it-card-head .af-card-badges {
+  border-top-color: rgba(154, 114, 52, 0.24);
 }
 .it-thumb-wrap {
   flex: 0 0 auto;
@@ -2324,6 +2332,61 @@ h1 {
   font-size: 9px;
   opacity: 0.65;
   vertical-align: 1px;
+}
+.rw-badge-class {
+  border-color: rgba(226, 132, 219, 0.55);
+  color: #f0a3ec;
+  background: rgba(66, 24, 68, 0.48);
+}
+.stat-list.it-unique-base-stats,
+.stat-list.it-unique-magic-stats,
+.stat-list.it-base-prop-stats,
+.stat-list.it-base-socket-stats {
+  margin: 4px 0;
+  padding: 7px 10px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.48;
+}
+.stat-list.it-unique-base-stats li::before,
+.stat-list.it-unique-magic-stats li::before,
+.stat-list.it-base-prop-stats li::before,
+.stat-list.it-base-socket-stats li::before {
+  content: "◆ ";
+  font-size: 9px;
+  opacity: 0.72;
+  vertical-align: 1px;
+}
+.stat-list.it-unique-base-stats {
+  color: #f7f5f0;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 3px solid rgba(247, 245, 240, 0.62);
+}
+.stat-list.it-unique-magic-stats {
+  color: #7cb8ff;
+  background: rgba(22, 42, 82, 0.34);
+  border: 1px solid rgba(124, 184, 255, 0.28);
+  border-left: 3px solid #7cb8ff;
+}
+.stat-list.it-base-prop-stats {
+  color: #e8f1ff;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(154, 216, 255, 0.16);
+  border-left: 3px solid rgba(154, 216, 255, 0.62);
+}
+.stat-list.it-base-socket-stats {
+  color: #ffd584;
+  background: rgba(74, 48, 12, 0.34);
+  border: 1px solid rgba(255, 213, 132, 0.26);
+  border-left: 3px solid #ffd584;
+}
+.it-set-piece-stats li.it-piece-base-line {
+  color: #f4f1ea;
 }
 .it-card-note { font-size: 11px; color: var(--muted); line-height: 1.45; }
 @media (max-width: 720px) {
@@ -2401,6 +2464,38 @@ h1 {
   font-size: 11px;
   color: #f5cf7b;
   font-variant-numeric: tabular-nums;
+}
+.meta-preset-bar {
+  margin-bottom: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(235, 168, 72, 0.34);
+  background: linear-gradient(135deg, rgba(46, 26, 14, 0.56), rgba(16, 13, 14, 0.88));
+}
+.meta-preset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.meta-preset-badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffd573;
+  white-space: nowrap;
+}
+.meta-preset-select {
+  height: 30px;
+  padding: 2px 10px;
+  font-size: 12px;
+  min-width: 240px;
+  max-width: 340px;
+}
+.meta-preset-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  flex: 1 1 220px;
+  min-width: 0;
 }
 .sk-planner-bar {
   display: flex;
@@ -2898,6 +2993,107 @@ h1 {
   font-size: 12px;
   color: var(--muted);
 }
+.sk-jump-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.34);
+  border: 1px solid rgba(213, 167, 72, 0.24);
+}
+.sk-jump-label {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.sk-jump-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.sk-jump-pills.is-col {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+}
+.sk-jump-arrow {
+  font-size: 11px;
+  color: rgba(213, 167, 72, 0.65);
+}
+.sk-jump-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(213, 167, 72, 0.36);
+  background: rgba(24, 18, 15, 0.88);
+  color: #f4dfad;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, transform 120ms ease;
+}
+.sk-jump-pill:hover {
+  border-color: rgba(255, 213, 115, 0.9);
+  background: rgba(54, 38, 22, 0.95);
+  transform: translateY(-1px);
+}
+.sk-jump-pill.is-req.is-met {
+  border-color: rgba(112, 226, 140, 0.45);
+  color: #b7f6c4;
+}
+.sk-jump-pill.is-syn {
+  width: 100%;
+  justify-content: flex-start;
+  border-color: rgba(103, 232, 122, 0.28);
+  background: rgba(12, 26, 16, 0.72);
+  color: #9df7ab;
+}
+.sk-jump-pill.is-syn:hover {
+  border-color: rgba(116, 244, 138, 0.85);
+  background: rgba(20, 44, 26, 0.92);
+}
+.sk-jump-ico {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  border: 1px solid rgba(226, 180, 92, 0.45);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.sk-jump-txt {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+.sk-jump-pts {
+  margin-left: auto;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.48);
+  border: 1px solid rgba(213, 167, 72, 0.32);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #ffd573;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sk-syn-static {
+  font-size: 12px;
+  color: #8af49f;
+  padding: 3px 6px;
+}
+@keyframes skNodePulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(255, 213, 115, 0.92); }
+  50% { box-shadow: 0 0 0 8px rgba(255, 213, 115, 0.28); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 213, 115, 0); }
+}
+.sk-node.sk-node-pulse {
+  animation: skNodePulseRing 900ms ease-out 1;
+}
 .bp-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3348,6 +3544,164 @@ h1 {
 }
 .pd-inv-item.is-unique .pd-inv-item-tag { color: #ffd573; }
 .pd-inv-item.is-util .pd-inv-item-tag { color: #c4c9d4; }
+.pd-inv-remove-btn {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 138, 117, 0.72);
+  background: rgba(128, 22, 16, 0.92);
+  color: #fff2ee;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 13px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s ease, transform .12s ease, background .12s ease;
+  z-index: 6;
+}
+.pd-inv-item:hover .pd-inv-remove-btn,
+.pd-inv-item.active-bag .pd-inv-remove-btn,
+.pd-inv-remove-btn:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pd-inv-remove-btn:hover {
+  background: #d83b28;
+  border-color: #ffd5cc;
+  transform: scale(1.08);
+}
+@media (hover: none) {
+  .pd-inv-remove-btn {
+    opacity: 0.92;
+    pointer-events: auto;
+  }
+}
+.pd-bag-inline-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 9px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 138, 117, 0.42);
+  background: rgba(34, 16, 16, 0.56);
+  font-size: 11.5px;
+}
+.pd-bag-inline-name {
+  color: #ffe08c;
+  font-weight: 800;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pd-bag-inline-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+:root[data-theme="light"] .pd-inv-remove-btn {
+  background: rgba(196, 46, 30, 0.94);
+  border-color: #8c1a10;
+  color: #ffffff;
+}
+:root[data-theme="light"] .pd-bag-inline-bar {
+  background: #fbf0e8;
+  border-color: rgba(196, 62, 42, 0.45);
+}
+:root[data-theme="light"] .pd-bag-inline-name {
+  color: #7a4805;
+}
+.pd-compare-bar {
+  margin-top: 8px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(213, 167, 72, 0.28);
+  background: linear-gradient(135deg, rgba(28, 22, 18, 0.88), rgba(14, 12, 14, 0.94));
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+.pd-compare-bar.is-active {
+  border-color: rgba(103, 232, 122, 0.52);
+  background: linear-gradient(135deg, rgba(16, 36, 24, 0.88), rgba(12, 16, 18, 0.95));
+  box-shadow: 0 0 14px rgba(87, 219, 112, 0.14);
+}
+.pd-compare-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pd-compare-info {
+  font-size: 11.5px;
+  color: var(--muted);
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.pd-compare-bar.is-active .pd-compare-info {
+  color: #d8f5df;
+  font-weight: 700;
+}
+.pd-compare-actions {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.pd-compare-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+.pd-cmp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.pd-cmp-chip.is-up {
+  color: #7df292;
+  background: rgba(87, 219, 112, 0.14);
+  border: 1px solid rgba(87, 219, 112, 0.42);
+}
+.pd-cmp-chip.is-down {
+  color: #ff9c8f;
+  background: rgba(239, 107, 91, 0.15);
+  border: 1px solid rgba(239, 107, 91, 0.44);
+}
+.pd-cmp-chip.is-same {
+  color: #b7c2d0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.pd-delta {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 10.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pd-delta.is-up { color: #67e87a; }
+.pd-delta.is-down { color: #ff8a75; }
+
 .pd-skill-atk-box {
   margin-top: 10px;
   padding: 10px 12px;
@@ -4850,4 +5204,1014 @@ dialog.auth-dialog::backdrop {
   .mobile-region-grid .cell { padding: 10px; }
   .mobile-region-grid .card-top { align-items: flex-start; flex-direction: column; }
   .mobile-region-grid .progress { margin-top: 11px; }
+}
+
+/* ==================== 全站亮/暗主题与跟随系统自动切换 ==================== */
+.theme-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line-gold);
+  background: rgba(16, 12, 10, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 224, 150, 0.08);
+}
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+.theme-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.07); }
+.theme-btn.active {
+  background: linear-gradient(180deg, rgba(213, 167, 72, 0.34), rgba(145, 98, 28, 0.36));
+  color: #ffe7ad;
+  box-shadow: inset 0 0 0 1px rgba(246, 206, 118, 0.52);
+}
+
+/* 浅色模式（保持庇护之地暗金视觉基因的暖色高对比浅色版；支持手动切换或跟随系统自动切换） */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f1e8d4;
+  --panel: #faf4e6;
+  --panel-2: #ede1c6;
+  --line: #cbb892;
+  --line-gold: rgba(154, 102, 24, 0.42);
+  --text: #271d14;
+  --muted: #64533e;
+  --gold: #8c5910;
+  --danger: #b82f20;
+  --success: #1a7334;
+  --q-unique: #8a570a;
+  --q-set: #14752c;
+  --q-rare: #876300;
+  --q-magic: #1e42b8;
+  --q-craft: #b04900;
+  --tz-border: rgba(138, 62, 122, 0.38);
+  --tz-accent: #822e72;
+  --dc-border: rgba(158, 102, 20, 0.44);
+  --dc-accent: #8f5b10;
+  --rw-border: rgba(34, 128, 76, 0.4);
+  --rw-accent: #18703e;
+  --af-border: rgba(42, 94, 184, 0.4);
+  --af-accent: #1f50ab;
+  --it-border: rgba(176, 94, 30, 0.42);
+  --it-accent: #9e4d10;
+}
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 80% 36rem at 50% -6%, rgba(196, 146, 68, 0.22) 0, transparent 70%),
+    radial-gradient(circle at 12% 28%, rgba(156, 112, 48, 0.10) 0, transparent 34rem),
+    repeating-linear-gradient(45deg, rgba(138, 98, 42, 0.025) 0 1px, transparent 1px 28px),
+    linear-gradient(180deg, #f6efe0 0%, var(--bg) 52%, #e6d8bc 100%);
+  color: var(--text);
+}
+
+/* 顶栏、状态胶囊、HUD 与导航标签 */
+:root[data-theme="light"] .hero,
+:root[data-theme="light"] .module-block,
+:root[data-theme="light"] .terror-module,
+:root[data-theme="light"] .dclone-module,
+:root[data-theme="light"] .runewords-module,
+:root[data-theme="light"] .affixes-module,
+:root[data-theme="light"] .items-module,
+:root[data-theme="light"] .skills-module,
+:root[data-theme="light"] .settings-module,
+:root[data-theme="light"] .main-nav-tabs,
+:root[data-theme="light"] .cloud-sync-bar,
+:root[data-theme="light"] .meta-preset-bar,
+:root[data-theme="light"] .sk-planner-bar,
+:root[data-theme="light"] .pd-compare-bar,
+:root[data-theme="light"] .bp-sync-bar,
+:root[data-theme="light"] .pd-aura-bar,
+:root[data-theme="light"] .pd-swap-bar,
+:root[data-theme="light"] .tz-directory-section,
+:root[data-theme="light"] .toolbar {
+  background: linear-gradient(180deg, rgba(252, 247, 236, 0.98), rgba(243, 234, 214, 0.98));
+  border-color: rgba(162, 124, 62, 0.44);
+  box-shadow: 0 6px 20px rgba(74, 52, 22, 0.09);
+  color: var(--text);
+}
+:root[data-theme="light"] .status-line,
+:root[data-theme="light"] .hud-pill,
+:root[data-theme="light"] .hud-shortcuts,
+:root[data-theme="light"] .sk-tree-legend {
+  background: #f5ecd8;
+  border-color: rgba(162, 124, 62, 0.42);
+  color: #3a2c1e;
+  box-shadow: 0 2px 8px rgba(74, 52, 22, 0.07);
+}
+:root[data-theme="light"] .hud-pill:hover {
+  background: #efe2c6;
+  border-color: rgba(154, 102, 24, 0.62);
+}
+:root[data-theme="light"] .hud-pill.hud-hot {
+  background: linear-gradient(135deg, #fbe8e2, #f5ecd8);
+  border-color: rgba(196, 62, 42, 0.48);
+}
+:root[data-theme="light"] .hud-pill-k,
+:root[data-theme="light"] .hud-shortcuts { color: #67543e; }
+:root[data-theme="light"] .hud-pill-v { color: #24190e; font-weight: 700; }
+:root[data-theme="light"] .hud-pill-badge,
+:root[data-theme="light"] .kbd-mini,
+:root[data-theme="light"] .tab-kbd {
+  background: #e7d8b8;
+  border-color: rgba(145, 104, 44, 0.42);
+  color: #4a351e;
+}
+:root[data-theme="light"] .main-nav-tab {
+  background: #f4ead4;
+  border-color: rgba(162, 124, 62, 0.36);
+  color: #4f3d29;
+  box-shadow: none;
+}
+:root[data-theme="light"] .main-nav-tab:hover {
+  background: #ebdcbe;
+  border-color: rgba(154, 102, 24, 0.56);
+  color: #24180c;
+}
+:root[data-theme="light"] .main-nav-tab.active,
+:root[data-theme="light"] .main-nav-tab.tab-terror.active,
+:root[data-theme="light"] .main-nav-tab.tab-dclone.active,
+:root[data-theme="light"] .main-nav-tab.tab-runewords.active,
+:root[data-theme="light"] .main-nav-tab.tab-affixes.active,
+:root[data-theme="light"] .main-nav-tab.tab-items.active,
+:root[data-theme="light"] .main-nav-tab.tab-skills.active {
+  background: linear-gradient(180deg, #b87a24, #8c550e);
+  border-color: #754608;
+  color: #fffaf0;
+  box-shadow: 0 3px 10px rgba(124, 75, 11, 0.28);
+}
+:root[data-theme="light"] .main-nav-tab.active .tab-kbd {
+  background: rgba(255, 250, 240, 0.24);
+  border-color: rgba(255, 250, 240, 0.45);
+  color: #fffaf0;
+}
+
+/* 职业按钮、子页签、筛选栏与按钮 */
+:root[data-theme="light"] .sk-class-btn,
+:root[data-theme="light"] .it-subtab,
+:root[data-theme="light"] .af-subtab,
+:root[data-theme="light"] .tz-chip,
+:root[data-theme="light"] .filter,
+:root[data-theme="light"] .refresh,
+:root[data-theme="light"] .interval-button,
+:root[data-theme="light"] .save-setting,
+:root[data-theme="light"] .rw-btn,
+:root[data-theme="light"] .lang-switcher,
+:root[data-theme="light"] .theme-switcher,
+:root[data-theme="light"] .settings-jump-btn,
+:root[data-theme="light"] .auth-pill-btn,
+:root[data-theme="light"] .tz-directory-toggle,
+:root[data-theme="light"] .af-craft-toggle,
+:root[data-theme="light"] .sim-affix-btn,
+:root[data-theme="light"] .back-to-top-btn {
+  background: #f5ebd5;
+  border-color: rgba(154, 114, 52, 0.44);
+  color: #2d2116;
+  box-shadow: none;
+}
+:root[data-theme="light"] .sk-class-btn:hover,
+:root[data-theme="light"] .it-subtab:hover,
+:root[data-theme="light"] .af-subtab:hover,
+:root[data-theme="light"] .tz-chip:hover,
+:root[data-theme="light"] .rw-btn:hover,
+:root[data-theme="light"] .refresh:hover,
+:root[data-theme="light"] .settings-jump-btn:hover,
+:root[data-theme="light"] .sim-affix-btn:hover:not(:disabled) {
+  background: #ebddbe;
+  border-color: rgba(154, 102, 24, 0.65);
+  color: #1e150c;
+}
+:root[data-theme="light"] .sk-class-btn.active {
+  background: linear-gradient(135deg, #8f2d1e, #661b12);
+  border-color: #661b12;
+  color: #fff6ed;
+  box-shadow: 0 3px 10px rgba(128, 36, 22, 0.28);
+}
+:root[data-theme="light"] .sk-class-btn.active * { color: #fff6ed; }
+:root[data-theme="light"] .rw-btn.active,
+:root[data-theme="light"] .lang-btn.active,
+:root[data-theme="light"] .theme-btn.active,
+:root[data-theme="light"] .it-subtab.active,
+:root[data-theme="light"] .af-subtab.active,
+:root[data-theme="light"] .tz-chip.active,
+:root[data-theme="light"] .filter.active,
+:root[data-theme="light"] .sim-affix-btn.selected {
+  background: linear-gradient(180deg, #b87a24, #8f5810);
+  color: #fffaf0;
+  border-color: #7c4b0b;
+  box-shadow: 0 2px 8px rgba(124, 75, 11, 0.24);
+}
+:root[data-theme="light"] .auth-pill-btn.logged-in {
+  background: #e9f5ec;
+  border-color: rgba(28, 128, 62, 0.45);
+  color: #145e2c;
+}
+
+/* 输入框、下拉框与数字框 */
+:root[data-theme="light"] input[type="text"],
+:root[data-theme="light"] input[type="number"],
+:root[data-theme="light"] input[type="search"],
+:root[data-theme="light"] input[type="password"],
+:root[data-theme="light"] textarea,
+:root[data-theme="light"] select,
+:root[data-theme="light"] .sim-select,
+:root[data-theme="light"] .sim-num-input,
+:root[data-theme="light"] .sk-bonus-input,
+:root[data-theme="light"] .tz-search-input,
+:root[data-theme="light"] .cloud-preset-input,
+:root[data-theme="light"] .auth-input,
+:root[data-theme="light"] .rw-search,
+:root[data-theme="light"] .it-search,
+:root[data-theme="light"] .af-search,
+:root[data-theme="light"] .setting-input,
+:root[data-theme="light"] .pd-combo-field,
+:root[data-theme="light"] .pd-jewel-val-inp {
+  background: #fffdf8;
+  border-color: rgba(154, 114, 52, 0.48);
+  color: #241a10;
+}
+:root[data-theme="light"] .pd-combo-menu {
+  background: #fcf8ee;
+  border-color: rgba(154, 114, 52, 0.55);
+  box-shadow: 0 10px 26px rgba(64, 42, 16, 0.2);
+}
+:root[data-theme="light"] .pd-search-hit { background: #f8f0df; border-color: rgba(154, 114, 52, 0.32); color: #271d14; }
+:root[data-theme="light"] .pd-search-hit:hover { background: #ede0c4; }
+
+/* 卡片、表格、符文、词缀、物品、档位与配装面板 */
+:root[data-theme="light"] .terror-card,
+:root[data-theme="light"] .terror-card.next,
+:root[data-theme="light"] .tz-directory-body,
+:root[data-theme="light"] .tz-filter-bar,
+:root[data-theme="light"] .tz-catalog-card,
+:root[data-theme="light"] .tz-history-item,
+:root[data-theme="light"] .dlc,
+:root[data-theme="light"] .cell,
+:root[data-theme="light"] .rw-summary-card,
+:root[data-theme="light"] .rw-rune-section,
+:root[data-theme="light"] .rw-rune-card,
+:root[data-theme="light"] .rw-filter-bar,
+:root[data-theme="light"] .rw-item,
+:root[data-theme="light"] .rw-modal,
+:root[data-theme="light"] .rw-modal-runes-box,
+:root[data-theme="light"] .rw-stat-group,
+:root[data-theme="light"] .rw-modal-foot,
+:root[data-theme="light"] .af-rule-card,
+:root[data-theme="light"] .af-craft-body,
+:root[data-theme="light"] .af-craft-card,
+:root[data-theme="light"] .af-filter-bar,
+:root[data-theme="light"] .af-card,
+:root[data-theme="light"] .sim-controls,
+:root[data-theme="light"] .sim-pool,
+:root[data-theme="light"] .sim-preview-card,
+:root[data-theme="light"] .it-card,
+:root[data-theme="light"] .it-set-piece,
+:root[data-theme="light"] .it-set-bonus-box,
+:root[data-theme="light"] .grail-summary-card,
+:root[data-theme="light"] .bp-card,
+:root[data-theme="light"] .pd-stat-card,
+:root[data-theme="light"] .pd-sheet-card,
+:root[data-theme="light"] .pd-skill-atk-box,
+:root[data-theme="light"] .pd-skill-notes-details,
+:root[data-theme="light"] .pd-alloc-box,
+:root[data-theme="light"] .pd-sock-slot-box,
+:root[data-theme="light"] .pd-pal-shield-fs,
+:root[data-theme="light"] .pd-affix-builder,
+:root[data-theme="light"] .pd-jewel-builder,
+:root[data-theme="light"] .pd-slider-row,
+:root[data-theme="light"] .setting-group,
+:root[data-theme="light"] dialog.auth-dialog,
+:root[data-theme="light"] .auth-profile-card,
+:root[data-theme="light"] .auth-preset-item,
+:root[data-theme="light"] .auth-recovery-box,
+:root[data-theme="light"] .alert-section {
+  background: #fbf6ea;
+  border-color: rgba(164, 128, 68, 0.38);
+  color: var(--text);
+  box-shadow: 0 3px 12px rgba(74, 52, 22, 0.08);
+}
+:root[data-theme="light"] .rw-item.completed,
+:root[data-theme="light"] .it-card.it-unique.grail-done,
+:root[data-theme="light"] .it-card.it-set.grail-done,
+:root[data-theme="light"] .it-set-piece.grail-done,
+:root[data-theme="light"] .bp-table tr.bp-active {
+  background: rgba(34, 148, 72, 0.12);
+  border-color: rgba(28, 132, 62, 0.44);
+}
+:root[data-theme="light"] .rw-badge,
+:root[data-theme="light"] .rw-rune-pill,
+:root[data-theme="light"] .terror-badge,
+:root[data-theme="light"] .pd-affix-chip {
+  background: #efe3c8;
+  border-color: rgba(154, 114, 52, 0.38);
+  color: #362717;
+}
+:root[data-theme="light"] .it-thumb-wrap {
+  background: #ede2ca;
+  border-color: rgba(154, 114, 52, 0.42);
+}
+:root[data-theme="light"] .matrix th,
+:root[data-theme="light"] .matrix td,
+:root[data-theme="light"] .corner,
+:root[data-theme="light"] .col-head,
+:root[data-theme="light"] .region,
+:root[data-theme="light"] .dlc-head,
+:root[data-theme="light"] .mobile-region-title {
+  background: #efe3c8;
+  color: var(--text);
+  border-color: rgba(164, 128, 68, 0.34);
+}
+:root[data-theme="light"] .bar { background: #dfd1b3; }
+
+/* 浅色模式下修正原本硬编码为亮浅色的文字，确保高对比清晰可读（WCAG AA+） */
+/* 1. 深褐主文字（替换白色/浅米白） */
+:root[data-theme="light"] .hud-val,
+:root[data-theme="light"] .terror-countdown,
+:root[data-theme="light"] .tz-card-title,
+:root[data-theme="light"] .rw-stat strong,
+:root[data-theme="light"] .rw-rune-name,
+:root[data-theme="light"] .rw-item-title,
+:root[data-theme="light"] .rw-item-name,
+:root[data-theme="light"] .af-rule-head,
+:root[data-theme="light"] .af-craft-row-head,
+:root[data-theme="light"] .af-card-title,
+:root[data-theme="light"] .sim-status-bar,
+:root[data-theme="light"] .sim-status-metrics strong,
+:root[data-theme="light"] .it-card-title,
+:root[data-theme="light"] .cloud-sync-status,
+:root[data-theme="light"] .bp-sync-bar,
+:root[data-theme="light"] .bp-sync-bar label,
+:root[data-theme="light"] .bp-sync-toggle,
+:root[data-theme="light"] .sk-planner-bar,
+:root[data-theme="light"] .pd-compare-bar,
+:root[data-theme="light"] .pd-compare-bar.is-active .pd-compare-info,
+:root[data-theme="light"] .pd-compare-info,
+:root[data-theme="light"] .pd-swap-tab,
+:root[data-theme="light"] .pd-swap-kbd-btn,
+:root[data-theme="light"] .pd-swap-preview,
+:root[data-theme="light"] .pd-sheet-v,
+:root[data-theme="light"] .pd-combo-opt,
+:root[data-theme="light"] .pd-search-hit,
+:root[data-theme="light"] .pd-alloc-btn,
+:root[data-theme="light"] .pd-alloc-input,
+:root[data-theme="light"] .alert-toggle-row,
+:root[data-theme="light"] .alert-zone-chip,
+:root[data-theme="light"] .alert-log-list,
+:root[data-theme="light"] .auth-hint-box,
+:root[data-theme="light"] .auth-profile-name,
+:root[data-theme="light"] .auth-preset-title,
+:root[data-theme="light"] .auth-field label,
+:root[data-theme="light"] .auth-close-btn,
+:root[data-theme="light"] .auth-pw-toggle,
+:root[data-theme="light"] .rw-modal-close,
+:root[data-theme="light"] .rw-modal-meta,
+:root[data-theme="light"] .af-badge-all,
+:root[data-theme="light"] .terror-badge.immunity-ph,
+:root[data-theme="light"] .terror-rating.rating-c,
+:root[data-theme="light"] .settings-tag {
+  color: #241a10;
+}
+:root[data-theme="light"] .auth-profile-sub,
+:root[data-theme="light"] .auth-dlg-sub,
+:root[data-theme="light"] .auth-dialog-sub {
+  color: #61503c;
+}
+
+/* 2. 深暗金/古铜文字（替换亮黄/淡金） */
+:root[data-theme="light"] .hero h1,
+:root[data-theme="light"] .module-title,
+:root[data-theme="light"] .dlc h2,
+:root[data-theme="light"] .dclone-tag,
+:root[data-theme="light"] .terror-name,
+:root[data-theme="light"] .terror-rating,
+:root[data-theme="light"] .terror-rating.rating-s,
+:root[data-theme="light"] .terror-badge.immunity-l,
+:root[data-theme="light"] .rw-gold,
+:root[data-theme="light"] .rw-stat strong.rw-gold,
+:root[data-theme="light"] .rw-badge-ladder,
+:root[data-theme="light"] .rw-item-note,
+:root[data-theme="light"] .rw-rune-pill.tier-high,
+:root[data-theme="light"] .rw-modal-title,
+:root[data-theme="light"] .rw-stat-group-title,
+:root[data-theme="light"] .af-rule-card.rule-rare .af-rule-limit,
+:root[data-theme="light"] .af-badge-rare,
+:root[data-theme="light"] .q-rare .sim-item-name,
+:root[data-theme="light"] .it-unique .it-card-title,
+:root[data-theme="light"] .it-rare .it-card-title,
+:root[data-theme="light"] .it-set-bonus-title,
+:root[data-theme="light"] .it-set-bonus-list,
+:root[data-theme="light"] .sk-class-pts,
+:root[data-theme="light"] .meta-preset-badge,
+:root[data-theme="light"] .bp-card-title,
+:root[data-theme="light"] .bp-table tr.bp-active,
+:root[data-theme="light"] .bp-table tr.bp-active td,
+:root[data-theme="light"] .pd-jump-bp-btn,
+:root[data-theme="light"] .pd-swap-kbd-btn kbd,
+:root[data-theme="light"] .pd-sheet-title,
+:root[data-theme="light"] .pd-skill-notes-summary,
+:root[data-theme="light"] .pd-combo-opt:hover,
+:root[data-theme="light"] .pd-combo-opt.is-active,
+:root[data-theme="light"] .pd-search-hit:hover,
+:root[data-theme="light"] .pd-affix-chip.is-suffix,
+:root[data-theme="light"] .pd-pal-shield-fs,
+:root[data-theme="light"] .pd-pal-shield-fs legend,
+:root[data-theme="light"] .pd-jewel-builder.is-rare .pd-jewel-row label,
+:root[data-theme="light"] .alert-section-title,
+:root[data-theme="light"] .auth-dlg-title,
+:root[data-theme="light"] .auth-dialog-title,
+:root[data-theme="light"] .auth-prov-badge,
+:root[data-theme="light"] .auth-link-btn,
+:root[data-theme="light"] .auth-recovery-code,
+:root[data-theme="light"] .auth-sec-details summary {
+  color: #7a4805;
+  text-shadow: none;
+}
+:root[data-theme="light"] .lvl-calc-badge {
+  background: rgba(168, 108, 20, 0.16);
+  border-color: rgba(154, 96, 16, 0.5);
+  color: #6b3c02;
+}
+:root[data-theme="light"] .rw-rune-card.selected {
+  background: linear-gradient(135deg, #1b6b3a, #124d29);
+  border-color: #d49b2a;
+  outline: 1.5px solid rgba(196, 138, 28, 0.78);
+  box-shadow: 0 4px 14px rgba(18, 77, 41, 0.34);
+}
+:root[data-theme="light"] .rw-rune-card.selected::after {
+  background: #ffd54f;
+  color: #1c1408;
+}
+:root[data-theme="light"] .rw-rune-card.selected .rw-rune-top,
+:root[data-theme="light"] .rw-rune-card.selected .rw-rune-num,
+:root[data-theme="light"] .rw-rune-card.selected .rw-rune-name {
+  color: #fff6d6 !important;
+  text-shadow: none;
+}
+:root[data-theme="light"] .rw-rune-card.selected .rw-rune-rem {
+  color: #ffffff !important;
+}
+:root[data-theme="light"] .rw-rune-card.selected .rw-rune-tot {
+  color: #d7f2df !important;
+}
+:root[data-theme="light"] .rw-rune-card .rw-rune-tot {
+  color: #5c4b37;
+}
+:root[data-theme="light"] .rw-rune-pill.pill-selected {
+  background: #b87a1e !important;
+  border-color: #7a4b06 !important;
+  color: #fffaf0 !important;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(138, 86, 12, 0.32);
+}
+
+/* 3. 深宝蓝文字（替换所有浅蓝/天蓝：魔法属性、法力、技能等级、词缀范围等） */
+:root[data-theme="light"] .rw-stat-list,
+:root[data-theme="light"] .rw-stat-list li,
+:root[data-theme="light"] .rw-badge-unlocked,
+:root[data-theme="light"] .rw-rune-pill.tier-mid,
+:root[data-theme="light"] .affixes-tag,
+:root[data-theme="light"] .af-rule-limit,
+:root[data-theme="light"] .af-card-range,
+:root[data-theme="light"] .af-badge-magic,
+:root[data-theme="light"] .sim-pool-head,
+:root[data-theme="light"] .sim-affix-range,
+:root[data-theme="light"] .q-magic .sim-item-name,
+:root[data-theme="light"] .sim-item-lines,
+:root[data-theme="light"] .sim-item-lines li,
+:root[data-theme="light"] .it-magic .it-card-title,
+:root[data-theme="light"] .it-card-stats,
+:root[data-theme="light"] .it-stat-list,
+:root[data-theme="light"] .it-stat-list li,
+:root[data-theme="light"] .it-set-piece-stats,
+:root[data-theme="light"] .stat-list,
+:root[data-theme="light"] .stat-list li,
+:root[data-theme="light"] .terror-badge.immunity-c,
+:root[data-theme="light"] .terror-rating.rating-b,
+:root[data-theme="light"] .pd-jewel-row label,
+:root[data-theme="light"] .pd-sheet-card [style*="color:#9ad8ff"],
+:root[data-theme="light"] .pd-sheet-card [style*="color:#7cb6ff"],
+:root[data-theme="light"] .pd-sheet-card [style*="color:#88b3ff"],
+:root[data-theme="light"] .pd-sheet-card [style*="color:#a7d8ff"],
+:root[data-theme="light"] .pd-sheet-card [style*="color:#68a4ff"],
+:root[data-theme="light"] [style*="color:#9ad8ff"],
+:root[data-theme="light"] [style*="color: #9ad8ff"],
+:root[data-theme="light"] [style*="color:#a7d8ff"],
+:root[data-theme="light"] [style*="color: #a7d8ff"],
+:root[data-theme="light"] [style*="color:#7cb6ff"],
+:root[data-theme="light"] [style*="color:#88b3ff"],
+:root[data-theme="light"] [style*="color:#8cbcff"],
+:root[data-theme="light"] [style*="color:#9dc5ff"],
+:root[data-theme="light"] [style*="color:#68a4ff"],
+:root[data-theme="light"] [style*="color:#a6d6ff"],
+:root[data-theme="light"] [style*="color:#b7d7ff"],
+:root[data-theme="light"] [style*="color:#dbeeff"],
+:root[data-theme="light"] [style*="color:#8ee5ff"],
+:root[data-theme="light"] [style*="color:#56d4ff"] {
+  color: #1548a8 !important;
+}
+:root[data-theme="light"] .rw-badge-class {
+  background: #f5e6f6 !important;
+  border-color: rgba(138, 46, 128, 0.48) !important;
+  color: #7a1e72 !important;
+}
+:root[data-theme="light"] .stat-list.it-unique-base-stats,
+:root[data-theme="light"] .stat-list.it-unique-base-stats li {
+  color: #1f1812 !important;
+}
+:root[data-theme="light"] .stat-list.it-unique-base-stats {
+  background: #ffffff !important;
+  border-color: rgba(138, 112, 74, 0.36) !important;
+  border-left: 3px solid #7c5c32 !important;
+}
+:root[data-theme="light"] .stat-list.it-unique-magic-stats,
+:root[data-theme="light"] .stat-list.it-unique-magic-stats li {
+  color: #1548a8 !important;
+}
+:root[data-theme="light"] .stat-list.it-unique-magic-stats {
+  background: #eaf1fd !important;
+  border-color: rgba(34, 88, 186, 0.32) !important;
+  border-left: 3px solid #2458ba !important;
+}
+:root[data-theme="light"] .stat-list.it-base-prop-stats,
+:root[data-theme="light"] .stat-list.it-base-prop-stats li {
+  color: #1f1812 !important;
+}
+:root[data-theme="light"] .stat-list.it-base-prop-stats {
+  background: #ffffff !important;
+  border-color: rgba(138, 112, 74, 0.34) !important;
+  border-left: 3px solid #5c6f8c !important;
+}
+:root[data-theme="light"] .stat-list.it-base-socket-stats,
+:root[data-theme="light"] .stat-list.it-base-socket-stats li {
+  color: #7a4805 !important;
+}
+:root[data-theme="light"] .stat-list.it-base-socket-stats {
+  background: #fdf2d8 !important;
+  border-color: rgba(178, 122, 24, 0.42) !important;
+  border-left: 3px solid #b57612 !important;
+}
+:root[data-theme="light"] .it-set-piece-stats li.it-piece-base-line {
+  color: #241b13 !important;
+}
+
+/* 4. 深松绿文字（替换浅绿/薄荷绿：绿装、已完成、协同、导出按钮等） */
+:root[data-theme="light"] .runewords-tag,
+:root[data-theme="light"] .rw-stat strong.rw-accent,
+:root[data-theme="light"] .rw-section-title,
+:root[data-theme="light"] .rw-rune-rem,
+:root[data-theme="light"] .rw-item.completed .rw-item-title,
+:root[data-theme="light"] .rw-badge-patch,
+:root[data-theme="light"] .rw-detail-btn,
+:root[data-theme="light"] .it-set .it-card-title,
+:root[data-theme="light"] .it-set-piece-title,
+:root[data-theme="light"] .it-set-piece-bonus,
+:root[data-theme="light"] .terror-badge.immunity-p,
+:root[data-theme="light"] .terror-rating.rating-s-a,
+:root[data-theme="light"] .terror-rating.rating-a,
+:root[data-theme="light"] .pd-combo-opt.is-base-jump,
+:root[data-theme="light"] .pd-combo-opt-tag,
+:root[data-theme="light"] .pd-search-hit.is-base-hit,
+:root[data-theme="light"] [style*="color:#67e87a"],
+:root[data-theme="light"] [style*="color: #67e87a"],
+:root[data-theme="light"] [style*="color:#8af49f"],
+:root[data-theme="light"] [style*="color: #8af49f"],
+:root[data-theme="light"] [style*="color:#9bf4ae"],
+:root[data-theme="light"] [style*="color:#8ee5b6"],
+:root[data-theme="light"] [style*="color:#c6e08b"] {
+  color: #11692a !important;
+}
+
+/* 5. 深橙褐/深梅紫/深绯红（替换浅橙、淡紫、淡粉红） */
+:root[data-theme="light"] .items-tag,
+:root[data-theme="light"] .af-rule-card.rule-crafted .af-rule-limit,
+:root[data-theme="light"] .af-craft-toggle,
+:root[data-theme="light"] .af-craft-formula-tip,
+:root[data-theme="light"] .af-craft-title,
+:root[data-theme="light"] .af-badge-crafted,
+:root[data-theme="light"] .q-crafted .sim-item-name,
+:root[data-theme="light"] .sim-item-lines li.fixed-line,
+:root[data-theme="light"] [style*="color:#ffb26b"],
+:root[data-theme="light"] [style*="color:#ffaa4d"],
+:root[data-theme="light"] [style*="color:#ffd5a8"] {
+  color: #9e4308 !important;
+}
+:root[data-theme="light"] .terror-tag,
+:root[data-theme="light"] .terror-label,
+:root[data-theme="light"] .hud-badge.tz,
+:root[data-theme="light"] .tz-directory-toggle,
+:root[data-theme="light"] .tz-act-badge,
+:root[data-theme="light"] .rw-badge-rotw,
+:root[data-theme="light"] .terror-badge.immunity-m,
+:root[data-theme="light"] [style*="color:#ec9ce4"] {
+  color: #78206e !important;
+}
+:root[data-theme="light"] .skills-tag,
+:root[data-theme="light"] .hud-badge.hot,
+:root[data-theme="light"] .terror-badge.immunity-f,
+:root[data-theme="light"] .terror-rating.rating-f,
+:root[data-theme="light"] .pd-combo-empty,
+:root[data-theme="light"] .pd-affix-chip-del,
+:root[data-theme="light"] .setting-status.failure,
+:root[data-theme="light"] .error,
+:root[data-theme="light"] .auth-err-msg,
+:root[data-theme="light"] .auth-error,
+:root[data-theme="light"] [style*="color:#ff9b8f"],
+:root[data-theme="light"] [style*="color:#ffb3a7"],
+:root[data-theme="light"] [style*="color:#ff8a75"],
+:root[data-theme="light"] [style*="color:#ff9c8f"],
+:root[data-theme="light"] [style*="color:#ff7f6e"] {
+  color: #a32318 !important;
+}
+
+/* 6. 行内淡黄/白色文字兜底（排除深色激活态与游戏石板/纸娃娃内部） */
+:root[data-theme="light"] [style*="color:#ffd573"],
+:root[data-theme="light"] [style*="color: #ffd573"],
+:root[data-theme="light"] [style*="color:#ffe08c"],
+:root[data-theme="light"] [style*="color: #ffe08c"],
+:root[data-theme="light"] [style*="color:#f5cf7b"],
+:root[data-theme="light"] [style*="color: #f5cf7b"],
+:root[data-theme="light"] [style*="color:#f5d58c"],
+:root[data-theme="light"] [style*="color:#ffe29a"],
+:root[data-theme="light"] [style*="color:#ffd584"],
+:root[data-theme="light"] [style*="color:#e3bc6d"],
+:root[data-theme="light"] [style*="color:#ffe3a3"],
+:root[data-theme="light"] [style*="color:#f3d28e"],
+:root[data-theme="light"] [style*="color:#f8e97a"],
+:root[data-theme="light"] [style*="color: #f8e97a"],
+:root[data-theme="light"] [style*="rgb(248, 233, 122)"],
+:root[data-theme="light"] [style*="color:#f7df74"],
+:root[data-theme="light"] [style*="color:#ffe066"] {
+  color: #754c00 !important;
+}
+:root[data-theme="light"] #pd-cat-chips [data-pd-cat="rare"] {
+  background: #faf0c8;
+  border-color: rgba(168, 122, 12, 0.55);
+  color: #6e4700 !important;
+}
+:root[data-theme="light"] #pd-cat-chips [data-pd-cat="magic"] {
+  background: #eaf1fd;
+  border-color: rgba(34, 88, 186, 0.45);
+  color: #1548a8 !important;
+}
+:root[data-theme="light"] #pd-cat-chips [data-pd-cat="craft"] {
+  background: #fbeee0;
+  border-color: rgba(182, 82, 16, 0.48);
+  color: #963f06 !important;
+}
+:root[data-theme="light"] #pd-cat-chips [data-pd-cat="rare"].active {
+  background: #8a5e00 !important;
+  border-color: #614100 !important;
+  color: #fffaf0 !important;
+}
+:root[data-theme="light"] #pd-cat-chips [data-pd-cat="magic"].active {
+  background: #1c53a8 !important;
+  border-color: #123b7a !important;
+  color: #fffaf0 !important;
+}
+:root[data-theme="light"] #pd-cat-chips [data-pd-cat="craft"].active {
+  background: #a64608 !important;
+  border-color: #783104 !important;
+  color: #fffaf0 !important;
+}
+:root[data-theme="light"] [style*="color:#f2e7d5"],
+:root[data-theme="light"] [style*="color:#fff"],
+:root[data-theme="light"] [style*="color: #fff"],
+:root[data-theme="light"] [style*="color:#ffffff"] {
+  color: #241a10 !important;
+}
+/* 恢复激活态按钮上的白字可读性 */
+:root[data-theme="light"] .rw-btn.active,
+:root[data-theme="light"] .rw-btn.active *,
+:root[data-theme="light"] .sk-class-btn.active,
+:root[data-theme="light"] .sk-class-btn.active *,
+:root[data-theme="light"] .main-nav-tab.active,
+:root[data-theme="light"] .main-nav-tab.active *,
+:root[data-theme="light"] .theme-btn.active,
+:root[data-theme="light"] .lang-btn.active,
+:root[data-theme="light"] .it-subtab.active,
+:root[data-theme="light"] .af-subtab.active,
+:root[data-theme="light"] .tz-chip.active,
+:root[data-theme="light"] .auth-submit-btn {
+  color: #fffaf0 !important;
+}
+
+:root[data-theme="light"] .bp-sync-badge,
+:root[data-theme="light"] .bp-status-pill {
+  background: rgba(24, 138, 62, 0.13);
+  border-color: rgba(24, 138, 62, 0.42);
+  color: #13612b;
+}
+:root[data-theme="light"] .bp-sync-badge.is-manual {
+  background: rgba(168, 112, 24, 0.14);
+  border-color: rgba(168, 112, 24, 0.45);
+  color: #6b4108;
+}
+:root[data-theme="light"] .auth-dlg-head {
+  background: linear-gradient(180deg, #ede0c4, #f7efdc);
+  border-bottom-color: rgba(154, 114, 52, 0.36);
+}
+:root[data-theme="light"] .auth-hint-box { background: #f2e7cf; border-color: rgba(154, 114, 52, 0.36); }
+:root[data-theme="light"] .auth-toast { background: #2b2016; color: #fff8ea; border-color: #9b6516; }
+:root[data-theme="light"] .pd-delta.is-up,
+:root[data-theme="light"] .pd-cmp-chip.is-up { color: #0f6b2e !important; background: rgba(24, 148, 64, 0.14); border-color: rgba(24, 148, 64, 0.42); }
+:root[data-theme="light"] .pd-delta.is-down,
+:root[data-theme="light"] .pd-cmp-chip.is-down { color: #a62018 !important; background: rgba(188, 42, 30, 0.12); border-color: rgba(188, 42, 30, 0.38); }
+:root[data-theme="light"] .pd-cmp-chip.is-same { color: #5c4a35; background: #ede1c6; border-color: rgba(154, 114, 52, 0.35); }
+:root[data-theme="light"] .bp-table th { color: #6b3b08; border-bottom-color: rgba(154, 114, 52, 0.36); }
+:root[data-theme="light"] .bp-table td { color: #2b2016; border-bottom-color: rgba(154, 114, 52, 0.18); }
+
+/* 浅色模式下的纸娃娃配装区、佣兵区、10×4 背包与悬浮属性卡（融入暖浅羊皮纸青铜质感，不再突兀发黑） */
+:root[data-theme="light"] .pd-doll-grid {
+  border-color: rgba(154, 114, 52, 0.52);
+  background:
+    radial-gradient(circle at 50% 35%, #eee1c6, #dfd0ae),
+    repeating-linear-gradient(0deg, rgba(138, 98, 42, 0.06) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(90deg, rgba(138, 98, 42, 0.06) 0 1px, transparent 1px 16px);
+  box-shadow: inset 0 0 18px rgba(96, 68, 28, 0.14);
+}
+:root[data-theme="light"] .pd-doll-grid.is-swap-active {
+  border-color: rgba(48, 110, 196, 0.58);
+  background:
+    radial-gradient(circle at 50% 35%, #e4edf8, #d2e0f0),
+    repeating-linear-gradient(0deg, rgba(48, 102, 178, 0.06) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(90deg, rgba(48, 102, 178, 0.06) 0 1px, transparent 1px 16px);
+}
+:root[data-theme="light"] .pd-merc-grid {
+  border-color: rgba(42, 128, 68, 0.48);
+  background:
+    radial-gradient(circle at 50% 35%, #e3ecde, #d1dfca),
+    repeating-linear-gradient(0deg, rgba(36, 108, 56, 0.06) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(90deg, rgba(36, 108, 56, 0.06) 0 1px, transparent 1px 16px);
+  box-shadow: inset 0 0 18px rgba(28, 86, 44, 0.12);
+}
+:root[data-theme="light"] .pd-slot {
+  border-color: rgba(154, 114, 52, 0.48);
+  background-color: #f6eedc;
+  color: #2b2016;
+  box-shadow: inset 0 1px 3px rgba(92, 64, 24, 0.08);
+}
+:root[data-theme="light"] .pd-slot:not(.equipped),
+:root[data-theme="light"] .pd-slot.locked-slot {
+  background-image: none !important;
+  border-style: dashed;
+  border-color: rgba(154, 114, 52, 0.52);
+  background-color: #f4ebd7;
+}
+:root[data-theme="light"] .pd-slot.locked-slot {
+  background-color: #e6dac0;
+  border-color: rgba(138, 108, 68, 0.45);
+  color: #5c4b37;
+}
+:root[data-theme="light"] .pd-slot:not(.equipped):hover {
+  background-color: #fbf4e4;
+  border-style: solid;
+  border-color: rgba(168, 108, 20, 0.82);
+}
+:root[data-theme="light"] .pd-slot:hover {
+  border-color: rgba(168, 108, 20, 0.82);
+  background-color: #fcf7eb;
+}
+:root[data-theme="light"] .pd-slot.active-slot {
+  outline: 2px solid #c43824;
+  border-color: #c43824;
+  box-shadow: 0 0 12px rgba(196, 56, 36, 0.28);
+}
+:root[data-theme="light"] .pd-slot.equipped {
+  border-color: rgba(176, 124, 34, 0.72);
+  background-color: #fdf5e2;
+  box-shadow: 0 2px 8px rgba(92, 64, 24, 0.10), inset 0 0 10px rgba(184, 130, 36, 0.08);
+}
+:root[data-theme="light"] .pd-slot.equipped.q-set {
+  border-color: rgba(36, 136, 62, 0.72);
+  background-color: #e8f5e7;
+  box-shadow: 0 2px 8px rgba(24, 102, 46, 0.10);
+}
+:root[data-theme="light"] .pd-slot.equipped.q-rw {
+  border-color: rgba(196, 108, 34, 0.78);
+  background-color: #fcecd9;
+  box-shadow: 0 2px 8px rgba(148, 76, 20, 0.10);
+}
+:root[data-theme="light"] .pd-slot.equipped.q-craft {
+  border-color: rgba(194, 86, 16, 0.8);
+  background-color: #fbe8d6;
+}
+:root[data-theme="light"] .pd-slot.equipped.q-magic {
+  border-color: rgba(53, 104, 204, 0.76);
+  background-color: #e8f0fc;
+}
+:root[data-theme="light"] .pd-slot.equipped.q-rare {
+  border-color: rgba(176, 138, 20, 0.8);
+  background-color: #faf3d0;
+}
+:root[data-theme="light"] .pd-slot-label { color: #5c4b37; }
+:root[data-theme="light"] .pd-slot-name { color: #594734; }
+:root[data-theme="light"] .pd-slot.equipped .pd-slot-name { color: #754504; font-weight: 800; }
+:root[data-theme="light"] .pd-slot.q-set .pd-slot-name { color: #105e24 !important; }
+:root[data-theme="light"] .pd-slot.q-rw .pd-slot-name { color: #8f3f06 !important; }
+:root[data-theme="light"] .pd-slot.q-craft .pd-slot-name { color: #8c3704 !important; }
+:root[data-theme="light"] .pd-slot.q-magic .pd-slot-name { color: #144099 !important; }
+:root[data-theme="light"] .pd-slot.q-rare .pd-slot-name { color: #6e4e00 !important; }
+:root[data-theme="light"] .pd-slot-img { filter: drop-shadow(0 2px 5px rgba(34, 20, 8, 0.45)); }
+:root[data-theme="light"] .it-stat-list {
+  background: #f4ead4;
+  border-color: rgba(154, 114, 52, 0.36);
+  color: #1548a8;
+}
+:root[data-theme="light"] .pd-alloc-row {
+  background: #f6eedc;
+  border: 1px solid rgba(154, 114, 52, 0.28);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+:root[data-theme="light"] .pd-alloc-row strong,
+:root[data-theme="light"] [style*="color:#e6effc"],
+:root[data-theme="light"] [style*="color: #e6effc"] {
+  color: #241a10 !important;
+}
+:root[data-theme="light"] [data-pd-roll-lbl],
+:root[data-theme="light"] [style*="color:#cfe0fa"],
+:root[data-theme="light"] [style*="color:#cfe7ff"],
+:root[data-theme="light"] [style*="color:#dbeaff"] {
+  color: #1548a8 !important;
+}
+:root[data-theme="light"] [style*="color:#f8e97a"],
+:root[data-theme="light"] [style*="color:#ffbe70"] {
+  color: #824d05 !important;
+}
+:root[data-theme="light"] [style*="color:#b9f6ca"],
+:root[data-theme="light"] #pd-reset-class-set-btn {
+  color: #11692a !important;
+  border-color: rgba(24, 132, 58, 0.5) !important;
+}
+:root[data-theme="light"] [style*="color:#f0a3ec"],
+:root[data-theme="light"] [style*="color:#e8c7f0"] {
+  color: #78206e !important;
+}
+:root[data-theme="light"] #pd-active-auras-list .rw-badge {
+  background: #f5ebd5 !important;
+  border-color: rgba(154, 114, 52, 0.48) !important;
+  color: #2b2016 !important;
+  font-weight: 700;
+}
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#67e87a"],
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#5ec48e"],
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#8af49f"] {
+  background: #e7f5ea !important;
+  border-color: rgba(28, 132, 62, 0.48) !important;
+  color: #11692a !important;
+}
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#e284db"],
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#ec9ce4"],
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#d39bff"] {
+  background: #f6e8f6 !important;
+  border-color: rgba(138, 52, 128, 0.45) !important;
+  color: #731d69 !important;
+}
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#ffd573"],
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#f5cf7b"],
+:root[data-theme="light"] #pd-active-auras-list .rw-badge[style*="#ffe08c"] {
+  background: #faf0d4 !important;
+  border-color: rgba(168, 112, 24, 0.5) !important;
+  color: #734404 !important;
+}
+:root[data-theme="light"] #pd-warlock-demon-wrap {
+  background: #f6e8f6 !important;
+  border-color: rgba(138, 52, 128, 0.45) !important;
+}
+:root[data-theme="light"] #pd-pal-hs-wrap {
+  background: #faf0d4 !important;
+  border-color: rgba(168, 112, 24, 0.5) !important;
+}
+:root[data-theme="light"] #pd-pal-hs-wrap span[style*="#ffd573"] {
+  color: #734404 !important;
+}
+:root[data-theme="light"] #pd-pal-hs-badge {
+  color: #11692a !important;
+}
+:root[data-theme="light"] #pd-warlock-hex-wrap,
+:root[data-theme="light"] #pd-superior-row {
+  background: #e9f1fc !important;
+  border-color: rgba(42, 98, 188, 0.45) !important;
+  color: #1548a8 !important;
+}
+:root[data-theme="light"] #pd-craft-skill-row {
+  background: #faeada !important;
+  border-color: rgba(188, 92, 22, 0.48) !important;
+}
+:root[data-theme="light"] .pd-swap-tab {
+  background: #f4ead4;
+  border-color: rgba(154, 114, 52, 0.42);
+  color: #4f3d29;
+}
+:root[data-theme="light"] .pd-swap-tab.active[data-pd-wset="1"] {
+  background: linear-gradient(180deg, #b87a24, #8f5810);
+  border-color: #754608;
+  color: #fffaf0 !important;
+}
+:root[data-theme="light"] .pd-swap-tab.active[data-pd-wset="2"] {
+  background: linear-gradient(180deg, #2a6cc7, #1a4d9c);
+  border-color: #143d7d;
+  color: #fffaf0 !important;
+}
+:root[data-theme="light"] .pd-swap-kbd-btn {
+  background: #efe2c4;
+  border-color: rgba(154, 114, 52, 0.48);
+  color: #2b2016;
+}
+:root[data-theme="light"] .pd-swap-kbd-btn kbd {
+  background: #fffdf8;
+  border-color: rgba(154, 114, 52, 0.5);
+  color: #6b3f08;
+}
+:root[data-theme="light"] .pd-inv-wrap {
+  background: #f4ead4;
+  border-color: rgba(154, 114, 52, 0.42);
+}
+:root[data-theme="light"] .pd-inv-grid {
+  background: #e7d9bc;
+  border-color: rgba(154, 114, 52, 0.48);
+}
+:root[data-theme="light"] .pd-inv-cell {
+  border-color: rgba(145, 108, 52, 0.26);
+  background: rgba(252, 247, 236, 0.45);
+}
+:root[data-theme="light"] .pd-inv-item {
+  background: #fcf7eb;
+  border-color: rgba(53, 104, 204, 0.5);
+  box-shadow: 0 1px 4px rgba(54, 38, 16, 0.12);
+}
+:root[data-theme="light"] .pd-inv-item:hover {
+  border-color: #9b6516;
+  background: #fffdf6;
+}
+:root[data-theme="light"] .pd-inv-item.is-unique {
+  background: #fdf2d6;
+  border-color: rgba(176, 124, 34, 0.72);
+}
+:root[data-theme="light"] .pd-inv-item.is-util {
+  background: #eee3ca;
+  border-color: rgba(138, 112, 74, 0.45);
+}
+:root[data-theme="light"] .pd-inv-item-tag { color: #1548a8; }
+:root[data-theme="light"] .pd-inv-item.is-unique .pd-inv-item-tag { color: #7a4805 !important; }
+:root[data-theme="light"] .pd-inv-item.is-util .pd-inv-item-tag { color: #4d3e2c !important; }
+:root[data-theme="light"] .pd-inv-item.is-magic-blank .pd-inv-item-tag { color: #1548a8 !important; }
+:root[data-theme="light"] .pd-inv-item img { filter: drop-shadow(0 1px 3px rgba(34, 20, 8, 0.4)); }
+:root[data-theme="light"] .pd-hover-tooltip {
+  background: #fcf7ec;
+  border-color: rgba(168, 118, 38, 0.75);
+  color: #241a10;
+  box-shadow: 0 14px 36px rgba(54, 36, 12, 0.24);
+}
+:root[data-theme="light"] .pd-tt-title { color: #7a4805; }
+:root[data-theme="light"] .pd-hover-tooltip.q-set .pd-tt-title { color: #11692a; }
+:root[data-theme="light"] .pd-hover-tooltip.q-magic .pd-tt-title { color: #1548a8; }
+:root[data-theme="light"] .pd-hover-tooltip.q-craft .pd-tt-title { color: #9e4308; }
+:root[data-theme="light"] .pd-tt-sub,
+:root[data-theme="light"] .pd-tt-foot { color: #61503c; }
+:root[data-theme="light"] .pd-tt-meta { color: #362819; }
+:root[data-theme="light"] .pd-tt-stats { color: #1548a8; }
+:root[data-theme="light"] .pd-tt-socks { color: #7a4805; }
+:root[data-theme="light"] .pd-tt-set { color: #11692a; }
+
+/* 技能树石板与技能详情保持原版游戏石雕纹理（仅限技能面板，用户之前特别要求保留） */
+:root[data-theme="light"] .sk-tree-col,
+:root[data-theme="light"] .sk-inspector {
+  color: #f2e7d5;
+  --text: #f2e7d5;
+  --muted: #c2b39c;
+}
+:root[data-theme="light"] .sk-inspector .stat-list,
+:root[data-theme="light"] .sk-inspector .stat-list li,
+:root[data-theme="light"] .sk-inspector [style*="color:#9ad8ff"] {
+  color: #9ad8ff !important;
+}
+:root[data-theme="light"] .sk-inspector [style*="color:#f2e7d5"],
+:root[data-theme="light"] .sk-inspector [style*="color:#fff"] {
+  color: #f2e7d5 !important;
+}
+:root[data-theme="light"] .sk-inspector .it-set-bonus-box {
+  background: rgba(12, 26, 16, 0.72);
+  border-color: rgba(103, 232, 122, 0.34);
+}
+:root[data-theme="light"] .sk-inspector [style*="color:#67e87a"],
+:root[data-theme="light"] .sk-inspector .sk-jump-pill.is-syn,
+:root[data-theme="light"] .sk-inspector .sk-syn-static {
+  color: #8af49f !important;
+}
+:root[data-theme="light"] .sk-inspector .sk-insp-title,
+:root[data-theme="light"] .sk-inspector .sk-jump-pts {
+  color: #ffd573 !important;
 }

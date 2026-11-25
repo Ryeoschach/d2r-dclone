@@ -17,6 +17,7 @@ import { getItemsCatalog } from "./items-metadata.js";
 import { getSkillsCatalog } from "./skills-catalog.js";
 import { getDropCalculatorData } from "./drop-calculator.js";
 import { getPaperdollCatalog } from "./paperdoll-data.js";
+import { getPresetBuildsCatalog } from "./preset-builds.js";
 import {
   getAuthenticatedAdmin,
   handleAuthOrUserRequest,
@@ -138,18 +139,19 @@ export default {
       if (adminResponse) return adminResponse;
     }
 
-    if (url.pathname.startsWith("/api/auth/") || url.pathname.startsWith("/api/user/")) {
-      const authResponse = await handleAuthOrUserRequest(request, env, url);
-      if (authResponse) return authResponse;
-    }
-
     if (
+      url.pathname === "/api/user/shares" ||
       url.pathname === "/api/builds/share" ||
       url.pathname.startsWith("/api/builds/share/") ||
       url.pathname.startsWith("/build/")
     ) {
       const shareResponse = await handleSharedBuildRequest(request, env, url);
       if (shareResponse) return shareResponse;
+    }
+
+    if (url.pathname.startsWith("/api/auth/") || url.pathname.startsWith("/api/user/")) {
+      const authResponse = await handleAuthOrUserRequest(request, env, url);
+      if (authResponse) return authResponse;
     }
 
     if (
@@ -195,6 +197,10 @@ export default {
 
     if (request.method === "GET" && url.pathname === "/api/paperdoll") {
       return json({ ok: true, ...getPaperdollCatalog() });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/presets") {
+      return json({ ok: true, ...getPresetBuildsCatalog() });
     }
 
     if (request.method === "GET" && url.pathname === "/api/status") {

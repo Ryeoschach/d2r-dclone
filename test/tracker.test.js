@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import {
   buildFeishuMessage,
@@ -16,8 +18,10 @@ import {
   validateServerCombinations
 } from "../src/tracker.js";
 import {
+  DASHBOARD_ASSET_VERSIONS,
   DASHBOARD_CSS_VERSION,
   DASHBOARD_JS_VERSION,
+  DASHBOARD_THEME_VERSION,
   renderDashboard
 } from "../src/dashboard.js";
 import { SKILL_CLASSES } from "../src/skills-catalog.js";
@@ -116,16 +120,64 @@ test("毁灭之王 HC 映射正确", () => {
 test("仪表盘包含完整分组和筛选入口", () => {
   const pageHtml = renderDashboard();
   const dashboardCss = fs.readFileSync(new URL("../public/assets/dashboard.css", import.meta.url), "utf8");
-  const dashboardJs = fs.readFileSync(new URL("../public/assets/dashboard.js", import.meta.url), "utf8");
   const expectedCssVer = crypto.createHash("sha256").update(dashboardCss).digest("hex").slice(0, 10);
-  const expectedJsVer = crypto.createHash("sha256").update(dashboardJs).digest("hex").slice(0, 10);
   assert.equal(DASHBOARD_CSS_VERSION, expectedCssVer, "DASHBOARD_CSS_VERSION 须与 public/assets/dashboard.css 哈希一致（可运行 npm run sync:assets）");
-  assert.equal(DASHBOARD_JS_VERSION, expectedJsVer, "DASHBOARD_JS_VERSION 须与 public/assets/dashboard.js 哈希一致（可运行 npm run sync:assets）");
-  assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="/assets/dashboard\\.css\\?v=${expectedCssVer}">`));
-  assert.match(pageHtml, new RegExp(`<script src="/assets/dashboard\\.js\\?v=${expectedJsVer}" defer></script>`));
-  assert.doesNotMatch(pageHtml, /<style>/, "仪表盘 CSS 应已拆分至 public/assets/dashboard.css");
-  assert.doesNotMatch(pageHtml, /<script>\s*\n/, "仪表盘主脚本应已拆分至 public/assets/dashboard.js");
 
+  const moduleFiles = [
+    "shared.js",
+    "i18n-dict.js",
+    "core.js",
+    "tab-runewords.js",
+    "tab-affixes.js",
+    "tab-items.js",
+    "tab-skills.js"
+  ];
+  const moduleSources = {};
+  for (const modFile of moduleFiles) {
+    const modUrl = new URL(`../public/assets/js/${modFile}`, import.meta.url);
+    const code = fs.readFileSync(modUrl, "utf8");
+    const hash = crypto.createHash("sha256").update(code).digest("hex").slice(0, 10);
+    assert.equal(
+      DASHBOARD_ASSET_VERSIONS[modFile],
+      hash,
+      `DASHBOARD_ASSET_VERSIONS["${modFile}"] 须与 public/assets/js/${modFile} 哈希一致（可运行 npm run sync:assets）`
+    );
+    assert.doesNotThrow(
+      () => execFileSync(process.execPath, ["--check", fileURLToPath(modUrl)], { stdio: "pipe" }),
+      `ES Module public/assets/js/${modFile} 语法必须合法`
+    );
+    moduleSources[modFile] = code;
+  }
+  assert.equal(DASHBOARD_JS_VERSION, DASHBOARD_ASSET_VERSIONS["core.js"], "DASHBOARD_JS_VERSION 须与 core.js 哈希一致");
+  assert.match(pageHtml, new RegExp(`<link rel="stylesheet" href="/assets/dashboard\\.css\\?v=${expectedCssVer}">`));
+  assert.match(pageHtml, new RegExp(`<script type="module" src="/assets/js/core\\.js\\?v=${DASHBOARD_JS_VERSION}"></script>`));
+  assert.match(pageHtml, /<meta name="d2r-assets" content="/);
+  assert.match(pageHtml, /<link rel="manifest" href="\/manifest\.webmanifest">/);
+  const manifestJson = JSON.parse(fs.readFileSync(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"));
+  assert.equal(manifestJson.display, "standalone");
+  assert.ok(Array.isArray(manifestJson.icons) && manifestJson.icons.length >= 1);
+  const swUrl = new URL("../public/sw.js", import.meta.url);
+  const swSrc = fs.readFileSync(swUrl, "utf8");
+  assert.doesNotThrow(() => execFileSync(process.execPath, ["--check", fileURLToPath(swUrl)], { stdio: "pipe" }));
+  assert.match(swSrc, /\/api\/auth\//, "Service Worker 必须跳过 /api/auth/ 鉴权接口缓存");
+  assert.match(swSrc, /\/api\/user\//, "Service Worker 必须跳过 /api/user/ 用户私有数据缓存");
+  assert.match(swSrc, /\/api\/admin\//, "Service Worker 必须跳过 /api/admin/ 管理接口缓存");
+  const themeInitUrl = new URL("../public/assets/theme-init.js", import.meta.url);
+  const themeInitSrc = fs.readFileSync(themeInitUrl, "utf8");
+  const expectedThemeVer = crypto.createHash("sha256").update(themeInitSrc).digest("hex").slice(0, 10);
+  assert.equal(DASHBOARD_THEME_VERSION, expectedThemeVer, "DASHBOARD_THEME_VERSION 须与 theme-init.js 哈希一致");
+  assert.doesNotThrow(() => execFileSync(process.execPath, ["--check", fileURLToPath(themeInitUrl)], { stdio: "pipe" }));
+  assert.match(themeInitSrc, /prefers-color-scheme:\s*light/, "主题初始化脚本应支持跟随操作系统亮/暗自动切换");
+  assert.match(pageHtml, new RegExp(`<script src="/assets/theme-init\\.js\\?v=${expectedThemeVer}"></script>`));
+  assert.match(pageHtml, /id="theme-switcher"/);
+  assert.match(pageHtml, /data-theme-mode="auto"/);
+  assert.match(pageHtml, /data-theme-mode="dark"/);
+  assert.match(pageHtml, /data-theme-mode="light"/);
+  assert.match(dashboardCss, /:root\[data-theme="light"\]/);
+  assert.doesNotMatch(pageHtml, /<style>/, "仪表盘 CSS 应已拆分至 public/assets/dashboard.css");
+  assert.doesNotMatch(pageHtml, /<script>\s*\n/, "仪表盘主脚本应已拆分至 public/assets/js/* ES Modules");
+
+  const dashboardJs = Object.values(moduleSources).join("\n");
   const html = pageHtml + "\n" + dashboardCss + "\n" + dashboardJs;
   assert.match(html, /暗黑 2 重置版 · 庇护之地实时战报/);
   assert.match(html, /Diablo II: Resurrected · Sanctuary Live/);
@@ -313,6 +365,17 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /pd-swap-preset-mf/);
   assert.match(html, /switchPaperdollWeaponSet/);
   assert.match(html, /computeRealCtaBoStats/);
+  assert.match(html, /pd-compare-bar/);
+  assert.match(html, /pd-cmp-pin-btn/);
+  assert.match(html, /pd-cmp-restore-btn/);
+  assert.match(html, /pd-cmp-clear-btn/);
+  assert.match(html, /capturePaperdollCompareBaseline/);
+  assert.match(html, /restorePaperdollCompareBaseline/);
+  assert.match(html, /fmtCompareDelta/);
+  assert.match(html, /fmtCompareFrameDelta/);
+  assert.match(html, /jumpToSkillNode/);
+  assert.match(html, /data-sk-jump/);
+  assert.match(html, /sk-node-pulse/);
   assert.match(html, /alert-open-btn/);
   assert.match(html, /alert-dialog/);
   assert.match(html, /evaluatePersonalAlerts/);
@@ -321,6 +384,10 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /d2s-import-dialog/);
   assert.match(html, /sk-import-d2s-btn/);
   assert.match(html, /pd-import-d2s-btn/);
+  assert.match(html, /sk-export-d2s-btn/);
+  assert.match(html, /pd-export-d2s-btn/);
+  assert.match(html, /exportCurrentBuildAsD2s/);
+  assert.match(html, /\/assets\/d2s-exporter\.js/);
   assert.match(html, /applyMappedD2sImport/);
   assert.match(html, /\/assets\/d2s-parser\.js/);
   assert.equal((pageHtml.match(/class="auth-dlg-head"/g) || []).length, 4, "全部 4 个前台原生弹窗均应使用统一的 auth-dlg-head 顶栏布局");
@@ -339,7 +406,8 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /sim-base-select/);
   assert.match(html, /rollSimulatedItem/);
 
-  assert.doesNotThrow(() => new Function(dashboardJs), "仪表盘静态脚本 public/assets/dashboard.js 语法必须合法");
+  assert.match(moduleSources["core.js"], /ensureTabModule/);
+  assert.match(moduleSources["core.js"], /import\(url\)/);
   assert.match(html, /符文之语 100% 记事/);
   assert.match(html, /\/api\/runewords/);
   assert.match(html, /rw-rune-grid/);
@@ -364,12 +432,19 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /updateSyncAge/);
   assert.match(html, /auth-profile-edit-form/);
   assert.match(html, /\/api\/user\/profile/);
+  assert.match(html, /auth-shares-list/);
+  assert.match(html, /\/api\/user\/shares/);
+  assert.match(html, /loadUserSharedBuilds/);
+  assert.match(html, /deleteUserSharedBuildById/);
   assert.match(adminHtml, /data-auto-min="5"/);
   assert.match(adminHtml, /\/api\/admin\/settings/);
   assert.match(adminHtml, /adm-audit-section/);
   assert.match(adminHtml, /adm-audit-refresh-btn/);
   assert.match(adminHtml, /loadAdminAuditLogs/);
   assert.match(adminHtml, /\/api\/admin\/audit-logs/);
+  assert.match(adminHtml, /\/assets\/theme-init\.js/);
+  assert.match(adminHtml, /data-theme-mode="auto"/);
+  assert.match(adminHtml, /data-theme-mode="light"/);
   assert.match(html, /\/api\/status/);
 });
 

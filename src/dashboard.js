@@ -1,5 +1,15 @@
-export const DASHBOARD_CSS_VERSION = "b6b949983f";
-export const DASHBOARD_JS_VERSION = "a4e9508434";
+export const DASHBOARD_CSS_VERSION = "802d3ea3e2";
+export const DASHBOARD_JS_VERSION = "b0c9bac916";
+export const DASHBOARD_THEME_VERSION = "f096babd8b";
+export const DASHBOARD_ASSET_VERSIONS = {
+  "shared.js": "09528eb701",
+  "i18n-dict.js": "f3ee8aa070",
+  "core.js": "b0c9bac916",
+  "tab-runewords.js": "4f1c3d5199",
+  "tab-affixes.js": "4ba75116c1",
+  "tab-items.js": "b89905d2e9",
+  "tab-skills.js": "1cb3a15c36"
+};
 
 function escapeSsrHtml(str) {
   return String(str ?? "")
@@ -51,7 +61,13 @@ export function renderDashboard(options = {}) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="/assets/theme-init.js?v=${DASHBOARD_THEME_VERSION}"></script>
   <link rel="stylesheet" href="/assets/dashboard.css?v=${DASHBOARD_CSS_VERSION}">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="/images/ui/pwa-icon.svg">
+  <meta name="theme-color" content="#090809">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="d2r-assets" content="${escapeSsrHtml(JSON.stringify(DASHBOARD_ASSET_VERSIONS))}">
 </head>
 <body>
   <main class="shell">
@@ -74,6 +90,11 @@ export function renderDashboard(options = {}) {
           <button class="lang-btn active" data-lang="zhCN" type="button">简</button>
           <button class="lang-btn" data-lang="zhTW" type="button">繁</button>
           <button class="lang-btn" data-lang="enUS" type="button">EN</button>
+        </div>
+        <div class="theme-switcher" id="theme-switcher" role="group" aria-label="深浅外观切换">
+          <button class="theme-btn active" type="button" data-theme-mode="auto" aria-pressed="true" title="跟随操作系统亮/暗外观自动切换"><span aria-hidden="true">🌓</span><span>跟随</span></button>
+          <button class="theme-btn" type="button" data-theme-mode="dark" aria-pressed="false" title="深色模式（经典庇护所暗金）"><span aria-hidden="true">🌙</span><span>深色</span></button>
+          <button class="theme-btn" type="button" data-theme-mode="light" aria-pressed="false" title="浅色模式（暖色羊皮纸高对比）"><span aria-hidden="true">☀</span><span>浅色</span></button>
         </div>
         <button class="settings-jump-btn alert-open-btn" id="alert-open-btn" type="button" title="设置个人恐怖地带与地表暗黑桌面通知 / 声音提醒">
           <span aria-hidden="true">🔔</span>
@@ -595,7 +616,11 @@ export function renderDashboard(options = {}) {
             <div class="tz-filter-label">筛选：</div>
             <div class="tz-chips" id="it-subfilter-chips"></div>
           </div>
-          <div class="tz-filter-row" id="it-grail-filter-row" style="display:none">
+          <div class="tz-filter-row" id="it-base-subtype-row">
+            <div class="tz-filter-label">细分：</div>
+            <div class="tz-chips" id="it-base-subtype-chips"></div>
+          </div>
+          <div class="tz-filter-row" id="it-grail-filter-row" style="display:none;flex-wrap:wrap;gap:8px 14px">
             <div class="tz-filter-label">圣杯：</div>
             <div class="tz-chips" id="it-grail-chips">
               <button type="button" class="tz-chip active" data-grail-filter="all">全部状态</button>
@@ -603,8 +628,17 @@ export function renderDashboard(options = {}) {
               <button type="button" class="tz-chip" data-grail-filter="done">已收集</button>
               <button type="button" class="tz-chip" data-grail-filter="tc87">仅看 TC87 毕业稀有</button>
             </div>
+            <div class="tz-filter-label" id="it-unique-tier-label" style="display:none;margin-left:4px">阶梯：</div>
+            <div class="tz-chips" id="it-unique-tier-chips" style="display:none">
+              <button type="button" class="tz-chip active" data-it-utier="all">全部</button>
+              <button type="button" class="tz-chip" data-it-utier="普通">普通</button>
+              <button type="button" class="tz-chip" data-it-utier="扩展">扩展</button>
+              <button type="button" class="tz-chip" data-it-utier="精华">精华</button>
+              <button type="button" class="tz-chip" data-it-utier="独特">独特(戒指/链/符/珠)</button>
+            </div>
+            <span id="it-unique-count-badge" style="display:none;font-size:11.5px;color:var(--muted);margin-left:auto"></span>
           </div>
-          <div class="tz-filter-row" id="it-base-sockets-row">
+          <div class="tz-filter-row" id="it-base-sockets-row" style="flex-wrap:wrap;gap:8px 14px">
             <div class="tz-filter-label">孔数：</div>
             <div class="tz-chips" id="it-base-sockets-chips">
               <button type="button" class="tz-chip active" data-it-sock="all">全部孔数</button>
@@ -613,7 +647,16 @@ export function renderDashboard(options = {}) {
               <button type="button" class="tz-chip" data-it-sock="4">可出 4 孔</button>
               <button type="button" class="tz-chip" data-it-sock="5">可出 5 孔</button>
               <button type="button" class="tz-chip" data-it-sock="6">可出 6 孔</button>
+              <button type="button" class="tz-chip" data-it-sock="0">不可打孔</button>
             </div>
+            <div class="tz-filter-label" style="margin-left:4px">阶梯：</div>
+            <div class="tz-chips" id="it-base-tier-chips">
+              <button type="button" class="tz-chip active" data-it-tier="all">全部</button>
+              <button type="button" class="tz-chip" data-it-tier="普通">普通</button>
+              <button type="button" class="tz-chip" data-it-tier="扩展">扩展</button>
+              <button type="button" class="tz-chip" data-it-tier="精华">精华</button>
+            </div>
+            <span id="it-base-count-badge" style="font-size:11.5px;color:var(--muted);margin-left:auto"></span>
           </div>
           <div id="it-drops-console" style="display:none;flex-direction:column;gap:10px">
             <div class="tz-filter-row" style="flex-wrap:wrap;gap:10px">
@@ -725,6 +768,17 @@ export function renderDashboard(options = {}) {
           </div>
         </section>
 
+        <section class="meta-preset-bar" id="sk-meta-preset-bar" aria-label="D2R 3.4 热门流派预设库">
+          <div class="meta-preset-row">
+            <span class="meta-preset-badge">🔥 3.4 热门流派预设库</span>
+            <select class="sim-select meta-preset-select" id="sk-meta-preset-select" aria-label="选择 D2R 3.4 热门流派预设">
+              <option value="">正在加载 8 职业预设库…</option>
+            </select>
+            <button class="rw-btn active" id="sk-meta-preset-apply-btn" type="button">⚡ 一键载入（技能+配装）</button>
+            <span class="meta-preset-desc" id="sk-meta-preset-desc">涵盖 8 大职业开荒/毕业/专项共 16 套完整构筑，一键试玩或作为基准 A 对比换装</span>
+          </div>
+        </section>
+
         <div id="sk-view-planner">
         <div class="sk-planner-bar">
           <div class="sk-metrics">
@@ -740,6 +794,7 @@ export function renderDashboard(options = {}) {
           </div>
           <div class="rw-actions">
             <button class="rw-btn" id="sk-import-d2s-btn" type="button" style="border-color:rgba(154,216,255,0.5);color:#9ad8ff">📂 导入 .d2s 存档</button>
+            <button class="rw-btn" id="sk-export-d2s-btn" type="button" style="border-color:rgba(112,226,140,0.5);color:#9bf4ae" title="离线导出当前职业等级、四维、30项技能、地狱全通与全小站的单机 .d2s 测试存档">💾 导出 .d2s 存档</button>
             <button class="rw-btn active" id="sk-share-full-bd-btn" type="button">🔗 分享完整 BD 短链</button>
             <button class="rw-btn" id="sk-share-btn" type="button">复制加点分享链接</button>
             <button class="rw-btn rw-btn-danger" id="sk-reset-btn" type="button">重置当前职业加点</button>
@@ -948,6 +1003,11 @@ export function renderDashboard(options = {}) {
                     <option value="lr-16">降低抵抗 Lower Resist Lv.16 (-61% 敌火/冰/电/毒抗)</option>
                   </select>
                 </label>
+                <label class="sk-bonus-ctrl" id="pd-pal-hs-wrap" style="display:none;cursor:pointer;border:1px solid rgba(245,207,123,0.45);border-radius:6px;padding:2px 8px;background:rgba(48,34,12,0.48)">
+                  <input type="checkbox" class="rw-check" id="pd-pal-hs-on" checked />
+                  <span style="color:#ffd573">🛡️ 开启神圣之盾 Holy Shield</span>
+                  <span id="pd-pal-hs-badge" style="font-size:11px;color:#8af49f;font-weight:700"></span>
+                </label>
                 <label class="sk-bonus-ctrl" style="cursor:pointer">
                   <input type="checkbox" class="rw-check" id="pd-cta-bo" checked />
                   <span>战争召唤 CTA 战吼 (+1 全技能 · +65% 生命/法力)</span>
@@ -968,6 +1028,7 @@ export function renderDashboard(options = {}) {
                   </label>
                   <button type="button" class="rw-btn" id="pd-save-build-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(103,232,122,0.55);color:#8af49f">💾 保存配装</button>
                   <button type="button" class="rw-btn" id="pd-import-d2s-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(154,216,255,0.55);color:#9ad8ff">📂 导入 .d2s</button>
+                  <button type="button" class="rw-btn" id="pd-export-d2s-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(112,226,140,0.55);color:#9bf4ae" title="导出单机 .d2s 测试存档">💾 导出 .d2s</button>
                   <button type="button" class="rw-btn" id="pd-share-bd-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(245,207,123,0.65);color:#ffe08c">🔗 分享完整 BD</button>
                   <button type="button" class="rw-btn" id="pd-reset-class-set-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(103,232,122,0.35);color:#b9f6ca">🔄 恢复本职业套装</button>
                   <button type="button" class="rw-btn" id="pd-char-preset-btn" style="padding:3px 8px;font-size:11px">切换毕业暗金/符文预设</button>
@@ -1015,7 +1076,8 @@ export function renderDashboard(options = {}) {
                 </div>
                 <div id="pd-bag-msg" style="font-size:11px;color:#ffb3a7;display:none"></div>
                 <div class="pd-inv-grid" id="pd-inv-grid" aria-label="角色 10x4 背包网格"></div>
-                <div style="font-size:11px;color:var(--muted)">提示：点击背包内任意咒符，可在右侧编辑器调节其变量滑块、切换技能系别、复制或移出背包。</div>
+                <div class="pd-bag-inline-bar" id="pd-bag-inline-bar" style="display:none"></div>
+                <div style="font-size:11px;color:var(--muted)">提示：悬停点击物品右上角 <strong>×</strong>、<strong>右键单击</strong>，或选中后点击下方「移出」均可就近卸载；左键点击可在右侧微调变量与词缀。</div>
               </div>
 
               <!-- 技能攻击力模拟器（手动选择当前职业任意技能） -->
@@ -1033,6 +1095,19 @@ export function renderDashboard(options = {}) {
 
               <!-- 四维属性自由加点模拟器（锁定职业固有初始点数，自由分配等级点数） -->
               <div class="pd-alloc-box" id="pd-stat-alloc-box"></div>
+
+              <!-- 配装 A/B 实时差值对比工具条 -->
+              <div class="pd-compare-bar" id="pd-compare-bar" aria-label="配装 A/B 实时差值对比">
+                <div class="pd-compare-head">
+                  <div class="pd-compare-info" id="pd-cmp-status">📌 锁定当前配置为基准 A，任意换装/调变量/改护符即可实时查看各项属性绿红差值 Δ</div>
+                  <div class="pd-compare-actions">
+                    <button type="button" class="rw-detail-btn" id="pd-cmp-pin-btn">📌 设为基准 A</button>
+                    <button type="button" class="rw-detail-btn" id="pd-cmp-restore-btn" style="display:none">↩ 还原基准 A</button>
+                    <button type="button" class="rw-detail-btn" id="pd-cmp-clear-btn" style="display:none">✕ 结束对比</button>
+                  </div>
+                </div>
+                <div class="pd-compare-summary" id="pd-cmp-summary" style="display:none"></div>
+              </div>
 
               <!-- 完整人物属性面板 (D2R Character Sheet + 高级属性) -->
               <div id="pd-char-stats"></div>
@@ -1421,6 +1496,14 @@ export function renderDashboard(options = {}) {
           <div class="auth-presets-list" id="auth-presets-list"></div>
         </div>
 
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px">
+            <strong style="font-size:13px;color:#f5d58c">我分享的 BD 短链 (<span id="auth-shares-count">0</span>)</strong>
+            <button class="rw-btn" id="auth-shares-refresh-btn" type="button" style="height:24px;padding:0 9px;font-size:11px">🔄 刷新列表</button>
+          </div>
+          <div class="auth-presets-list" id="auth-shares-list"></div>
+        </div>
+
         <details class="auth-sec-details" id="auth-sec-details">
           <summary>
             <span>🔐 账号安全 · 修改密码与恢复码管理</span>
@@ -1641,7 +1724,7 @@ export function renderDashboard(options = {}) {
   <div class="auth-toast" id="auth-toast" role="status" aria-live="polite"></div>
 
   <script id="d2r-initial-auth" type="application/json">${ssrInitialAuthJson}</script>
-  <script src="/assets/dashboard.js?v=${DASHBOARD_JS_VERSION}" defer></script>
+  <script type="module" src="/assets/js/core.js?v=${DASHBOARD_JS_VERSION}"></script>
 </body>
 </html>`;
 }

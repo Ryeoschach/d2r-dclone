@@ -21,6 +21,7 @@ const MIME_TYPES = {
   ".js": "application/javascript; charset=utf-8",
   ".mjs": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   ".webp": "image/webp",
   ".png": "image/png",
   ".jpg": "image/jpeg",
@@ -65,9 +66,11 @@ function tryServeStaticAsset(reqPath, res) {
 
   const ext = path.extname(fullPath).toLowerCase();
   const mime = MIME_TYPES[ext] || "application/octet-stream";
-  const cacheControl = normalized.startsWith("/assets/") || normalized.startsWith("/images/")
-    ? "public, max-age=86400"
-    : "public, max-age=300";
+  const cacheControl = normalized === "/sw.js"
+    ? "no-cache, no-store, must-revalidate"
+    : (normalized.startsWith("/assets/") || normalized.startsWith("/images/")
+      ? "public, max-age=86400"
+      : "public, max-age=300");
 
   res.writeHead(200, {
     "content-type": mime,

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import worker from "../src/index.js";
 import { handleAuthOrUserRequest } from "../src/auth.js";
@@ -450,7 +452,6 @@ test("Fetch Metadata 与 Origin 跨站防护（先于鉴权拒绝）及仪表盘
 
   const html = renderDashboard();
   const dashboardCss = fs.readFileSync(new URL("../public/assets/dashboard.css", import.meta.url), "utf8");
-  const dashboardJs = fs.readFileSync(new URL("../public/assets/dashboard.js", import.meta.url), "utf8");
   assert.match(html, /<dialog class="auth-dialog" id="auth-dialog" closedby="any" aria-labelledby="auth-dialog-title">/);
   assert.doesNotMatch(html, /id="auth-dialog"[^>]*role="dialog"/);
   assert.doesNotMatch(html, /id="auth-dialog"[^>]*aria-modal=/);
@@ -458,10 +459,14 @@ test("Fetch Metadata 与 Origin 跨站防护（先于鉴权拒绝）及仪表盘
   assert.match(html, /autocomplete="new-password"/);
   assert.match(dashboardCss, /overscroll-behavior:\s*contain/);
   assert.match(html, /<link rel="stylesheet" href="\/assets\/dashboard\.css\?v=/);
-  assert.match(html, /<script src="\/assets\/dashboard\.js\?v=[^"]+" defer><\/script>/);
+  assert.match(html, /<script type="module" src="\/assets\/js\/core\.js\?v=[^"]+"><\/script>/);
 
-  // 校验拆分后的前端主脚本无语法错误
-  assert.doesNotThrow(() => new Function(dashboardJs), "主脚本 public/assets/dashboard.js 必须无 JS 语法错误");
+  // 校验拆分后的前端 ES Modules 入口无 JS 语法错误
+  const coreUrl = new URL("../public/assets/js/core.js", import.meta.url);
+  assert.doesNotThrow(
+    () => execFileSync(process.execPath, ["--check", fileURLToPath(coreUrl)], { stdio: "pipe" }),
+    "主入口模块 public/assets/js/core.js 必须无 JS 语法错误"
+  );
 });
 
 test("方案 1：注册签发 5 个一次性恢复码、重置踢旧会话、用光自动补发新 5 个与手动重生成", async () => {

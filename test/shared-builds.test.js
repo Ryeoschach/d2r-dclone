@@ -80,9 +80,9 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
         offhand: null
       },
       charBag: [
-        { uid: "b1", charmId: "torch", tabPage: 0, rolls: {} },
-        { uid: "b2", charmId: "anni", tabPage: 0, rolls: {} },
-        { uid: "b3", charmId: "gc-sk-life", tabPage: 1, rolls: {} },
+        { uid: "b1", charmId: "torch", tabPage: 0, rolls: { L1: 18, L2: 19 } },
+        { uid: "b2", charmId: "anni", tabPage: 0, rolls: { L1: 20, L2: 19, L3: 10 } },
+        { uid: "b3", charmId: "gc-sk-life", tabPage: 1, rolls: { L1: 42 } },
         { uid: "b4", charmId: "gc-sk-life", tabPage: 1, rolls: {} }
       ],
       statAlloc: { str: 110, dex: 130, vit: 240, enr: 0 },
@@ -128,7 +128,44 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
       skillDmg: "4,200–5,600",
       dps: 17500,
       weaponName: "悔恨 (幻化之刃)",
-      shieldName: "精神"
+      shieldName: "精神",
+      merc: {
+        enabled: true,
+        innateAuraOn: true,
+        variant: "a2-might",
+        lvl: 92,
+        hp: 3680,
+        hpMult: 1.65,
+        def: 5120,
+        dmgMin: 2350,
+        dmgMax: 6540,
+        ar: 2680,
+        str: 232,
+        baseStr: 202,
+        dex: 164,
+        baseDex: 164,
+        reqStr: 222,
+        reqDex: 130,
+        reqOk: true,
+        allSkills: 3,
+        resF: 75,
+        resC: 75,
+        resL: 80,
+        resP: 85,
+        baseResHell: 59,
+        ias: 35,
+        wsm: -10,
+        fanaEias: 0,
+        atkFrame: 10,
+        aps: 2.5,
+        ll: 10,
+        cb: 40,
+        ds: 0,
+        dr: 0,
+        cbf: false,
+        skills: "戳刺 Jab Lv.26 · 力量灵气 Might Lv.22（全队物理伤害 +250%）",
+        gearAuras: "信念 Lv.12"
+      }
     }
   };
 
@@ -204,6 +241,12 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
   assert.match(html, /bd-char-doll-swap/);
   assert.match(html, /bd-char-inspector/);
   assert.match(html, /bd-merc-inspector/);
+  assert.match(html, /bd-bag-inspector/);
+  assert.match(html, /data-bd-target="bag"/);
+  assert.match(html, /\+18 全属性 \[10–20\]/);
+  assert.match(html, /\+19 所有抗性 \[10–20\]/);
+  assert.match(html, /\+10% 经验获取 \[5–10\]/);
+  assert.match(html, /\+42 生命 \[10–45\]/);
   assert.match(html, /bd-insp-stats/);
   assert.match(html, /Amn \+ Ral \+ Mal \+ Ist \+ Ohm/);
   assert.match(html, /\+277% 强化伤害 \[250–290\]/);
@@ -218,8 +261,29 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
   assert.doesNotMatch(html, /gear-icon-ph/, "所有已穿戴装备均应有图标，不应退回空白占位");
   assert.match(html, /×2/); // 2x skiller GC grouped
   assert.match(html, /已分配 81 \/ 110 点/);
+  assert.match(html, /id="bd-sk-view-list"/);
+  assert.match(html, /id="bd-sk-view-tree"/);
+  assert.match(html, /data-bd-sk-view="tree"/);
+  assert.match(html, /class="bd-sk-edge is-active"/);
+  assert.match(html, /class="bd-sk-node is-invested"/);
+  assert.match(html, /<script src="\/assets\/theme-init\.js\?v=[a-f0-9]+"><\/script>/);
+  assert.match(html, /data-theme-mode="auto"/);
+  assert.match(html, /data-theme-mode="light"/);
   assert.match(html, /3,420/);
   assert.match(html, /17,500\/秒/);
+  assert.match(html, /神圣之盾 Holy Shield（已开启/);
+  assert.match(html, /merc-stats-wrap/);
+  assert.match(html, /佣兵属性达标可穿戴全部装备/);
+  assert.match(html, /3,680/);
+  assert.match(html, /5,120/);
+  assert.match(html, /2,350–6,540/);
+  assert.match(html, /AR 2,680/);
+  assert.match(html, /力 232/);
+  assert.match(html, /75% \/ 75% \/ 80% \/ 85%/);
+  assert.match(html, /10 帧<\/strong> \(2\.50 次\/秒\)/);
+  assert.match(html, /吸血 10% · 压碎 40%/);
+  assert.match(html, /力量灵气 Might Lv\.22/);
+  assert.match(html, /信念 Lv\.12（装备光环在城里常驻生效）/);
 
   const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
   assert.ok(scriptMatch);
@@ -317,4 +381,126 @@ test("登录用户分享 BD 自动署名为昵称，跨站请求被拦截，高�
     env
   );
   assert.equal(rlRes.status, 429);
+});
+
+test("「我分享的 BD」短链列表 GET /api/user/shares 与撤销 DELETE /api/builds/share/:id（鉴权/CSRF/越权防护）", async () => {
+  const env = createShareEnv();
+
+  // Unauthenticated list returns 401
+  const anonList = await worker.fetch(new Request("https://d2r.example/api/user/shares"), env);
+  assert.equal(anonList.status, 401);
+
+  // Register Alice & Bob
+  const regAlice = await worker.fetch(
+    new Request("https://d2r.example/api/auth/register", {
+      method: "POST",
+      headers: { "content-type": "application/json", "sec-fetch-site": "same-origin" },
+      body: JSON.stringify({ account: "alice_bd", displayName: "爱丽丝", password: "StrongPassword123!" })
+    }),
+    env
+  );
+  assert.equal(regAlice.status, 201);
+  const aliceCookie = extractSessionCookie(regAlice);
+
+  const regBob = await worker.fetch(
+    new Request("https://d2r.example/api/auth/register", {
+      method: "POST",
+      headers: { "content-type": "application/json", "sec-fetch-site": "same-origin" },
+      body: JSON.stringify({ account: "bob_bd", displayName: "鲍勃", password: "StrongPassword123!" })
+    }),
+    env
+  );
+  assert.equal(regBob.status, 201);
+  const bobCookie = extractSessionCookie(regBob);
+
+  // Alice creates two shares
+  const share1Res = await worker.fetch(
+    new Request("https://d2r.example/api/builds/share", {
+      method: "POST",
+      headers: { "content-type": "application/json", "sec-fetch-site": "same-origin", cookie: aliceCookie },
+      body: JSON.stringify({ classId: "sor", title: "暴风雪开荒", paperdoll: { charLvl: 88 }, skills: { Blizzard: 20 } })
+    }),
+    env
+  );
+  assert.equal(share1Res.status, 201);
+  const s1 = await share1Res.json();
+
+  const share2Res = await worker.fetch(
+    new Request("https://d2r.example/api/builds/share", {
+      method: "POST",
+      headers: { "content-type": "application/json", "sec-fetch-site": "same-origin", cookie: aliceCookie },
+      body: JSON.stringify({ classId: "war", title: "恶魔吞噬术士", paperdoll: { charLvl: 95 }, skills: { "Hex Purge": 20 } })
+    }),
+    env
+  );
+  assert.equal(share2Res.status, 201);
+  const s2 = await share2Res.json();
+
+  // Alice lists her shares (newest first)
+  const listRes = await worker.fetch(
+    new Request("https://d2r.example/api/user/shares", { headers: { cookie: aliceCookie } }),
+    env
+  );
+  assert.equal(listRes.status, 200);
+  const listData = await listRes.json();
+  assert.equal(listData.ok, true);
+  assert.equal(listData.shares.length, 2);
+  assert.equal(listData.shares[0].id, s2.id);
+  assert.equal(listData.shares[0].title, "恶魔吞噬术士");
+  assert.equal(listData.shares[0].charLvl, 95);
+  assert.equal(listData.shares[0].shareUrl, `https://d2r.example/build/${s2.id}`);
+  assert.equal(listData.shares[1].id, s1.id);
+
+  // Cross-site DELETE blocked with 403
+  const csrfDel = await worker.fetch(
+    new Request(`https://d2r.example/api/builds/share/${s1.id}`, {
+      method: "DELETE",
+      headers: { "sec-fetch-site": "cross-site", cookie: aliceCookie }
+    }),
+    env
+  );
+  assert.equal(csrfDel.status, 403);
+
+  // Unauthenticated DELETE returns 401
+  const anonDel = await worker.fetch(
+    new Request(`https://d2r.example/api/builds/share/${s1.id}`, {
+      method: "DELETE",
+      headers: { "sec-fetch-site": "same-origin" }
+    }),
+    env
+  );
+  assert.equal(anonDel.status, 401);
+
+  // Bob cannot revoke Alice's share (403)
+  const bobDel = await worker.fetch(
+    new Request(`https://d2r.example/api/builds/share/${s1.id}`, {
+      method: "DELETE",
+      headers: { "sec-fetch-site": "same-origin", cookie: bobCookie }
+    }),
+    env
+  );
+  assert.equal(bobDel.status, 403);
+
+  // Alice revokes s1 (200)
+  const aliceDel = await worker.fetch(
+    new Request(`https://d2r.example/api/builds/share/${s1.id}`, {
+      method: "DELETE",
+      headers: { "sec-fetch-site": "same-origin", cookie: aliceCookie }
+    }),
+    env
+  );
+  assert.equal(aliceDel.status, 200);
+  assert.deepEqual(await aliceDel.json(), { ok: true, id: s1.id, deleted: true });
+
+  // Revoked share returns 404 on JSON & SSR page
+  assert.equal((await worker.fetch(new Request(`https://d2r.example/api/builds/share/${s1.id}`), env)).status, 404);
+  assert.equal((await worker.fetch(new Request(`https://d2r.example/build/${s1.id}`), env)).status, 404);
+
+  // Alice's share list now only has s2
+  const listAfter = await (await worker.fetch(
+    new Request("https://d2r.example/api/user/shares", { headers: { cookie: aliceCookie } }),
+    env
+  )).json();
+  assert.equal(listAfter.shares.length, 1);
+  assert.equal(listAfter.shares[0].id, s2.id);
 });

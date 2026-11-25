@@ -1,0 +1,26 @@
+{
+  "name": "暗黑 2 重置版 · 庇护之地实时战报",
+  "short_name": "庇护之地 D2R",
+  "description": "D2R 3.4 恐怖地带与地表暗黑实时监控、全 99 符文之语记事、词缀模拟、物品百科、技能树与纸娃娃配装模拟器",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090809",
+  "theme_color": "#090809",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/images/ui/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/ui/joingame_desecratedindicator.webp",
+      "sizes": "128x128",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ]
+}

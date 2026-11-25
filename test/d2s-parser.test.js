@@ -7,6 +7,10 @@ import {
   mapParsedD2sToPaperdoll,
   parseD2sBuffer
 } from "../public/assets/d2s-parser.js";
+import {
+  buildD2sBuffer,
+  computeD2sChecksum
+} from "../public/assets/d2s-exporter.js";
 import { getSkillsCatalog } from "../src/skills-catalog.js";
 import { getPaperdollCatalog } from "../src/paperdoll-data.js";
 import { getRunewordsCatalog } from "../src/runewords-metadata.js";
@@ -346,4 +350,72 @@ test("拒绝非法文件头或截断损坏的 .d2s 文件", () => {
   const badMagic = new Uint8Array(1024);
   badMagic[0] = 0x00;
   assert.throws(() => parseD2sBuffer(badMagic), /文件头签名不匹配/);
+});
+
+test("反向导出 .d2s 单机存档（含 32 位旋转校验和与 D2R 3.4 术士）并往返解析完全一致", () => {
+  const catalogs = getTestCatalogs();
+
+  // Case 1: Paladin Lv.93 Hammerdin (v99)
+  const palCls = catalogs.classes.find((c) => c.id === "pal");
+  const palExport = buildD2sBuffer({
+    name: "HammerHero",
+    classId: "pal",
+    level: 93,
+    activeWeaponSet: 1,
+    statAlloc: { str: 35, dex: 120, vit: 310, enr: 0 },
+    charBaseStats: catalogs.charBaseStats.pal,
+    skills: { "Blessed Hammer": 20, Concentration: 20, Vigor: 20, "Blessed Aim": 20, "Holy Shield": 15 },
+    classSkills: palCls.skills,
+    mercEnabled: true,
+    mercVariant: "a2-hf"
+  });
+  assert.equal(palExport.filename, "HammerHero.d2s");
+  assert.equal(palExport.meta.version, 99);
+  assert.equal(palExport.meta.usedSkillPts, 95);
+
+  const palView = new DataView(palExport.bytes.buffer);
+  assert.equal(palView.getUint32(0, true), D2S_MAGIC);
+  assert.equal(palView.getUint32(8, true), palExport.bytes.length);
+  assert.equal(palView.getInt32(12, true), computeD2sChecksum(palExport.bytes));
+
+  const palParsed = parseD2sBuffer(palExport.bytes, palExport.filename);
+  const palMapped = mapParsedD2sToPaperdoll(palParsed, catalogs);
+  assert.equal(palMapped.classId, "pal");
+  assert.equal(palMapped.name, "HammerHero");
+  assert.equal(palMapped.level, 93);
+  assert.equal(palMapped.activeWeaponSet, 1);
+  assert.deepEqual(palMapped.statAlloc, { str: 35, dex: 120, vit: 310, enr: 0 });
+  assert.equal(palMapped.skills["Blessed Hammer"], 20);
+  assert.equal(palMapped.skills.Concentration, 20);
+  assert.equal(palMapped.skills["Holy Shield"], 15);
+  assert.equal(palMapped.totalSkillPts, 95);
+
+  // Case 2: D2R 3.4 Warlock Lv.95 (v100, class 7, Set II active)
+  const warCls = catalogs.classes.find((c) => c.id === "war");
+  const warExport = buildD2sBuffer({
+    name: "AbyssWarlock",
+    classId: "war",
+    level: 95,
+    activeWeaponSet: 2,
+    statAlloc: { str: 65, dex: 25, vit: 375, enr: 10 },
+    charBaseStats: catalogs.charBaseStats.war,
+    skills: { Abyss: 20, Apocalypse: 20, "Miasma Chains": 20, "Sigil Death": 20, "Enhanced Entropy": 20 },
+    classSkills: warCls.skills,
+    mercEnabled: true,
+    mercVariant: "a2-might"
+  });
+  assert.equal(warExport.meta.version, 100);
+  assert.equal(warExport.meta.classCode, 7);
+  const warView = new DataView(warExport.bytes.buffer);
+  assert.equal(warView.getInt32(12, true), computeD2sChecksum(warExport.bytes));
+
+  const warParsed = parseD2sBuffer(warExport.bytes, warExport.filename);
+  const warMapped = mapParsedD2sToPaperdoll(warParsed, catalogs);
+  assert.equal(warMapped.classId, "war");
+  assert.equal(warMapped.level, 95);
+  assert.equal(warMapped.activeWeaponSet, 2);
+  assert.deepEqual(warMapped.statAlloc, { str: 65, dex: 25, vit: 375, enr: 10 });
+  assert.equal(warMapped.skills.Abyss, 20);
+  assert.equal(warMapped.skills.Apocalypse, 20);
+  assert.equal(warMapped.totalSkillPts, 100);
 });
