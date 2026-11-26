@@ -195,7 +195,7 @@ test("公开读取恐怖地带与首领掉率计算器数据（含 3.4 远古雕
   assert.ok(Array.isArray(data.specialDrops) && data.specialDrops.some((sp) => sp.code === "ua1"));
 });
 
-test("公开读取角色与佣兵纸娃娃配装元数据（含 3.4 术士魔典、最大孔数与 49 种镶嵌物）", async () => {
+test("公开读取角色与佣兵纸娃娃配装元数据（含 3.4 术士魔典、最大孔数与 55 种镶嵌物）", async () => {
   const response = await worker.fetch(
     new Request("https://example.com/api/paperdoll"),
     createEnv()
@@ -218,9 +218,11 @@ test("公开读取角色与佣兵纸娃娃配装元数据（含 3.4 术士魔典
   assert.equal(data.setMeta["Griswold's Redemption"].maxSockets, 4);
   assert.equal(data.setMeta["Tal Rasha's Guardianship"].code, "uth");
   assert.equal(data.setMeta["Whistan's Guard"].code, "xml");
-  assert.equal(data.socketables.length, 49);
+  assert.equal(data.socketables.length, 55);
   assert.ok(data.socketables.some((s) => s.id === "r08" && s.helm.includes("火焰抗性")));
-  assert.ok(data.socketables.some((s) => s.id === "jw-55-ltng"));
+  assert.ok(data.socketables.some((s) => s.id === "jw-55-ltng" && s.icon.includes("perfect_diamond")));
+  assert.ok(data.socketables.some((s) => s.id === "jw-34-fire" && s.icon.includes("fragment_fire")));
+  assert.ok(data.socketables.some((s) => s.id === "jw-34-mag" && s.icon.includes("fragment_magic")));
   assert.equal(Object.keys(data.charBaseStats).length, 8);
   assert.equal(data.charBaseStats.war.lifePerVit, 3);
   assert.equal(data.charBaseStats.bar.lifePerVit, 4);
@@ -259,4 +261,33 @@ test("公开读取角色与佣兵纸娃娃配装元数据（含 3.4 术士魔典
   assert.ok(rareRingAffixes.includes("3–8% 击中偷取生命 (LL)"));
   assert.ok(rareRingAffixes.includes("+1–40 生命"));
   assert.ok(rareRingAffixes.includes("魔法伤害减少 1–2 (MDR)"));
+});
+
+test("词缀拆分、3.4 暗金珠宝与纸娃娃/符文之语增强回归校验", async () => {
+  const afRes = await worker.fetch(new Request("https://example.com/api/affixes"), createEnv());
+  assert.equal(afRes.status, 200);
+  const afData = await afRes.json();
+  // 词缀不再包含「钻石 / 珍珠」或「(或 ...)」合并写法
+  assert.ok(!afData.affixes.some((a) => String(a.range || "").includes("或 ")));
+  assert.ok(afData.affixes.some((a) => a.slot === "jewel" && a.nameEn === "Diamond (Jewel)"));
+  assert.ok(afData.affixes.some((a) => a.slot === "jewel" && a.nameEn === "Pearl (Jewel)"));
+  // 普通珠宝使用经典珠宝图标，3.4 新暗金珠宝使用 fragment_*.webp
+  const jewelBase = afData.simulatorBases.find((b) => b.id === "jewel");
+  assert.ok(jewelBase && jewelBase.supportsUnique === true && jewelBase.icon.includes("perfect_diamond1.webp"));
+  assert.ok(Array.isArray(afData.uniqueJewels) && afData.uniqueJewels.length === 10);
+  assert.equal(afData.uniqueJewels.filter((j) => j.patch === "3.4" && j.code === "cjw").length, 6);
+  // 物品库底材包含大院长之弓别名（可同时搜大院长之弓与仕女长之弓）
+  const itRes = await worker.fetch(new Request("https://example.com/api/items"), createEnv());
+  const itData = await itRes.json();
+  const gmb = itData.baseItems.find((b) => b.code === "amc");
+  assert.ok(gmb && (gmb.nameZh.includes("大院长") || (gmb.aliasZh || "").includes("大院长")));
+  // 仪表盘 HTML 包含自动同步开关、底材原生属性、暗金珠宝选择与扩展符文之语底材分类
+  const dashRes = await worker.fetch(new Request("https://example.com/"), createEnv());
+  const html = await dashRes.text();
+  assert.ok(html.includes('id="pd-auto-sync-skills"'));
+  assert.ok(html.includes('id="pd-base-automod-row"'));
+  assert.ok(html.includes('data-sim-quality="unique"'));
+  assert.ok(html.includes('data-rw-type="pal_shield"'));
+  assert.ok(html.includes('data-rw-type="grimoire"'));
+  assert.ok(html.includes('data-rw-type="bow_xbow"'));
 });

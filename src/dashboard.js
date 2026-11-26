@@ -1,14 +1,16 @@
-export const DASHBOARD_CSS_VERSION = "802d3ea3e2";
-export const DASHBOARD_JS_VERSION = "b0c9bac916";
+import { APP_VERSION, APP_BUILD_TIME, APP_COMMIT } from "./build-info.js";
+
+export const DASHBOARD_CSS_VERSION = "92154866f7";
+export const DASHBOARD_JS_VERSION = "7881e587dc";
 export const DASHBOARD_THEME_VERSION = "f096babd8b";
 export const DASHBOARD_ASSET_VERSIONS = {
   "shared.js": "09528eb701",
   "i18n-dict.js": "f3ee8aa070",
-  "core.js": "b0c9bac916",
-  "tab-runewords.js": "4f1c3d5199",
-  "tab-affixes.js": "4ba75116c1",
-  "tab-items.js": "b89905d2e9",
-  "tab-skills.js": "1cb3a15c36"
+  "core.js": "7881e587dc",
+  "tab-runewords.js": "41b17b7067",
+  "tab-affixes.js": "b44f2408f1",
+  "tab-items.js": "7f0acfb51c",
+  "tab-skills.js": "2a9cd5ee4b"
 };
 
 function escapeSsrHtml(str) {
@@ -68,6 +70,7 @@ export function renderDashboard(options = {}) {
   <meta name="theme-color" content="#090809">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="d2r-assets" content="${escapeSsrHtml(JSON.stringify(DASHBOARD_ASSET_VERSIONS))}">
+  <meta name="app-version" content="${escapeSsrHtml(APP_VERSION)}">
 </head>
 <body>
   <main class="shell">
@@ -358,10 +361,24 @@ export function renderDashboard(options = {}) {
             <div class="tz-filter-label">底材：</div>
             <div class="tz-chips" id="rw-type-chips">
               <button class="tz-chip active" data-rw-type="all" type="button">全部类型</button>
-              <button class="tz-chip" data-rw-type="weapon" type="button"><img class="ui-chip-icon" src="/images/items/weapon/axe/war_axe.webp" alt="">武器</button>
+              <button class="tz-chip" data-rw-type="weapon" type="button"><img class="ui-chip-icon" src="/images/items/weapon/axe/war_axe.webp" alt="">全部武器</button>
               <button class="tz-chip" data-rw-type="armor" type="button"><img class="ui-chip-icon" src="/images/items/armor/armor/ancient_armor.webp" alt="">盔甲</button>
               <button class="tz-chip" data-rw-type="helm" type="button"><img class="ui-chip-icon" src="/images/items/armor/helmet/crown.webp" alt="">头盔</button>
               <button class="tz-chip" data-rw-type="shield" type="button"><img class="ui-chip-icon" src="/images/items/armor/shield/kite_shield.webp" alt="">盾牌</button>
+              <button class="tz-chip" data-rw-type="sword" type="button"><img class="ui-chip-icon" src="/images/items/weapon/sword/crystal_sword.webp" alt="">剑</button>
+              <button class="tz-chip" data-rw-type="axe" type="button"><img class="ui-chip-icon" src="/images/items/weapon/axe/war_axe.webp" alt="">斧</button>
+              <button class="tz-chip" data-rw-type="polearm" type="button"><img class="ui-chip-icon" src="/images/items/weapon/polearm/halberd.webp" alt="">长柄</button>
+              <button class="tz-chip" data-rw-type="spear" type="button"><img class="ui-chip-icon" src="/images/items/weapon/spear/pike.webp" alt="">矛</button>
+              <button class="tz-chip" data-rw-type="mace_hammer" type="button"><img class="ui-chip-icon" src="/images/items/weapon/mace/flail.webp" alt="">锤/钉锤/权杖</button>
+              <button class="tz-chip" data-rw-type="bow_xbow" type="button"><img class="ui-chip-icon" src="/images/items/weapon/bow/reflex_bow.webp" alt="">弓/弩</button>
+              <button class="tz-chip" data-rw-type="staff" type="button"><img class="ui-chip-icon" src="/images/items/weapon/staff/war_staff.webp" alt="">双手法杖</button>
+              <button class="tz-chip" data-rw-type="wand" type="button"><img class="ui-chip-icon" src="/images/items/weapon/wand/bone_wand.webp" alt="">死灵法杖</button>
+              <button class="tz-chip" data-rw-type="claw" type="button"><img class="ui-chip-icon" src="/images/items/weapon/h2h/claws.webp" alt="">刺客爪</button>
+              <button class="tz-chip" data-rw-type="dagger" type="button"><img class="ui-chip-icon" src="/images/items/weapon/knife/kriss.webp" alt="">匕首</button>
+              <button class="tz-chip" data-rw-type="pal_shield" type="button"><img class="ui-chip-icon" src="/images/items/armor/shield/heraldic_shield.webp" alt="">圣骑士盾</button>
+              <button class="tz-chip" data-rw-type="nec_shield" type="button"><img class="ui-chip-icon" src="/images/items/armor/voodoo_head/preserved_head.webp" alt="">死灵盾</button>
+              <button class="tz-chip" data-rw-type="grimoire" type="button"><img class="ui-chip-icon" src="/images/items/misc/book/identify_book.webp" alt="">术士魔典</button>
+              <button class="tz-chip" data-rw-type="druid_helm" type="button"><img class="ui-chip-icon" src="/images/items/armor/pelt/wolf_head.webp" alt="">德鲁伊头</button>
             </div>
           </div>
           <div class="tz-filter-row">
@@ -480,8 +497,16 @@ export function renderDashboard(options = {}) {
                   <button class="tz-chip" data-sim-quality="magic" type="button"><img class="ui-chip-icon" src="/images/items/misc/gem/perfect_saphire.webp" alt="">魔法 (蓝)</button>
                   <button class="tz-chip active" data-sim-quality="rare" type="button"><img class="ui-chip-icon" src="/images/items/misc/gem/perfect_topaz.webp" alt="">亮金 (黄)</button>
                   <button class="tz-chip" data-sim-quality="crafted" type="button"><img class="ui-chip-icon" src="/images/items/misc/gem/perfect_amethyst.webp" alt="">手工 (橙)</button>
+                  <button class="tz-chip" data-sim-quality="unique" type="button" style="display:none"><img class="ui-chip-icon" src="/images/items/misc/body_part/fragment_fire.webp" alt="">暗金 (含3.4新珠宝)</button>
                 </div>
               </div>
+            </div>
+
+            <div class="sim-row" id="sim-unique-opts" style="display:none">
+              <label class="sim-field" style="flex:1">
+                <span>暗金珠宝模板（含 D2R 3.4 术士君临新增 6 颗巨型暗金珠宝 + 彩虹刻面）</span>
+                <select class="sim-select" id="sim-unique-select"></select>
+              </label>
             </div>
 
             <div class="sim-row" id="sim-standard-lvls">
@@ -795,6 +820,7 @@ export function renderDashboard(options = {}) {
           <div class="rw-actions">
             <button class="rw-btn" id="sk-import-d2s-btn" type="button" style="border-color:rgba(154,216,255,0.5);color:#9ad8ff">📂 导入 .d2s 存档</button>
             <button class="rw-btn" id="sk-export-d2s-btn" type="button" style="border-color:rgba(112,226,140,0.5);color:#9bf4ae" title="离线导出当前职业等级、四维、30项技能、地狱全通与全小站的单机 .d2s 测试存档">💾 导出 .d2s 存档</button>
+          <button class="rw-btn" id="sk-stash-export-btn" type="button" style="border-color:rgba(240,185,90,0.55);color:#ffd573" title="配置角色个人仓库物品，或导出/合并 D2R 3.4 共享仓库 .d2i（支持 1–99 堆叠符文/宝石/材料）">📦 仓库 / 堆叠 .d2i</button>
             <button class="rw-btn active" id="sk-share-full-bd-btn" type="button">🔗 分享完整 BD 短链</button>
             <button class="rw-btn" id="sk-share-btn" type="button">复制加点分享链接</button>
             <button class="rw-btn rw-btn-danger" id="sk-reset-btn" type="button">重置当前职业加点</button>
@@ -974,9 +1000,6 @@ export function renderDashboard(options = {}) {
                     <option value="conc">专注 Concentration (+物理/天锤伤)</option>
                     <option value="hf">神圣冰冻 Holy Freeze (群体减速控场)</option>
                     <option value="thorns">荆棘 Thorns (近战反伤)</option>
-                    <option value="might">力量 Might (+物理伤)</option>
-                    <option value="conv">信念 Conviction (-敌火/冰/电抗 · -敌防)</option>
-                    <option value="ba">祝福瞄准 Blessed Aim (+攻击准确率 AR)</option>
                   </select>
                   <span id="pd-warlock-demon-mlvl-wrap" style="display:none;align-items:center;gap:4px;font-size:11px;color:#e8c7f0" title="被束缚恶魔的怪物等级 mlvl（普通地狱85区精英约88级，96+级恐怖地带 TZ 可达96~99级）；按官方公式 floor(mlvl / 除数) 自动换算灵气等级">
                     <label for="pd-warlock-demon-mlvl" style="white-space:nowrap">恶魔 mlvl</label>
@@ -1018,7 +1041,7 @@ export function renderDashboard(options = {}) {
 
           <div class="pd-workspace">
             <!-- 1. 左侧：角色真实纸娃娃配装盘 (纯 10 部位) + 10x4 游戏背包 + 技能攻击力与完整人物面板 -->
-            <article class="bp-card" style="border-color:rgba(213,167,72,0.45)">
+            <article class="bp-card pd-col-char" style="border-color:rgba(213,167,72,0.45)">
               <div class="bp-card-head">
                 <h3 class="bp-card-title" style="color:#f5cf7b" id="pd-char-title">角色真实配装纸娃娃</h3>
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
@@ -1029,10 +1052,15 @@ export function renderDashboard(options = {}) {
                   <button type="button" class="rw-btn" id="pd-save-build-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(103,232,122,0.55);color:#8af49f">💾 保存配装</button>
                   <button type="button" class="rw-btn" id="pd-import-d2s-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(154,216,255,0.55);color:#9ad8ff">📂 导入 .d2s</button>
                   <button type="button" class="rw-btn" id="pd-export-d2s-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(112,226,140,0.55);color:#9bf4ae" title="导出单机 .d2s 测试存档">💾 导出 .d2s</button>
+                  <button type="button" class="rw-btn" id="pd-stash-export-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(240,185,90,0.55);color:#ffd573" title="配置角色个人仓库物品或导出/合并共享仓库 .d2i（1–99 堆叠符文/宝石/材料）">📦 仓库/.d2i</button>
                   <button type="button" class="rw-btn" id="pd-share-bd-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(245,207,123,0.65);color:#ffe08c">🔗 分享完整 BD</button>
                   <button type="button" class="rw-btn" id="pd-reset-class-set-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(103,232,122,0.35);color:#b9f6ca">🔄 恢复本职业套装</button>
                   <button type="button" class="rw-btn" id="pd-char-preset-btn" style="padding:3px 8px;font-size:11px">切换毕业暗金/符文预设</button>
-                  <button type="button" class="rw-btn" id="pd-sync-skills-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(154,216,255,0.45);color:#9ad8ff">同步 +技能至技能树</button>
+                  <label class="sk-bonus-ctrl pd-autosync-toggle" title="开启后每次调整装备/咒符/底材技能时自动同步 +技能至技能树；关闭则点击右侧按钮手动同步" style="font-size:11px;padding:2px 7px;gap:4px;cursor:pointer">
+                    <input type="checkbox" id="pd-auto-sync-skills" checked />
+                    <span>自动同步技能</span>
+                  </label>
+                  <button type="button" class="rw-btn" id="pd-sync-skills-btn" style="padding:3px 8px;font-size:11px;border-color:rgba(154,216,255,0.45);color:#9ad8ff">手动同步 +技能</button>
                 </div>
               </div>
               <div class="pd-swap-bar" id="pd-swap-bar" role="region" aria-label="主/副手武器栏切换">
@@ -1114,7 +1142,7 @@ export function renderDashboard(options = {}) {
             </article>
 
             <!-- 2. 中间：四幕佣兵真实纸娃娃配装盘 (4 部位 + 流派成长) -->
-            <article class="bp-card" id="pd-merc-card" style="border-color:rgba(87,219,112,0.42)">
+            <article class="bp-card pd-col-merc" id="pd-merc-card" style="border-color:rgba(87,219,112,0.42)">
               <div class="bp-card-head">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                   <label class="sk-bonus-ctrl" style="cursor:pointer;font-size:12px;font-weight:700;color:#8af49f" title="默认勾选表示携带佣兵；取消勾选后佣兵面板置灰锁定不可修改，且所有佣兵自带与装备灵气均不计入角色面板">
@@ -1150,7 +1178,7 @@ export function renderDashboard(options = {}) {
             </article>
 
             <!-- 3. 右侧：当前选中装备部位 / 背包咒符 自由编辑、打孔镶嵌 & 变量属性滑块编辑器 -->
-            <article class="bp-card" style="border-color:rgba(255,138,117,0.5);position:sticky;top:72px">
+            <article class="bp-card pd-col-editor" style="border-color:rgba(255,138,117,0.5)">
               <div class="bp-card-head">
                 <div>
                   <h3 class="bp-card-title" style="color:#ffb3a7" id="pd-editor-title">部位自由配装 & 打孔/变量编辑器</h3>
@@ -1207,14 +1235,14 @@ export function renderDashboard(options = {}) {
                     </select>
                   </div>
                   <div id="pd-superior-row" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 9px;border-radius:8px;border:1px solid rgba(154,216,255,0.35);background:rgba(16,30,48,0.62);font-size:11.5px;color:#cfe7ff">
-                    <span style="color:#9ad8ff;font-weight:700;white-space:nowrap" title="D2R 超强底材 (Superior) 原生词缀：武器可带 +5–15% 强化伤害 与 +1–3 攻击准确率，防具可带 +5–15% 强化防御（注意：若符文之语 ED 滑块已按游戏合并后的总 ED 填写，此处超强 ED 保持 0 即可避免重复计算）">✨ 超强底材 (Superior)：</span>
+                    <span id="pd-sup-title" style="color:#9ad8ff;font-weight:700;white-space:nowrap" title="D2R 超强底材 (Superior) 原生词缀：武器/弓可带 +5–15% 强化伤害 与 +1–3 攻击准确率，防具/盾牌可带 +5–15% 强化防御（若符文之语 ED 滑块已填合并后的总 ED，此处超强 ED 保持 0 即可避免重复计算）">✨ 超强底材 (Superior)：</span>
                     <label id="pd-sup-ed-wrap" style="display:inline-flex;align-items:center;gap:4px">
-                      <span>ED +</span>
+                      <span>强化伤害 ED +</span>
                       <input type="number" class="sk-bonus-input" id="pd-sup-ed" min="0" max="15" value="0" style="width:46px;height:24px;font-size:11.5px" />
                       <span>%</span>
                     </label>
                     <label id="pd-sup-ar-wrap" style="display:inline-flex;align-items:center;gap:4px">
-                      <span>准确率 +</span>
+                      <span>准确率 AR +</span>
                       <input type="number" class="sk-bonus-input" id="pd-sup-ar" min="0" max="3" value="0" style="width:44px;height:24px;font-size:11.5px" />
                     </label>
                     <label id="pd-sup-def-wrap" style="display:none;align-items:center;gap:4px">
@@ -1254,6 +1282,15 @@ export function renderDashboard(options = {}) {
                       </span>
                       <span id="pd-pal-block-hint" style="font-size:11px;color:#9ad8ff"></span>
                     </div>
+                  </fieldset>
+                  <fieldset class="pd-pal-shield-fs" id="pd-base-automod-row" style="display:none">
+                    <legend id="pd-base-automod-legend">✨ 底材原生技能属性</legend>
+                    <div id="pd-base-automod-tab-wrap" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+                      <label for="pd-base-auto-tab-lvl" id="pd-base-auto-tab-label" style="font-size:12px">原生单系技能 +</label>
+                      <input type="number" class="sk-bonus-input" id="pd-base-auto-tab-lvl" min="0" max="3" value="0" inputmode="numeric" style="width:48px;height:24px;font-size:11.5px" />
+                      <span style="font-size:11px;color:var(--muted)">（原生 0–3 级，可与符文之语 / 蓝黄词缀及超强 ED 叠加）</span>
+                    </div>
+                    <div id="pd-base-staffmod-wrap" style="display:none;flex-direction:column;gap:5px"></div>
                   </fieldset>
                 </div>
               </div>
@@ -1314,7 +1351,7 @@ export function renderDashboard(options = {}) {
       </section>
     </div>
 
-    <footer>数据来源 d2runewizard.com · DC 后台每 <span id="footer-pull-interval">5</span> 分钟拉取 · 恐怖区域整点、半点同步 · 页面读取 Cloudflare KV 缓存</footer>
+    <footer>数据来源 d2runewizard.com · DC 后台每 <span id="footer-pull-interval">5</span> 分钟拉取 · 恐怖区域整点、半点同步 · 页面读取 Cloudflare KV 缓存 · <span class="app-version" title="版本 ${escapeSsrHtml(APP_VERSION)} · 构建时间 ${escapeSsrHtml(APP_BUILD_TIME)} · Commit ${escapeSsrHtml(APP_COMMIT)}">${escapeSsrHtml(APP_VERSION)}</span></footer>
     <button class="back-to-top-btn" id="back-to-top-btn" type="button" title="回到顶部" aria-label="回到顶部">↑</button>
   </main>
 
@@ -1717,6 +1754,132 @@ export function renderDashboard(options = {}) {
           </div>
         </div>
         <button type="button" class="rw-btn active" id="d2s-confirm-import-btn" style="height:40px;font-weight:700">✓ 确认导入至模拟器</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 角色个人仓库 (.d2s) 与 共享仓库堆叠专页 (.d2i) 配置弹窗 -->
+  <dialog class="auth-dialog auth-dialog-lg" id="pd-stash-dialog" closedby="any" aria-labelledby="pd-stash-title">
+    <div class="auth-dlg-head">
+      <div class="auth-dlg-head-text">
+        <h3 class="auth-dlg-title" id="pd-stash-title">📦 仓库物品配置 &amp; D2R 3.4 共享仓库 (.d2i) 堆叠导出</h3>
+        <div class="auth-dlg-sub">🔒 100% 浏览器本地离线生成：个人仓库随 <code>.d2s</code> 导出，1–99 堆叠符文/宝石/材料写入共享仓库 <code>.d2i</code> 专页</div>
+      </div>
+      <button class="auth-close-btn" id="pd-stash-close-btn" type="button" aria-label="关闭弹窗">×</button>
+    </div>
+    <div class="auth-dlg-body" style="gap:12px">
+      <div class="stash-mode-tabs" role="tablist">
+        <button type="button" class="rw-btn active" id="stash-tab-personal" data-stash-tab="personal" role="tab" aria-selected="true">🎒 指定仓库物品（10×10，随 .d2s / .d2i 导出）</button>
+        <button type="button" class="rw-btn" id="stash-tab-shared" data-stash-tab="shared" role="tab" aria-selected="false">💎 共享仓库 .d2i（原生 1–99 堆叠符文/宝石/材料）</button>
+      </div>
+
+      <!-- Tab 1: 指定仓库物品（用于 .d2s 个人仓库 & 可选注入 .d2i 共享页） -->
+      <div id="stash-pane-personal" class="stash-pane">
+        <div class="alert-section" style="gap:10px">
+          <div class="alert-section-title">
+            <span>➕ 添加指定装备到仓库列表</span>
+            <span id="stash-personal-usage" style="font-size:11.5px;color:#ffd573">0 件 · 占 0/100 格</span>
+          </div>
+          <div class="stash-picker-row">
+            <select id="stash-add-cat" class="rw-select" aria-label="物品类别">
+              <option value="unique">暗金装备 (Unique)</option>
+              <option value="rw">符文之语 (Runeword)</option>
+              <option value="set">绿色套装 (Set)</option>
+              <option value="base">精选无形/带孔底材</option>
+              <option value="stack">单件符文/宝石/材料</option>
+            </select>
+            <input type="search" id="stash-add-search" class="rw-input" placeholder="搜索物品中文或英文名..." autocomplete="off" />
+          </div>
+          <div class="stash-picker-row">
+            <select id="stash-add-item" class="rw-select" style="flex:2" aria-label="选择物品"></select>
+            <select id="stash-add-base" class="rw-select" style="flex:1;display:none" aria-label="选择底材"></select>
+            <label id="stash-add-eth-wrap" class="stash-inline-check"><input type="checkbox" id="stash-add-eth" /><span>无形</span></label>
+            <button type="button" class="rw-btn active" id="stash-add-btn">+ 放入仓库</button>
+          </div>
+          <div class="stash-quick-row">
+            <button type="button" class="rw-btn" id="stash-quick-char-btn">⚡ 导入当前角色全身装备</button>
+            <button type="button" class="rw-btn" id="stash-quick-merc-btn">⚔️ 导入当前佣兵装备</button>
+            <button type="button" class="rw-btn" id="stash-clear-personal-btn">🧹 清空列表</button>
+          </div>
+        </div>
+        <div id="stash-personal-list" class="stash-item-list"></div>
+        <div class="stash-foot-bar">
+          <span style="font-size:11.5px;color:var(--muted)">💡 列表中的物品会自动随「导出 .d2s」装入角色个人仓库（10×10 格自动排版不重叠），也可在右侧标签页一键注入共享仓库 .d2i。</span>
+          <button type="button" class="rw-btn active" id="stash-export-d2s-now-btn" style="white-space:nowrap">💾 立即导出含仓库的 .d2s</button>
+        </div>
+      </div>
+
+      <!-- Tab 2: 共享仓库 .d2i 堆叠导出（支持增量合并现有 .d2i） -->
+      <div id="stash-pane-shared" class="stash-pane" style="display:none">
+        <div class="alert-section" style="gap:8px">
+          <div class="alert-section-title">
+            <span>📂 增量合并你现有的 .d2i（推荐，不覆盖原仓库）</span>
+            <span id="d2i-base-status" style="font-size:11.5px;color:var(--muted)">当前：生成全新共享仓库</span>
+          </div>
+          <div class="stash-quick-row" style="align-items:center">
+            <input type="file" id="d2i-base-input" accept=".d2i" style="display:none" />
+            <button type="button" class="rw-btn" id="d2i-pick-base-btn">📂 载入现有 ModernSharedStash*.d2i</button>
+            <button type="button" class="rw-btn" id="d2i-clear-base-btn" style="display:none">× 清除基准文件</button>
+            <span style="font-size:11.5px;color:var(--muted)">保留原有 5 页装备、堆叠库存与编年史进度，仅叠加下方修改</span>
+          </div>
+          <div class="auth-err-msg" id="d2i-error-msg" role="alert"></div>
+        </div>
+
+        <div class="alert-section" style="gap:8px">
+          <div class="alert-section-title">
+            <span>⚡ 一键堆叠套餐（D2R 3.4 专页原生 1–99 堆叠）</span>
+            <span id="d2i-stack-summary" style="font-size:11.5px;color:#9bf4ae">已配置 0 种 · 共 0 个</span>
+          </div>
+          <div class="stash-quick-row">
+            <button type="button" class="rw-btn" data-d2i-preset="runes-all">🪙 全 33 符文 ×99</button>
+            <button type="button" class="rw-btn" data-d2i-preset="runes-hr">🪙 高号 20#–33# ×99</button>
+            <button type="button" class="rw-btn" data-d2i-preset="gems-perfect">💎 7系完美宝石+骷髅 ×99</button>
+            <button type="button" class="rw-btn" data-d2i-preset="mats-all">🔑 3.4全材料(钥匙/器官/精华/洗点/碎片/雕像/大紫) ×99</button>
+            <button type="button" class="rw-btn" data-d2i-preset="all-99">✨ 全部 91 种 ×99</button>
+            <button type="button" class="rw-btn" data-d2i-preset="clear">🧹 清空堆叠</button>
+          </div>
+          <div class="stash-picker-row">
+            <div class="stash-cat-pills" id="d2i-cat-pills">
+              <button type="button" class="rw-btn active" data-d2i-cat="all">全部</button>
+              <button type="button" class="rw-btn" data-d2i-cat="rune">符文(33)</button>
+              <button type="button" class="rw-btn" data-d2i-cat="pgem">完美宝石(7)</button>
+              <button type="button" class="rw-btn" data-d2i-cat="gem">全部宝石(35)</button>
+              <button type="button" class="rw-btn" data-d2i-cat="mat">3.4材料/钥匙(21)</button>
+              <button type="button" class="rw-btn" data-d2i-cat="pot">紫药(2)</button>
+              <button type="button" class="rw-btn" data-d2i-cat="selected">已选</button>
+            </div>
+            <input type="search" id="d2i-stack-search" class="rw-input" placeholder="搜索符文/宝石/材料..." autocomplete="off" style="max-width:200px" />
+          </div>
+          <div id="d2i-stack-grid" class="d2i-stack-grid"></div>
+        </div>
+
+        <div class="alert-section" style="gap:8px">
+          <div class="stash-picker-row" style="align-items:center;flex-wrap:wrap">
+            <label class="stash-inline-check">
+              <input type="checkbox" id="d2i-include-gear" checked />
+              <span>同时将「指定仓库物品」(<span id="d2i-gear-count">0</span> 件) 注入共享仓库第</span>
+            </label>
+            <select id="d2i-target-tab" class="rw-select" style="width:auto;min-width:72px">
+              <option value="0">1 页</option>
+              <option value="1">2 页</option>
+              <option value="2">3 页</option>
+              <option value="3">4 页</option>
+              <option value="4">5 页</option>
+            </select>
+            <label class="stash-inline-check" style="margin-left:auto">
+              <span>模式：</span>
+              <select id="d2i-mode-select" class="rw-select" style="width:auto">
+                <option value="sc">普通 (ModernSharedStashSoftCoreV2.d2i)</option>
+                <option value="hc">专家 (ModernSharedStashHardCoreV2.d2i)</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="stash-foot-bar">
+          <span style="font-size:11.5px;color:var(--muted)">⚠️ 覆盖游戏目录 <code>Saved Games\\Diablo II Resurrected\\ModernSharedStashSoftCoreV2.d2i</code> 前建议先备份原文件。</span>
+          <button type="button" class="rw-btn active" id="d2i-export-btn" style="white-space:nowrap;font-weight:700">💾 导出共享仓库 .d2i</button>
+        </div>
       </div>
     </div>
   </dialog>

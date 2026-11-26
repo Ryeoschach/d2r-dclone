@@ -158,6 +158,33 @@ function renderRunewordsSummary() {
   });
 }
 
+function matchesRunewordTypeFilter(rw, filterType) {
+  if (!filterType || filterType === "all") return true;
+  if (["weapon", "armor", "helm", "shield"].includes(filterType)) {
+    return Array.isArray(rw.types) && rw.types.includes(filterType);
+  }
+  const tokens = String(rw.basesZh || "").split(/\s*\/\s*/).map(s => s.trim()).filter(Boolean);
+  const has = (...names) => names.some(n => tokens.includes(n));
+  const sock = Number(rw.sockets || 0);
+  switch (filterType) {
+    case "sword": return has("剑", "近战武器", "武器");
+    case "axe": return has("斧", "近战武器", "武器");
+    case "polearm": return has("长柄", "近战武器", "武器");
+    case "spear": return has("矛", "近战武器", "武器");
+    case "mace_hammer": return has("锤", "钉头锤", "权杖", "棍棒", "近战武器", "武器");
+    case "bow_xbow": return has("弓弩", "远程武器", "武器");
+    case "staff": return has("双手法杖") || (has("近战武器", "武器") && sock <= 6);
+    case "wand": return has("死灵法杖") || (has("近战武器", "武器") && sock <= 2);
+    case "claw": return has("爪") || (has("近战武器", "武器") && sock <= 3);
+    case "dagger": return has("匕首") || (has("近战武器", "武器") && sock <= 3);
+    case "pal_shield": return has("圣骑士盾", "盾牌");
+    case "nec_shield": return has("死灵盾") || (has("盾牌") && sock <= 2);
+    case "grimoire": return has("术士魔典") || (has("盾牌") && sock <= 2);
+    case "druid_helm": return has("德鲁伊头盔") || (has("头盔") && sock <= 3);
+    default: return Array.isArray(rw.types) && rw.types.includes(filterType);
+  }
+}
+
 function renderRunewordsList() {
   const container = document.getElementById("rw-list");
   if (!rwList || rwList.length === 0) {
@@ -170,7 +197,7 @@ function renderRunewordsList() {
     const done = rwCompleted.has(rw.id);
     if (rwFilterStatus === "todo" && done) return false;
     if (rwFilterStatus === "done" && !done) return false;
-    if (rwFilterType !== "all" && !rw.types.includes(rwFilterType)) return false;
+    if (!matchesRunewordTypeFilter(rw, rwFilterType)) return false;
     if (rwFilterSocket !== "all" && String(rw.sockets) !== String(rwFilterSocket)) return false;
     if (rwFilterMode !== "all" && (rw.ladderStatus || "universal") !== rwFilterMode) return false;
     if (rwFilterPatch !== "all") {

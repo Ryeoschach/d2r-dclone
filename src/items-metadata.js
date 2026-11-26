@@ -140,6 +140,10 @@ function buildFullBaseItems() {
           })
       : [];
     const mergedStats = statParts.concat(curatedExtra).join(" · ");
+    const aliasParts = new Set();
+    if (curated?.nameZh && curated.nameZh !== zhCN) aliasParts.add(curated.nameZh);
+    if (rule.nameZh && rule.nameZh !== zhCN) aliasParts.add(rule.nameZh);
+    if (rule.aliasZh) aliasParts.add(rule.aliasZh);
     items.push({
       id: slug,
       code: rule.code,
@@ -152,6 +156,7 @@ function buildFullBaseItems() {
       tier: tierLabel,
       tierNum,
       nameZh: zhCN,
+      aliasZh: [...aliasParts].join(" "),
       nameEn: rule.nameEn,
       reqStr: Number(rule.reqStr || 0),
       reqDex: Number(rule.reqDex || 0),

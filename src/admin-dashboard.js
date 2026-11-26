@@ -1,4 +1,5 @@
 import { DASHBOARD_THEME_VERSION } from "./dashboard.js";
+import { APP_VERSION, APP_BUILD_TIME, APP_COMMIT } from "./build-info.js";
 
 function escapeAdmHtml(str) {
   return String(str ?? "")
@@ -59,33 +60,13 @@ export function renderAdminDashboard(options = {}) {
       --gold-bright: #ffe3a3;
       --text: #f3ead8;
       --muted: #b7a992;
+      --info: #9ad8ff;
       --ok: #67e87a;
-      --danger: #f06d5b;
+      --danger: #ff9b8f;
     }
-    :root[data-theme="light"] {
-      color-scheme: light;
-      --bg: #f1e8d4;
-      --panel: #faf4e6;
-      --line: rgba(154, 114, 52, 0.42);
-      --gold: #8c5912;
-      --gold-bright: #5e3806;
-      --text: #271d14;
-      --muted: #665541;
-      --ok: #1b7a36;
-      --danger: #b82f20;
-    }
-    :root[data-theme="light"] body { background: radial-gradient(circle at 20% 0%, #f9f2e2 0%, var(--bg) 52%); }
-    :root[data-theme="light"] .adm-header { background: linear-gradient(135deg, #fbf6ea, #ede0c4); }
-    :root[data-theme="light"] .adm-card,
-    :root[data-theme="light"] .adm-stat { background: #fbf6ea; }
-    :root[data-theme="light"] .adm-input,
-    :root[data-theme="light"] .adm-btn,
-    :root[data-theme="light"] .adm-link-btn { background: #f3e8d0; color: #271d14; border-color: rgba(154, 114, 52, 0.44); }
     .adm-theme-bar { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; border: 1px solid var(--line); background: rgba(0, 0, 0, 0.28); }
-    :root[data-theme="light"] .adm-theme-bar { background: #efe3c8; }
     .adm-theme-btn { border: 0; border-radius: 999px; padding: 4px 8px; background: transparent; color: var(--muted); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
     .adm-theme-btn.active { background: linear-gradient(180deg, rgba(213, 167, 72, 0.34), rgba(145, 98, 28, 0.36)); color: var(--gold-bright); }
-    :root[data-theme="light"] .adm-theme-btn.active { background: #9b6516; color: #fffaf0; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -425,6 +406,218 @@ export function renderAdminDashboard(options = {}) {
       .adm-table tbody td:nth-child(6)::before { content: var(--label-6) ": "; color: var(--muted); font-size: 12px; }
       .adm-table tbody td:nth-child(7)::before { content: var(--label-7) ": "; color: var(--muted); font-size: 12px; }
     }
+    .adm-footer {
+      margin-top: 8px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .adm-footer .app-version {
+      display: inline-block;
+      margin-left: 4px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      cursor: help;
+    }
+
+    /* High-contrast Light Mode Overrides (placed last to win CSS cascade cleanly) */
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #efe6d4;
+      --panel: #fbf7ee;
+      --line: rgba(145, 102, 38, 0.42);
+      --gold: #8a540c;
+      --gold-bright: #4e2e04;
+      --text: #1f1710;
+      --muted: #5c4c3a;
+      --info: #1b5c9e;
+      --ok: #146c2e;
+      --danger: #b42318;
+    }
+    :root[data-theme="light"] body {
+      background: radial-gradient(circle at 20% 0%, #faf4e6 0%, var(--bg) 56%);
+      color: var(--text);
+    }
+    :root[data-theme="light"] .adm-header {
+      background: linear-gradient(135deg, #fdfaf2, #eee1c6);
+      border-color: rgba(145, 102, 38, 0.48);
+      box-shadow: 0 4px 16px rgba(72, 48, 16, 0.08);
+    }
+    :root[data-theme="light"] .adm-theme-bar { background: #e8dac0; border-color: rgba(145, 102, 38, 0.42); }
+    :root[data-theme="light"] .adm-theme-btn { color: #544432; }
+    :root[data-theme="light"] .adm-theme-btn.active { background: #8a540c; color: #fffdf8; }
+    :root[data-theme="light"] .adm-nav { border-bottom-color: rgba(145, 102, 38, 0.34); }
+    :root[data-theme="light"] .adm-nav-link { color: #5c4c3a; }
+    :root[data-theme="light"] .adm-nav-link:hover { color: #1f1710; }
+    :root[data-theme="light"] .adm-nav-link[aria-current="page"] { color: #4e2e04; }
+    :root[data-theme="light"] .adm-card {
+      background: linear-gradient(180deg, #fdfaf3, #f8f1e2);
+      border-color: rgba(145, 102, 38, 0.38);
+      box-shadow: 0 3px 14px rgba(72, 48, 16, 0.06);
+    }
+    :root[data-theme="light"] .adm-card-head { border-bottom-color: rgba(145, 102, 38, 0.24); }
+    :root[data-theme="light"] .adm-field label { color: #362718; }
+    :root[data-theme="light"] .adm-input,
+    :root[data-theme="light"] .adm-select {
+      background: #ffffff;
+      color: #1f1710;
+      border-color: rgba(145, 102, 38, 0.48);
+    }
+    :root[data-theme="light"] .adm-input::placeholder { color: #8c7b65; }
+    :root[data-theme="light"] .adm-btn,
+    :root[data-theme="light"] .adm-link-btn {
+      background: #f5ebd6;
+      color: #2c1e10;
+      border-color: rgba(145, 102, 38, 0.48);
+    }
+    :root[data-theme="light"] .adm-btn:hover:not(:disabled),
+    :root[data-theme="light"] .adm-link-btn:hover {
+      background: #ebd9b6;
+      border-color: #8a540c;
+      color: #1f1409;
+    }
+    :root[data-theme="light"] .adm-btn-primary {
+      background: linear-gradient(180deg, #9d6514, #764909);
+      border-color: #6b4106;
+      color: #fffdf8;
+    }
+    :root[data-theme="light"] .adm-btn-primary:hover:not(:disabled) {
+      background: linear-gradient(180deg, #b07419, #85530b);
+      color: #ffffff;
+    }
+    :root[data-theme="light"] .adm-btn-danger {
+      background: #fdeceb;
+      border-color: rgba(180, 35, 24, 0.5);
+      color: #9e1c13;
+    }
+    :root[data-theme="light"] .adm-btn-danger:hover:not(:disabled) {
+      background: #fbd7d4;
+      border-color: #b42318;
+      color: #7d130b;
+    }
+    :root[data-theme="light"] .adm-kpi,
+    :root[data-theme="light"] .adm-setting-box {
+      background: #f4ecdb;
+      border-color: rgba(145, 102, 38, 0.34);
+    }
+    :root[data-theme="light"] .adm-kpi-meta { color: var(--info); font-weight: 500; }
+    :root[data-theme="light"] .adm-chip {
+      background: #ffffff;
+      color: #3a2a1a;
+      border-color: rgba(145, 102, 38, 0.42);
+    }
+    :root[data-theme="light"] .adm-chip:hover { background: #f2e5ca; border-color: #8a540c; }
+    :root[data-theme="light"] .adm-chip.active {
+      background: #8a540c;
+      border-color: #6b4106;
+      color: #fffdf8;
+    }
+    :root[data-theme="light"] .adm-alert {
+      background: #fdeceb;
+      border-color: rgba(180, 35, 24, 0.45);
+      color: #8c1a12;
+    }
+    :root[data-theme="light"] .adm-alert.ok {
+      background: #e6f5ea;
+      border-color: rgba(20, 108, 46, 0.42);
+      color: #0e5423;
+    }
+    :root[data-theme="light"] .adm-recovery-box {
+      background: #fdf3dc;
+      border-color: rgba(168, 112, 22, 0.58);
+    }
+    :root[data-theme="light"] .adm-code-pill {
+      background: #ffffff;
+      border-color: rgba(145, 102, 38, 0.48);
+      color: #5c3605;
+      font-weight: 700;
+    }
+    :root[data-theme="light"] .adm-badge {
+      background: #f5e5c2;
+      border-color: rgba(145, 102, 38, 0.52);
+      color: #5c3604;
+    }
+    :root[data-theme="light"] .adm-badge.ok {
+      background: #dcf3e3;
+      border-color: rgba(20, 108, 46, 0.45);
+      color: #0f5a26;
+    }
+    :root[data-theme="light"] .adm-badge.danger {
+      background: #fce3e1;
+      border-color: rgba(180, 35, 24, 0.48);
+      color: #961b12;
+    }
+    :root[data-theme="light"] .adm-badge.muted {
+      background: #eae0cc;
+      border-color: rgba(120, 96, 64, 0.36);
+      color: #4f4030;
+    }
+    :root[data-theme="light"] #adm-promote-box {
+      background: #e6f5ea !important;
+      border-color: rgba(20, 108, 46, 0.45) !important;
+    }
+    :root[data-theme="light"] dialog.adm-dialog {
+      background: linear-gradient(180deg, #fdfaf3, #f4ebda);
+      border-color: rgba(145, 102, 38, 0.58);
+      color: var(--text);
+      box-shadow: 0 24px 60px rgba(45, 30, 10, 0.28);
+    }
+    :root[data-theme="light"] dialog.adm-dialog::backdrop {
+      background: rgba(34, 24, 12, 0.48);
+    }
+    :root[data-theme="light"] .adm-dlg-head {
+      background: linear-gradient(180deg, #f6ecd7, #eee1c6);
+      border-bottom-color: rgba(145, 102, 38, 0.32);
+    }
+    :root[data-theme="light"] .adm-detail-box {
+      background: #ffffff;
+      border-color: rgba(145, 102, 38, 0.34);
+      color: var(--text);
+    }
+    :root[data-theme="light"] .table-wrapper {
+      background: #ffffff;
+      border-color: rgba(145, 102, 38, 0.4);
+    }
+    :root[data-theme="light"] .adm-table caption {
+      background: #f7f0e0;
+      color: #554534;
+      border-bottom-color: rgba(145, 102, 38, 0.26);
+    }
+    :root[data-theme="light"] .adm-table thead th {
+      background: #ebe0c8;
+      color: #4a2c04;
+      border-bottom-color: rgba(145, 102, 38, 0.46);
+    }
+    :root[data-theme="light"] .adm-table tbody th {
+      background: #fdfaf3;
+      color: #1f1710;
+    }
+    :root[data-theme="light"] .adm-table tbody td {
+      color: #271d14;
+      border-bottom-color: rgba(145, 102, 38, 0.18);
+    }
+    :root[data-theme="light"] .adm-table tbody tr:nth-child(even) th,
+    :root[data-theme="light"] .adm-table tbody tr:nth-child(even) td {
+      background: #f9f3e6;
+    }
+    :root[data-theme="light"] .adm-table tbody tr:hover th,
+    :root[data-theme="light"] .adm-table tbody tr:hover td {
+      background: #f1e4c9;
+    }
+    @container (width < 760px) {
+      :root[data-theme="light"] .adm-table tr {
+        background: #ffffff;
+        border-color: rgba(145, 102, 38, 0.36);
+      }
+      :root[data-theme="light"] .adm-table tbody th {
+        background: #efe3c9;
+        color: #3d2405;
+        border-bottom-color: rgba(145, 102, 38, 0.32);
+      }
+    }
   </style>
 </head>
 <body>
@@ -461,7 +654,7 @@ export function renderAdminDashboard(options = {}) {
       </div>
       <p class="adm-card-sub">当前系统尚未初始化任何管理员。创建后该初始化入口将自动永久关闭，并签发 5 个一次性恢复码。</p>
       <div id="adm-promote-box" style="display:${ssrUser && !initAuth?.isAdmin ? "block" : "none"};padding:10px 12px;border-radius:9px;border:1px solid rgba(103,232,122,0.35);background:rgba(103,232,122,0.08)">
-        <p class="adm-card-sub" id="adm-promote-desc" style="color:#d6f5df;margin-bottom:8px"></p>
+        <p class="adm-card-sub" id="adm-promote-desc" style="color:var(--ok);margin-bottom:8px"></p>
         <button class="adm-btn adm-btn-primary" id="adm-promote-btn" type="button" style="width:100%">直接将当前登录账号升级为管理员</button>
       </div>
       <form class="adm-form" id="adm-bootstrap-form" method="post" action="/api/admin/bootstrap">
@@ -529,7 +722,7 @@ export function renderAdminDashboard(options = {}) {
 
       <!-- 一次性恢复码提示区 -->
       <section class="adm-recovery-box" id="adm-recovery-box" role="region" aria-label="一次性恢复码">
-        <strong style="color:#ffe29a;font-size:14px" id="adm-recovery-title">🛡 请立即保存以下 5 个一次性恢复码（关闭后不再明文显示）：</strong>
+        <strong style="color:var(--gold-bright);font-size:14px" id="adm-recovery-title">🛡 请立即保存以下 5 个一次性恢复码（关闭后不再明文显示）：</strong>
         <div class="adm-codes-grid" id="adm-recovery-grid"></div>
         <div class="adm-row">
           <button class="adm-btn adm-btn-primary adm-btn-sm" id="adm-copy-codes-btn" type="button">📋 一键复制全部恢复码</button>
@@ -568,7 +761,7 @@ export function renderAdminDashboard(options = {}) {
           <div class="adm-settings-grid">
             <div class="adm-setting-box">
               <div class="adm-row" style="justify-content:space-between">
-                <strong style="color:#f5d58c;font-size:14.5px">页面数据自动刷新（全局默认）</strong>
+                <strong style="color:var(--gold-bright);font-size:14.5px">页面数据自动刷新（全局默认）</strong>
                 <label class="adm-switch">
                   <input type="checkbox" id="adm-auto-refresh-toggle" />
                   <span>开启自动刷新</span>
@@ -588,7 +781,7 @@ export function renderAdminDashboard(options = {}) {
 
             <div class="adm-setting-box">
               <div class="adm-row" style="justify-content:space-between">
-                <strong style="color:#f5d58c;font-size:14.5px">DC 后台接口拉取间隔</strong>
+                <strong style="color:var(--gold-bright);font-size:14.5px">DC 后台接口拉取间隔</strong>
                 <span class="adm-badge" id="adm-pull-current-badge">当前 - 分钟</span>
               </div>
               <p class="adm-card-sub">控制 Worker Cron 拉取 24 组地表暗黑进度的频率（1–1440 分钟）；恐怖区域仍按整点、半点独立同步。</p>
@@ -700,6 +893,7 @@ export function renderAdminDashboard(options = {}) {
         </section>
       </div>
     </div>
+    <footer class="adm-footer">庇护之地管理后台 · <span class="app-version" title="版本 ${escapeAdmHtml(APP_VERSION)} · 构建时间 ${escapeAdmHtml(APP_BUILD_TIME)} · Commit ${escapeAdmHtml(APP_COMMIT)}">${escapeAdmHtml(APP_VERSION)}</span></footer>
   </main>
 
   <!-- 原生弹窗 1：用户详情与云端技能/装备查看 -->
@@ -750,11 +944,11 @@ export function renderAdminDashboard(options = {}) {
   <!-- 原生弹窗 3：删除用户二次确认（安全操作 Cancel 置 autofocus） -->
   <dialog class="adm-dialog" id="adm-delete-dialog" aria-labelledby="adm-del-title" style="width:min(94vw,430px)">
     <div class="adm-dlg-head">
-      <h2 class="adm-card-title" id="adm-del-title" style="color:#ffb9af">⚠ 确认删除用户账号</h2>
+      <h2 class="adm-card-title" id="adm-del-title" style="color:var(--danger)">⚠ 确认删除用户账号</h2>
       <button class="adm-btn adm-btn-sm" id="adm-del-close-btn" type="button" aria-label="关闭确认">×</button>
     </div>
     <div class="adm-dlg-body">
-      <p class="adm-card-sub" id="adm-del-desc" style="color:#f3ead8"></p>
+      <p class="adm-card-sub" id="adm-del-desc" style="color:var(--text)"></p>
       <p class="adm-card-sub">删除后将同时清除该用户的账号索引与所有云端技能/装备存档及方案，此操作不可撤销。</p>
       <div class="adm-row" style="justify-content:flex-end">
         <button class="adm-btn" id="adm-del-cancel-btn" type="button" autofocus>取消</button>
@@ -1087,7 +1281,7 @@ export function renderAdminDashboard(options = {}) {
         const tr = document.createElement("tr");
         const td = document.createElement("td");
         td.colSpan = 6;
-        td.style.color = "#ff9b8f";
+        td.style.color = "var(--danger)";
         td.textContent = err.message || "读取审计日志失败";
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -1294,7 +1488,7 @@ export function renderAdminDashboard(options = {}) {
 
         // Cloud builds breakdown
         const clsTitle = document.createElement("strong");
-        clsTitle.style.color = "#f5d58c";
+        clsTitle.style.color = "var(--gold-bright)";
         clsTitle.textContent = "☁ 云端职业技能与装备存档（最近同步：" + fmtTime(b.updatedAt) + "）";
         body.appendChild(clsTitle);
 
@@ -1310,7 +1504,7 @@ export function renderAdminDashboard(options = {}) {
             const box = document.createElement("div");
             box.className = "adm-detail-box";
             const h = document.createElement("strong");
-            h.style.color = "#9ad8ff";
+            h.style.color = "var(--info)";
             h.textContent = (CLASS_LABELS[c.classId] || c.classId) + (c.charLvl ? (" · Lv." + c.charLvl) : "");
             box.appendChild(h);
             const skLine = document.createElement("div");
@@ -1328,7 +1522,7 @@ export function renderAdminDashboard(options = {}) {
 
         // Grail & Runewords summary
         const colTitle = document.createElement("strong");
-        colTitle.style.color = "#f5d58c";
+        colTitle.style.color = "var(--gold-bright)";
         colTitle.textContent = "🏆 圣杯收集与符文之语记事";
         body.appendChild(colTitle);
         const colBox = document.createElement("div");
@@ -1341,7 +1535,7 @@ export function renderAdminDashboard(options = {}) {
 
         // Saved presets
         const preTitle = document.createElement("strong");
-        preTitle.style.color = "#f5d58c";
+        preTitle.style.color = "var(--gold-bright)";
         preTitle.textContent = "📁 命名方案库（" + (b.presets ? b.presets.length : 0) + " 套）";
         body.appendChild(preTitle);
 

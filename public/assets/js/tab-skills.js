@@ -1483,6 +1483,32 @@ let pdAffixFilter = "";
 let pdSelectedRwBaseCode = "";
 let pdLastCharSkillBonus = 0;
 let pdLastSyncPayload = { all: 0, byTab: { 1: 0, 2: 0, 3: 0 }, bySkill: {}, fire: 0 };
+const PD_AUTO_SYNC_KEY = "d2r-pd-auto-sync-skills";
+let pdAutoSyncSkills = (() => {
+  try {
+    const v = localStorage.getItem(PD_AUTO_SYNC_KEY);
+    return v === null ? true : v === "1";
+  } catch (e) {
+    return true;
+  }
+})();
+let pdLastSyncedSkillSig = "";
+
+function applyPaperdollSkillsToTree(silent) {
+  const sig = skActiveClassId + "|" + JSON.stringify(pdLastSyncPayload);
+  if (silent && sig === pdLastSyncedSkillSig) return false;
+  pdLastSyncedSkillSig = sig;
+  skBonusAll = Math.min(35, Math.max(0, pdLastSyncPayload.all || 0));
+  skBonusByTab = Object.assign({ 1: 0, 2: 0, 3: 0 }, pdLastSyncPayload.byTab || {});
+  skBonusBySkill = Object.assign({}, pdLastSyncPayload.bySkill || {});
+  skBonusFire = pdLastSyncPayload.fire || 0;
+  skBonusClassId = skActiveClassId;
+  const bonusInp = document.getElementById("sk-bonus-all");
+  if (bonusInp && document.activeElement !== bonusInp) bonusInp.value = String(skBonusAll);
+  if (typeof renderSkillsTrees === "function") renderSkillsTrees();
+  if (typeof renderSkillInspector === "function") renderSkillInspector();
+  return true;
+}
 let pdActiveOskills = {};
 let pdSelectedSkillKey = "";
 let pdSkillNotesOpen = false;
@@ -1514,9 +1540,110 @@ function getCraftedItemDef(id) {
   return (pdData && Array.isArray(pdData.craftedItems) ? pdData.craftedItems : []).find(c => c.id === id) || null;
 }
 
+const PD_BASE_TYPE_LABELS = {
+  abow: "亚马逊专用弓 弓",
+  aspe: "亚马逊专用矛 长矛",
+  ajav: "亚马逊专用标枪 标枪",
+  bow: "弓",
+  xbow: "弩 十字弓",
+  pole: "长柄武器 长柄",
+  spea: "长矛 矛",
+  jave: "标枪",
+  swor: "剑",
+  axe: "斧 斧头",
+  mace: "钉头锤 钉锤 连枷",
+  hamm: "锤 重锤",
+  club: "木棒 棍棒",
+  scep: "权杖 圣骑权杖",
+  staf: "双手法杖 法杖",
+  wand: "死灵法杖 魔杖",
+  orb: "法师法珠 法珠",
+  knif: "匕首",
+  tkni: "飞刀 投掷",
+  taxe: "飞斧 投掷",
+  h2h: "刺客爪 拳刃",
+  h2h2: "刺客爪 拳刃",
+  tors: "盔甲 衣服",
+  helm: "头盔",
+  circ: "头环 宝冠 三重冠 权冠",
+  phlm: "野蛮人专用头盔 野蛮人头",
+  pelt: "德鲁伊专用头盔 狼头",
+  shie: "盾牌",
+  ashd: "圣骑士专用盾 圣骑士盾 圣骑盾",
+  head: "死灵专用盾 死灵首级",
+  grim: "术士专用魔典 魔典",
+  glov: "手套",
+  boot: "鞋子 战靴",
+  belt: "腰带"
+};
+const PD_CLASS_LABELS_ZH = {
+  ama: "亚马逊",
+  sor: "法师",
+  nec: "死灵法师 死灵",
+  pal: "圣骑士",
+  bar: "野蛮人",
+  dru: "德鲁伊",
+  ass: "刺客",
+  war: "术士"
+};
+
+function getBaseTierMeta(b) {
+  if (!b) return { rank: 1, label: "普通" };
+  const tMap = itData && itData.baseUpgradeTiers;
+  const ti = tMap && tMap[b.code];
+  if (ti) {
+    if (ti.tier === 3) return { rank: 3, label: "精华" };
+    if (ti.tier === 2) return { rank: 2, label: "扩展" };
+    return { rank: 1, label: "普通" };
+  }
+  const itItem = itData && Array.isArray(itData.baseItems) ? itData.baseItems.find(x => x.code === b.code) : null;
+  if (itItem && itItem.tierNum) {
+    return { rank: itItem.tierNum, label: itItem.tier || (itItem.tierNum === 3 ? "精华" : itItem.tierNum === 2 ? "扩展" : "普通") };
+  }
+  const reqLvl = Number(b.reqLvl || 0);
+  if (reqLvl >= 42 || /^7|^6|^u|^wa[b-f]|^am[b-f]|^ob[b-f]|^pa[b-f]|^ne[b-f]|^ba[b-f]|^dr[b-f]/.test(b.code || "")) {
+    return { rank: 3, label: "精华" };
+  }
+  if (reqLvl >= 20 || /^9|^8|^x|^wa[6-a]|^am[6-a]|^ob[6-a]|^pa[6-a]|^ne[6-a]|^ba[6-a]|^dr[6-a]/.test(b.code || "")) {
+    return { rank: 2, label: "扩展" };
+  }
+  return { rank: 1, label: "普通" };
+}
+
+function getBaseAutomodSpec(bRule) {
+  if (!bRule) return null;
+  const t = bRule.type;
+  if (t === "abow") {
+    return { mode: "tab", legend: "🏹 亚马逊弓底材原生属性（可叠加超强 ED / AR 与符文之语）", tabLabel: "弓与弩技能 +", tabStatName: "弓与弩技能", max: 3, classId: "ama" };
+  }
+  if (t === "aspe" || t === "ajav") {
+    return { mode: "tab", legend: "🔱 亚马逊矛/标枪底材原生属性（可叠加超强 ED / AR）", tabLabel: "标枪与长矛技能 +", tabStatName: "标枪与长矛技能", max: 3, classId: "ama" };
+  }
+  const staffmodMap = {
+    orb: { classId: "sor", legend: "🔮 法师法珠底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    staf: { classId: "sor", legend: "🪄 双手法杖底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    wand: { classId: "nec", legend: "🦴 死灵魔杖底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    head: { classId: "nec", legend: "💀 死灵首级底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    scep: { classId: "pal", legend: "⚜️ 圣骑权杖底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    phlm: { classId: "bar", legend: "🪖 野蛮人头盔底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    pelt: { classId: "dru", legend: "🐺 德鲁伊狼头底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    h2h: { classId: "ass", legend: "🗡️ 刺客拳刃底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    h2h2: { classId: "ass", legend: "🗡️ 刺客拳刃底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" },
+    grim: { classId: "war", legend: "📖 术士魔典底材原生自带技能（Staffmods · 最多 3 条，各 +1–3 级）" }
+  };
+  if (staffmodMap[t]) {
+    return { mode: "staffmod", classId: staffmodMap[t].classId, legend: staffmodMap[t].legend };
+  }
+  return null;
+}
+
 function getBaseSearchText(b) {
   if (!b) return "";
-  return (b.nameZh || "") + " " + (b.aliasZh || "") + " " + (b.nameEn || "") + " " + (b.code || "");
+  const tm = getBaseTierMeta(b);
+  const typeLbl = PD_BASE_TYPE_LABELS[b.type] || "";
+  const clsLbl = b.classOnly ? (PD_CLASS_LABELS_ZH[b.classOnly] || b.classOnly) : "";
+  const extraAlias = b.code === "amc" ? "大院长之弓 仕女长之弓 主母之弓 GMB 精华弓 亚马逊精华弓" : (b.code === "amb" ? "女族长之弓 女族长弓 MB 精华弓 亚马逊精华弓" : "");
+  return (b.nameZh || "") + " " + (b.aliasZh || "") + " " + extraAlias + " " + (b.nameEn || "") + " " + (b.code || "") + " " + tm.label + " " + typeLbl + " " + clsLbl;
 }
 
 function getDefaultCraftSkill(cDef, clsObj) {
@@ -2088,10 +2215,12 @@ function getBaseRule(code) {
   return (pdData && pdData.baseRules && pdData.baseRules[code]) || null;
 }
 
+const VALID_WARLOCK_DEMON_AURAS = new Set(["vigor", "fana", "conc", "hf", "thorns"]);
+
 function normalizeDemonAuraId(v) {
-  const s = String(v || "none").trim();
+  const s = String(v || "none").trim().replace(/-\d+$/, "");
   if (!s || s === "none") return "none";
-  return s.replace(/-\d+$/, "");
+  return VALID_WARLOCK_DEMON_AURAS.has(s) ? s : "none";
 }
 
 function computeBoundDemonAura(rawAuraId, rawMlvl) {
@@ -2557,7 +2686,7 @@ function resolveCustomJewelInfo(entry) {
   });
   return {
     nameZh: isRare ? "自定义黄珠宝" : "自定义蓝珠宝",
-    icon: isRare ? "/images/items/misc/body_part/fragment_lightning.webp" : "/images/items/misc/body_part/fragment_magic.webp",
+    icon: isRare ? "/images/items/misc/gem/perfect_diamond5.webp" : "/images/items/misc/gem/perfect_diamond1.webp",
     bonusText: parts.join(" · ")
   };
 }
@@ -2686,6 +2815,22 @@ function resolveEquippedItemInfo(eq, opts) {
     } else {
       const palRes = Math.min(45, Math.max(0, Math.floor(Number(eq.palRes || 0))));
       if (palRes > 0) rolledLines.push("+" + palRes + "% 所有抗性（圣骑士盾底材）");
+    }
+  }
+  if (bRule && ["rw", "base", "magic", "rare", "craft"].includes(eq.cat)) {
+    const autoSpec = getBaseAutomodSpec(bRule);
+    if (autoSpec && autoSpec.mode === "tab") {
+      const lv = Math.min(autoSpec.max || 3, Math.max(0, Math.floor(Number(eq.autoTabLvl || 0))));
+      if (lv > 0) rolledLines.push("+" + lv + " " + autoSpec.tabStatName + "（底材自带）");
+    } else if (autoSpec && autoSpec.mode === "staffmod" && Array.isArray(eq.baseStaffmods)) {
+      const clsForMod = (skClasses || []).find(c => c.id === autoSpec.classId);
+      eq.baseStaffmods.slice(0, 3).forEach(sm => {
+        if (!sm || !sm.key) return;
+        const lv = Math.min(3, Math.max(0, Math.floor(Number(sm.lvl || 0))));
+        if (lv <= 0) return;
+        const skObj = clsForMod && Array.isArray(clsForMod.skills) ? clsForMod.skills.find(s => s.key === sm.key) : null;
+        if (skObj) rolledLines.push("+" + lv + " " + skObj.nameZh + "（底材自带）");
+      });
     }
   }
   const sockLines = [];
@@ -2921,6 +3066,9 @@ function accumulateStatsFromLine(line, tot, actorLvl, itemSeen, ctx) {
         { key: "Berserk", re: /\+(\d+)\s*(?:狂战士|狂暴)/, charge: false },
         { key: "Vengeance", re: /\+(\d+)\s*复仇/, charge: false },
         { key: "Teleport", re: /\+(\d+)\s*(?:传送术|传送)/, charge: false },
+        { key: "Battle Command", re: /\+(\d+)\s*战斗指挥/, charge: false },
+        { key: "Battle Orders", re: /\+(\d+)\s*战斗体制/, charge: false },
+        { key: "Battle Cry", re: /\+(\d+)\s*战嚎/, charge: false },
         { key: "Werebear", re: /\+(\d+)\s*变熊/, charge: false },
         { key: "Werewolf", re: /\+(\d+)\s*狼人变化/, charge: false },
         { key: "Lycanthropy", re: /\+(\d+)\s*变形术/, charge: false },
@@ -3336,6 +3484,9 @@ function aggregateLoadoutStats(loadout, isChar, actorLvl, bagItems, extraOpts) {
         if (b.maxDef > 0) {
           tot.totalArmorDef += computeArmorPieceDefense(b, eq, itemOwnDefEd, itemAcc.defEd, itemAcc.flatDef);
         }
+        if (itemAcc.defEd > 0) {
+          tot.itemDefEd = (tot.itemDefEd || 0) + itemAcc.defEd;
+        }
         if (slotId === "offhand" && b.block > 0) {
           tot.shieldBlock = b.block;
           tot.shieldSmiteMin = b.minDmg || 0;
@@ -3541,12 +3692,12 @@ function buildPaperdollHoverTooltipHtml(target, slotOrUid) {
       qualityClass: qCls,
       html:
         '<div class="pd-tt-head">' +
-          '<img class="pd-tt-ico" src="' + escapeHtml(def.icon) + '" alt="" />' +
+          '<img class="pd-tt-ico" src="' + escapeHtml(getBagCharmIcon(bagItem, def)) + '" alt="" />' +
           '<div><div class="pd-tt-title" style="color:' + tCol + '">' + escapeHtml(def.nameZh) + '</div>' +
           '<div class="pd-tt-sub">' + escapeHtml(def.nameEn) + ' · 占格 ' + def.w + '×' + def.h + escapeHtml(tabNote) + '</div></div>' +
         '</div>' +
         statsHtml +
-        '<div class="pd-tt-foot">点击可在右侧微调变量 / 自选词缀 / 复制或移出</div>'
+        '<div class="pd-tt-foot">点击可在右侧微调变量 / 自选词缀 / 复制或移出' + (canCycleBagCharmSkin(def) ? ' · 左上角 ↻ 可换图案' : '') + '</div>'
     };
   }
 
@@ -3685,12 +3836,33 @@ function renderPaperdollSlotGrid(containerId, target, slotsDef, loadout) {
     }
     const areaStyle = s.area ? ("grid-area:" + s.area + ";") : (s.gridSpan ? ("grid-column:span " + s.gridSpan + ";") : "");
 
+    const unequipBtnHtml = (eq && !isLocked)
+      ? '<button type="button" class="pd-slot-unequip-btn" data-pd-unequip-target="' + target + '" data-pd-unequip-slot="' + s.id + '" title="直接卸下该装备（也可右键单击）" aria-label="卸下 ' + escapeHtml(s.label) + '">×</button>'
+      : '';
+
     return '<div class="' + classes.join(" ") + '" data-pd-target="' + target + '" data-pd-slot="' + s.id + '" style="' + areaStyle + 'background-image:url(' + s.bg + ')">' +
+      unequipBtnHtml +
       '<div class="pd-slot-label"><span>' + escapeHtml(s.label) + '</span>' + sockBadge + '</div>' +
       (info && info.icon ? '<img class="pd-slot-img" src="' + escapeHtml(info.icon) + '" alt="" />' : '<div style="height:34px"></div>') +
       '<div class="pd-slot-name">' + escapeHtml(isLocked ? "副手已锁定" : (info ? ((eq.eth ? "[无形] " : "") + info.titleZh) : "点击配装")) + '</div>' +
     '</div>';
   }).join("");
+
+  const unequipSlotDirect = (t, sid) => {
+    if (t === "merc" && !isMercEnabled()) return;
+    const ld = t === "char" ? pdCharLoadout : pdMercLoadout;
+    if (!ld || !ld[sid]) return;
+    hidePdTooltip();
+    delete ld[sid];
+    renderPaperdollAll();
+  };
+
+  grid.querySelectorAll("[data-pd-unequip-slot]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      unequipSlotDirect(btn.dataset.pdUnequipTarget, btn.dataset.pdUnequipSlot);
+    });
+  });
 
   grid.querySelectorAll("[data-pd-slot]").forEach(el => {
     el.addEventListener("mouseenter", (e) => {
@@ -3703,6 +3875,13 @@ function renderPaperdollSlotGrid(containerId, target, slotsDef, loadout) {
       if (tt && tt.style.display === "block") positionPdTooltip(tt, e);
     });
     el.addEventListener("mouseleave", hidePdTooltip);
+    el.addEventListener("contextmenu", (e) => {
+      const ld = el.dataset.pdTarget === "char" ? pdCharLoadout : pdMercLoadout;
+      if (ld && ld[el.dataset.pdSlot]) {
+        e.preventDefault();
+        unequipSlotDirect(el.dataset.pdTarget, el.dataset.pdSlot);
+      }
+    });
     el.addEventListener("click", () => {
       if (el.dataset.pdTarget === "merc" && !isMercEnabled()) return;
       hidePdTooltip();
@@ -3723,6 +3902,41 @@ function renderPaperdollSlotGrid(containerId, target, slotsDef, loadout) {
       renderPaperdollAll();
     });
   });
+}
+
+function canCycleBagCharmSkin(def) {
+  if (!def) return false;
+  if (def.cat === "util" || def.id === "anni" || def.id === "torch") return false;
+  return def.size === "SC" || def.size === "LC" || def.size === "GC";
+}
+
+function getBagCharmSkinIndex(item, def) {
+  if (item && Number(item.skin) >= 1 && Number(item.skin) <= 3) return Number(item.skin);
+  const ico = String((def && def.icon) || "");
+  const m = ico.match(/charm_(?:small|medium|large)([1-3])\.webp$/);
+  return m ? Number(m[1]) : 1;
+}
+
+function getBagCharmIcon(item, def) {
+  if (!def) return "";
+  if (!canCycleBagCharmSkin(def)) return def.icon || "";
+  const skin = getBagCharmSkinIndex(item, def);
+  const sizeKey = def.size === "SC" ? "small" : def.size === "LC" ? "medium" : "large";
+  return "/images/items/misc/charm/charm_" + sizeKey + skin + ".webp";
+}
+
+function cycleBagCharmSkinByUid(uid) {
+  if (!uid) return false;
+  const target = pdCharBag.find(x => x.uid === uid);
+  if (!target) return false;
+  const def = getBagCharmDef(target.charmId);
+  if (!canCycleBagCharmSkin(def)) return false;
+  const cur = getBagCharmSkinIndex(target, def);
+  target.skin = (cur % 3) + 1;
+  renderInventoryBag();
+  renderActiveItemPreview();
+  if (pdStateLoadedForClass === skActiveClassId) savePaperdollState(skActiveClassId);
+  return true;
 }
 
 function removeBagItemByUid(uid, opts) {
@@ -3772,13 +3986,25 @@ function renderInventoryBag() {
       const tab = clsObj.tabs.find(t => t.page === p.item.tabPage) || clsObj.tabs[0];
       if (tab) tag = "+" + tab.zhCN.slice(0, 2);
     }
+    const skinBtnHtml = canCycleBagCharmSkin(p.def)
+      ? '<button type="button" class="pd-inv-skin-btn" data-bag-skin-uid="' + escapeHtml(p.item.uid) + '" title="切换咒符图案（样式 ' + getBagCharmSkinIndex(p.item, p.def) + '/3）" aria-label="切换 ' + escapeHtml(p.def.nameZh || tag) + ' 图案">↻</button>'
+      : '';
     html += '<div class="' + cls.join(" ") + '" data-bag-uid="' + escapeHtml(p.item.uid) + '" style="grid-column:' + (p.x + 1) + ' / span ' + p.w + ';grid-row:' + (p.y + 1) + ' / span ' + p.h + '">' +
+      skinBtnHtml +
       '<button type="button" class="pd-inv-remove-btn" data-bag-remove-uid="' + escapeHtml(p.item.uid) + '" title="移出背包（也可直接右键单击）" aria-label="移出 ' + escapeHtml(p.def.nameZh || tag) + '">×</button>' +
-      '<img src="' + escapeHtml(p.def.icon) + '" alt="" />' +
+      '<img src="' + escapeHtml(getBagCharmIcon(p.item, p.def)) + '" alt="" />' +
       '<span class="pd-inv-item-tag">' + escapeHtml(tag) + '</span>' +
     '</div>';
   }
   grid.innerHTML = html;
+
+  grid.querySelectorAll("[data-bag-skin-uid]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      hidePdTooltip();
+      cycleBagCharmSkinByUid(btn.dataset.bagSkinUid);
+    });
+  });
 
   grid.querySelectorAll("[data-bag-remove-uid]").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -3965,7 +4191,7 @@ function renderActiveItemPreview() {
     prevEl.innerHTML =
       '<div class="it-set-bonus-box" style="margin-top:4px">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
-          '<img src="' + escapeHtml(def.icon) + '" alt="" style="width:30px;height:30px;object-fit:contain">' +
+          '<img src="' + escapeHtml(getBagCharmIcon(bagItem, def)) + '" alt="" style="width:30px;height:30px;object-fit:contain">' +
           '<div><strong style="color:' + (def.cat === "unique" ? "#ffd573" : "#7cb6ff") + '">' + escapeHtml(def.nameZh) + '</strong>' +
           '<div style="font-size:11px;color:var(--muted)">' + escapeHtml(def.nameEn) + ' · 占格 ' + def.w + '×' + def.h + escapeHtml(tabNote) + '</div></div>' +
         '</div>' +
@@ -4732,9 +4958,17 @@ function renderSlotEditor() {
   const curEq = loadout[pdActiveSlot] || null;
   if (ethCb) ethCb.checked = Boolean(curEq && curEq.eth);
 
-  const allLegalBases = Object.values(pdData.baseRules || {}).filter(b =>
-    isBaseRuleLegalForTargetSlot(pdActiveTarget, pdActiveSlot, b)
-  );
+  const allLegalBases = Object.values(pdData.baseRules || {})
+    .filter(b => isBaseRuleLegalForTargetSlot(pdActiveTarget, pdActiveSlot, b))
+    .sort((a, b) => {
+      const ta = getBaseTierMeta(a).rank;
+      const tb = getBaseTierMeta(b).rank;
+      if (tb !== ta) return tb - ta;
+      const ca = a.classOnly ? 1 : 0;
+      const cb = b.classOnly ? 1 : 0;
+      if (cb !== ca) return cb - ca;
+      return (Number(b.reqLvl || 0) - Number(a.reqLvl || 0)) || String(a.nameZh || "").localeCompare(String(b.nameZh || ""));
+    });
   const legalSocketBases = allLegalBases.filter(b => b.maxSockets > 0);
   const matchTokens = (text, q) => {
     const hay = String(text || "").toLowerCase();
@@ -4789,13 +5023,15 @@ function renderSlotEditor() {
       const clsBlkFactor = (pdData && pdData.charBaseStats && pdData.charBaseStats[skActiveClassId] && pdData.charBaseStats[skActiveClassId].blockFactor) || 25;
       const baseItems = legalSocketBases.map(b => {
         const blkInfo = b.block > 0 ? (" · 格挡 " + (b.block + clsBlkFactor) + "%") : "";
+        const tm = getBaseTierMeta(b);
+        const shortType = (PD_BASE_TYPE_LABELS[b.type] || "").split(" ")[0] || "";
         return {
           value: b.code,
           title: b.nameZh,
-          displayLabel: b.nameZh + " (" + b.maxSockets + "孔 · 需力" + b.reqStr + blkInfo + ")",
-          sub: b.nameEn + " · 最多 " + b.maxSockets + "孔 · 需力 " + b.reqStr + blkInfo + (b.type === "ashd" ? " · 圣骑士专属" : ""),
-          tag: b.maxSockets + "孔",
-          searchText: getBaseSearchText(b) + " " + b.maxSockets + "孔 " + b.reqStr + (b.type === "ashd" ? " 圣骑士盾" : "")
+          displayLabel: "[" + tm.label + "] " + b.nameZh + " (" + b.maxSockets + "孔 · 需力" + b.reqStr + blkInfo + ")",
+          sub: tm.label + (shortType ? (" · " + shortType) : "") + " · " + b.nameEn + " · 最多 " + b.maxSockets + "孔 · 需力 " + b.reqStr + blkInfo,
+          tag: tm.label + "·" + b.maxSockets + "孔",
+          searchText: getBaseSearchText(b) + " " + b.maxSockets + "孔 " + b.reqStr
         };
       });
       const activeBaseItem = baseItems.find(x => x.value === curBaseCode);
@@ -4958,32 +5194,40 @@ function renderSlotEditor() {
         }
         comboPlaceholder = "点击放入空白" + qLabel + "戒指（放入后自选词缀）";
       } else {
-        comboItems = allLegalBases.map(b => ({
-          value: b.code,
-          cat: pdActiveCat,
-          title: b.nameZh,
-          displayLabel: b.nameZh + " (" + b.nameEn + (b.maxSockets > 0 ? (" · 最多" + b.maxSockets + "孔") : "") + ")",
-          sub: b.nameEn + (b.maxSockets > 0 ? (" · 最多 " + b.maxSockets + "孔") : "") + " · 需力 " + b.reqStr,
-          tag: b.maxSockets > 0 ? (b.maxSockets + "孔") : "",
-          searchText: getBaseSearchText(b) + " " + b.reqStr
-        }));
+        comboItems = allLegalBases.map(b => {
+          const tm = getBaseTierMeta(b);
+          const shortType = (PD_BASE_TYPE_LABELS[b.type] || "").split(" ")[0] || "";
+          return {
+            value: b.code,
+            cat: pdActiveCat,
+            title: b.nameZh,
+            displayLabel: "[" + tm.label + "] " + b.nameZh + " (" + b.nameEn + (b.maxSockets > 0 ? (" · 最多" + b.maxSockets + "孔") : "") + ")",
+            sub: tm.label + (shortType ? (" · " + shortType) : "") + " · " + b.nameEn + (b.maxSockets > 0 ? (" · 最多 " + b.maxSockets + "孔") : "") + " · 需力 " + b.reqStr,
+            tag: tm.label + (b.maxSockets > 0 ? ("·" + b.maxSockets + "孔") : ""),
+            searchText: getBaseSearchText(b) + " " + b.reqStr
+          };
+        });
         if (curEq && curEq.cat === pdActiveCat) {
           selectedVal = curEq.baseCode || curEq.id;
           const hit = comboItems.find(x => x.value === selectedVal);
           selectedLabel = hit ? hit.displayLabel : "";
         }
-        comboPlaceholder = "输入搜" + qLabel + "底材，或点击下拉选择 (" + comboItems.length + " 种)...";
+        comboPlaceholder = "输入搜" + qLabel + "底材（支持搜 精华/弓/亚马逊/大院长...），或下拉浏览 (" + comboItems.length + " 种)...";
       }
     } else if (pdActiveCat === "base") {
-      comboItems = legalSocketBases.map(b => ({
-        value: b.code,
-        cat: "base",
-        title: b.nameZh,
-        displayLabel: b.nameZh + " (" + b.nameEn + " · 最大 " + b.maxSockets + "孔)",
-        sub: b.nameEn + " · 最大 " + b.maxSockets + "孔 · 需力 " + b.reqStr,
-        tag: b.maxSockets + "孔",
-        searchText: getBaseSearchText(b) + " " + b.maxSockets + "孔 " + b.reqStr
-      }));
+      comboItems = legalSocketBases.map(b => {
+        const tm = getBaseTierMeta(b);
+        const shortType = (PD_BASE_TYPE_LABELS[b.type] || "").split(" ")[0] || "";
+        return {
+          value: b.code,
+          cat: "base",
+          title: b.nameZh,
+          displayLabel: "[" + tm.label + "] " + b.nameZh + " (" + b.nameEn + " · 最大 " + b.maxSockets + "孔)",
+          sub: tm.label + (shortType ? (" · " + shortType) : "") + " · " + b.nameEn + " · 最大 " + b.maxSockets + "孔 · 需力 " + b.reqStr,
+          tag: tm.label + "·" + b.maxSockets + "孔",
+          searchText: getBaseSearchText(b) + " " + b.maxSockets + "孔 " + b.reqStr
+        };
+      });
       if (curEq && curEq.cat === "base") {
         selectedVal = curEq.baseCode || curEq.id;
         const hit = comboItems.find(x => x.value === selectedVal);
@@ -5016,6 +5260,15 @@ function renderSlotEditor() {
     supRow.style.display = canSup ? "flex" : "none";
     if (canSup) {
       const isWeap = info.bRule.slot === "weapon";
+      const supTitle = document.getElementById("pd-sup-title");
+      if (supTitle) {
+        const isBow = info.bRule.type === "bow" || info.bRule.type === "abow" || info.bRule.type === "xbow";
+        supTitle.textContent = isBow
+          ? "✨ 超强弓弩底材 (Superior · 强化伤害/准确率)："
+          : isWeap
+            ? "✨ 超强武器底材 (Superior · 强化伤害/准确率)："
+            : "✨ 超强防具/盾牌底材 (Superior · 强化防御)：";
+      }
       const edWrap = document.getElementById("pd-sup-ed-wrap");
       const arWrap = document.getElementById("pd-sup-ar-wrap");
       const defWrap = document.getElementById("pd-sup-def-wrap");
@@ -5052,6 +5305,65 @@ function renderSlotEditor() {
       if (arInp && document.activeElement !== arInp) arInp.value = String(Math.min(121, Math.max(0, Math.floor(Number(curEq.palAr || 0)))));
       const blkHint = document.getElementById("pd-pal-block-hint");
       if (blkHint) blkHint.textContent = "底材格挡 " + (info.itemDisplayBlock || (info.bRule.block + 30)) + "% · 盾击 " + (info.bRule.minDmg || 0) + "–" + (info.bRule.maxDmg || 0);
+    }
+  }
+  const autoRow = document.getElementById("pd-base-automod-row");
+  if (autoRow) {
+    const autoSpec = (curEq && info && info.bRule && ["rw", "base", "magic", "rare", "craft"].includes(curEq.cat))
+      ? getBaseAutomodSpec(info.bRule)
+      : null;
+    autoRow.style.display = autoSpec ? "flex" : "none";
+    if (autoSpec) {
+      const legEl = document.getElementById("pd-base-automod-legend");
+      if (legEl) legEl.textContent = autoSpec.legend;
+      const tabWrap = document.getElementById("pd-base-automod-tab-wrap");
+      const smWrap = document.getElementById("pd-base-staffmod-wrap");
+      if (autoSpec.mode === "tab") {
+        if (tabWrap) tabWrap.style.display = "flex";
+        if (smWrap) smWrap.style.display = "none";
+        const lblEl = document.getElementById("pd-base-auto-tab-label");
+        if (lblEl) lblEl.textContent = autoSpec.tabLabel;
+        const inpEl = document.getElementById("pd-base-auto-tab-lvl");
+        if (inpEl && document.activeElement !== inpEl) {
+          inpEl.value = String(Math.min(autoSpec.max || 3, Math.max(0, Math.floor(Number(curEq.autoTabLvl || 0)))));
+        }
+      } else if (autoSpec.mode === "staffmod") {
+        if (tabWrap) tabWrap.style.display = "none";
+        if (smWrap) {
+          smWrap.style.display = "flex";
+          const clsForMod = (skClasses || []).find(c => c.id === autoSpec.classId);
+          const skillsList = (clsForMod && Array.isArray(clsForMod.skills)) ? clsForMod.skills : [];
+          const curMods = Array.isArray(curEq.baseStaffmods) ? curEq.baseStaffmods : [];
+          let smHtml = "";
+          for (let i = 0; i < 3; i++) {
+            const entry = curMods[i] || { key: "", lvl: 3 };
+            const optsHtml = '<option value="">-- 原生技能位 #' + (i + 1) + '（空）--</option>' +
+              skillsList.map(sk => '<option value="' + escapeHtml(sk.key) + '"' + (sk.key === entry.key ? ' selected' : '') + '>' + escapeHtml(sk.nameZh) + ' (' + escapeHtml(sk.key) + ')</option>').join("");
+            smHtml += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
+              '<select class="sim-select" data-pd-sm-key="' + i + '" style="flex:1;min-width:150px;height:26px;font-size:11.5px">' + optsHtml + '</select>' +
+              '<select class="sim-select" data-pd-sm-lvl="' + i + '" style="width:66px;height:26px;font-size:11.5px">' +
+                '<option value="3"' + (Number(entry.lvl || 3) === 3 ? ' selected' : '') + '>+3 级</option>' +
+                '<option value="2"' + (Number(entry.lvl) === 2 ? ' selected' : '') + '>+2 级</option>' +
+                '<option value="1"' + (Number(entry.lvl) === 1 ? ' selected' : '') + '>+1 级</option>' +
+              '</select>' +
+            '</div>';
+          }
+          smWrap.innerHTML = smHtml;
+          const commitSm = () => {
+            const next = [];
+            for (let i = 0; i < 3; i++) {
+              const kEl = smWrap.querySelector('[data-pd-sm-key="' + i + '"]');
+              const lEl = smWrap.querySelector('[data-pd-sm-lvl="' + i + '"]');
+              if (kEl && kEl.value) {
+                next.push({ key: kEl.value, lvl: Math.min(3, Math.max(1, Number((lEl && lEl.value) || 3))) });
+              }
+            }
+            curEq.baseStaffmods = next;
+            renderPaperdollAll();
+          };
+          smWrap.querySelectorAll("select").forEach(sel => sel.addEventListener("change", commitSm));
+        }
+      }
     }
   }
   if (!info) {
@@ -5946,7 +6258,7 @@ function capturePaperdollCompareBaseline() {
     metrics: { ...pdLatestCompareMetrics },
     snapshot: {
       charLoadout: clone(pdCharLoadout),
-      swapLoadout: clone(pdSwapLoadout),
+      swapLoadout: clone(pdCharSwapLoadout),
       activeWeaponSet: pdActiveWeaponSet,
       mercLoadout: clone(pdMercLoadout),
       charBag: clone(pdCharBag),
@@ -5970,7 +6282,7 @@ function restorePaperdollCompareBaseline() {
   const s = pdCompareBaseline.snapshot;
   const clone = (v, fb) => { try { return JSON.parse(JSON.stringify(v)); } catch (e) { return fb; } };
   if (s.charLoadout) pdCharLoadout = clone(s.charLoadout, pdCharLoadout);
-  if (s.swapLoadout) pdSwapLoadout = clone(s.swapLoadout, pdSwapLoadout);
+  if (s.swapLoadout) pdCharSwapLoadout = clone(s.swapLoadout, pdCharSwapLoadout);
   pdActiveWeaponSet = s.activeWeaponSet === 2 ? 2 : 1;
   if (s.mercLoadout) pdMercLoadout = clone(s.mercLoadout, pdMercLoadout);
   if (Array.isArray(s.charBag)) pdCharBag = clone(s.charBag, pdCharBag);
@@ -6685,7 +6997,10 @@ function renderPaperdollLiveStats() {
   });
   const syncBtn = document.getElementById("pd-sync-skills-btn");
   if (syncBtn) {
-    syncBtn.textContent = "同步技能至技能树 (全+" + totalAllPlusClass + (extraSkillParts.length ? (" · " + extraSkillParts.join("/")) : "") + ")";
+    syncBtn.textContent = (pdAutoSyncSkills ? "✓ 自动已同步 (全+" : "手动同步 +技能 (全+") + totalAllPlusClass + (extraSkillParts.length ? (" · " + extraSkillParts.join("/")) : "") + ")";
+  }
+  if (pdAutoSyncSkills) {
+    applyPaperdollSkillsToTree(true);
   }
 
   // Render Selected Skill Attack Power Card
@@ -6718,6 +7033,14 @@ function renderPaperdollLiveStats() {
     resL: Math.min(maxL, rawLRes),
     resP: Math.min(maxP, rawPRes),
     allSkillBonus: totalAllPlusClass,
+    skillBonuses: {
+      all: totalAllPlusClass,
+      gearAll: charTot.skills + (charTot.classSkills || 0),
+      cta: ctaSkillBonus,
+      byTab: { 1: charTot.tabSkills[1] || 0, 2: charTot.tabSkills[2] || 0, 3: charTot.tabSkills[3] || 0 },
+      bySkill: Object.assign({}, charTot.singleSkills || {}),
+      fire: charTot.fireSkills || 0
+    },
     totalStr,
     totalDex,
     totalVit,
@@ -7305,6 +7628,18 @@ async function initMercenarySimulator() {
       el.addEventListener("input", syncPal);
       el.addEventListener("change", syncPal);
     });
+    const autoTabInp = document.getElementById("pd-base-auto-tab-lvl");
+    if (autoTabInp) {
+      const syncAutoTab = () => {
+        const loadout = pdActiveTarget === "char" ? pdCharLoadout : pdMercLoadout;
+        const cur = loadout[pdActiveSlot];
+        if (!cur) return;
+        cur.autoTabLvl = Math.min(3, Math.max(0, Math.floor(Number(autoTabInp.value || 0))));
+        renderPaperdollAll();
+      };
+      autoTabInp.addEventListener("input", syncAutoTab);
+      autoTabInp.addEventListener("change", syncAutoTab);
+    }
 
     const unequipBtn = document.getElementById("pd-unequip-btn");
     if (unequipBtn) {
@@ -7338,18 +7673,23 @@ async function initMercenarySimulator() {
       });
     }
 
+    const autoSyncCb = document.getElementById("pd-auto-sync-skills");
+    if (autoSyncCb) {
+      autoSyncCb.checked = pdAutoSyncSkills;
+      autoSyncCb.addEventListener("change", () => {
+        pdAutoSyncSkills = Boolean(autoSyncCb.checked);
+        try { localStorage.setItem(PD_AUTO_SYNC_KEY, pdAutoSyncSkills ? "1" : "0"); } catch (e) {}
+        if (pdAutoSyncSkills) {
+          applyPaperdollSkillsToTree(true);
+        }
+        renderPaperdollLiveStats();
+      });
+    }
+
     const syncSkillsBtn = document.getElementById("pd-sync-skills-btn");
     if (syncSkillsBtn) {
       syncSkillsBtn.addEventListener("click", () => {
-        skBonusAll = Math.min(35, Math.max(0, pdLastSyncPayload.all || 0));
-        skBonusByTab = Object.assign({ 1: 0, 2: 0, 3: 0 }, pdLastSyncPayload.byTab || {});
-        skBonusBySkill = Object.assign({}, pdLastSyncPayload.bySkill || {});
-        skBonusFire = pdLastSyncPayload.fire || 0;
-        skBonusClassId = skActiveClassId;
-        const bonusInp = document.getElementById("sk-bonus-all");
-        if (bonusInp) bonusInp.value = String(skBonusAll);
-        renderSkillsTrees();
-        renderSkillInspector();
+        applyPaperdollSkillsToTree(false);
         const orig = syncSkillsBtn.textContent;
         syncSkillsBtn.textContent = "✓ 已同步全/分系/单技能至技能树";
         setTimeout(() => { syncSkillsBtn.textContent = orig; }, 1800);
@@ -7996,9 +8336,361 @@ function setupD2sImportUi() {
     if (!dlg.open) dlg.showModal();
   };
 
+const OSKILL_NAME_TO_ID = {
+  Teleport: 54,
+  "Battle Cry": 146,
+  "Battle Orders": 149,
+  "Battle Command": 155,
+  Lycanthropy: 224,
+  Werebear: 228
+};
+
+function convertTotToD2sStats(tot, classCode, isWeapon, mod) {
+  if (!tot) return [];
+  const out = [];
+  const push = (id, val, param) => {
+    const v = Math.round(Number(val) || 0);
+    if (v === 0) return;
+    out.push(param !== undefined ? { id, param, val: v } : { id, val: v });
+  };
+  const oskillMap = (mod && mod.D2S_OSKILL_IDS) || OSKILL_NAME_TO_ID;
+  const auraMap = (mod && mod.D2S_AURA_SKILL_IDS) || {};
+
+  if (tot.skills > 0) push(127, Math.min(7, tot.skills));
+  if (tot.classSkills > 0) push(83, Math.min(7, tot.classSkills), classCode);
+  if (tot.fireSkills > 0) push(126, Math.min(7, tot.fireSkills), 1);
+  if (tot.tabSkills) {
+    for (const tabIdx of [1, 2, 3]) {
+      const pts = Number(tot.tabSkills[tabIdx] || 0);
+      if (pts > 0) push(188, Math.min(7, pts), ((classCode & 7) << 3) | ((tabIdx - 1) & 7));
+    }
+  }
+  if (tot.oskills) {
+    for (const [skName, skVal] of Object.entries(tot.oskills)) {
+      const skLvl = (skVal && typeof skVal === "object")
+        ? (skVal.isCharge ? 0 : Number(skVal.baseLvl || 0))
+        : Number(skVal || 0);
+      const skId = oskillMap[skName] || OSKILL_NAME_TO_ID[skName];
+      if (skId && skLvl > 0) push(97, Math.min(63, skLvl), skId);
+    }
+  }
+  if (Array.isArray(tot.auras)) {
+    for (const a of tot.auras) {
+      if (!a || !a.name || !(a.lvl > 0)) continue;
+      const aId = auraMap[a.name];
+      if (aId !== undefined) push(151, Math.min(31, a.lvl), aId);
+    }
+  }
+  push(105, tot.fcr);
+  push(93, tot.ias);
+  push(99, tot.fhr);
+  push(102, tot.fbr);
+  push(96, tot.frw);
+  push(20, tot.blockPct);
+  push(0, tot.str);
+  push(1, tot.enr);
+  push(2, tot.dex);
+  push(3, tot.vit);
+  push(7, (tot.flatHp || 0) + (tot.nonBoHp || 0));
+  push(76, tot.hpPct);
+  push(9, (tot.flatMana || 0) + (tot.nonBoMana || 0));
+  push(77, tot.manaPct);
+  push(39, tot.fRes);
+  push(41, tot.lRes);
+  push(43, tot.cRes);
+  push(45, tot.pRes);
+  if ((tot.maxFRes || 75) > 75) push(40, tot.maxFRes - 75);
+  if ((tot.maxLRes || 75) > 75) push(42, tot.maxLRes - 75);
+  if ((tot.maxCRes || 75) > 75) push(44, tot.maxCRes - 75);
+  if ((tot.maxPRes || 75) > 75) push(46, tot.maxPRes - 75);
+  push(80, tot.mf);
+  push(79, tot.eg);
+  push(85, tot.expPct);
+  push(36, tot.drPct);
+  push(34, tot.pdr);
+  push(35, tot.mdr);
+  if (tot.cbf) push(153, 1);
+  if (tot.itd) push(115, 1);
+  push(116, tot.targetDefPct);
+  push(19, tot.flatAr);
+  push(119, tot.arPct);
+  push(136, tot.cb);
+  push(141, tot.ds);
+  push(135, tot.ow);
+  push(60, tot.ll);
+  push(62, tot.ml);
+  push(86, tot.laek);
+  push(138, tot.maek);
+  if (isWeapon && tot.mainWeapEd > 0) push(17, tot.mainWeapEd);
+  if (!isWeapon && tot.itemDefEd > 0) push(16, tot.itemDefEd);
+  if (isWeapon && tot.flatDmg > 0) push(111, tot.flatDmg);
+  push(21, tot.flatMinDmg);
+  push(22, tot.flatMaxDmg);
+  push(31, (tot.flatDef || 0) + (tot.extraFlatDef || 0));
+  if (tot.sunders && tot.sunders.size > 0) {
+    if (tot.sunders.has("cold")) push(187, 300);
+    if (tot.sunders.has("fire")) push(189, 300);
+    if (tot.sunders.has("ltng")) push(190, 300);
+    if (tot.sunders.has("pois")) push(191, 300);
+    if (tot.sunders.has("phys")) push(192, 300);
+    if (tot.sunders.has("mag")) {
+      push(193, 300);
+      push(37, -45);
+    }
+  }
+  if (tot.eleDmg) {
+    push(329, tot.eleDmg.fire);
+    push(330, tot.eleDmg.ltng);
+    push(331, tot.eleDmg.cold);
+    push(332, tot.eleDmg.pois);
+    push(357, tot.eleDmg.mag);
+  }
+  if (tot.elePierce) {
+    push(333, tot.elePierce.fire);
+    push(334, tot.elePierce.ltng);
+    push(335, tot.elePierce.cold);
+    push(336, tot.elePierce.pois);
+    push(358, tot.elePierce.mag);
+  }
+  return out;
+}
+
+const D2S_JEWEL_SOCKET_SPECS = {
+  "jw-55-ltng": { code: "jew", simple: false, quality: 7, uniqueId: 392, ilvl: 85, stats: [{ id: 330, val: 5 }, { id: 334, val: 5 }] },
+  "jw-55-cold": { code: "jew", simple: false, quality: 7, uniqueId: 393, ilvl: 85, stats: [{ id: 331, val: 5 }, { id: 335, val: 5 }] },
+  "jw-55-fire": { code: "jew", simple: false, quality: 7, uniqueId: 394, ilvl: 85, stats: [{ id: 329, val: 5 }, { id: 333, val: 5 }] },
+  "jw-55-pois": { code: "jew", simple: false, quality: 7, uniqueId: 395, ilvl: 85, stats: [{ id: 332, val: 5 }, { id: 336, val: 5 }] },
+  "jw-34-pois": { code: "cjw", simple: false, quality: 7, uniqueId: 420, ilvl: 85, stats: [{ id: 332, val: 10 }, { id: 336, val: 10 }, { id: 85, val: 5 }, { id: 80, val: 35 }, { id: 79, val: 50 }] },
+  "jw-34-ltng": { code: "cjw", simple: false, quality: 7, uniqueId: 421, ilvl: 85, stats: [{ id: 330, val: 10 }, { id: 334, val: 10 }, { id: 85, val: 5 }, { id: 80, val: 35 }, { id: 79, val: 50 }] },
+  "jw-34-cold": { code: "cjw", simple: false, quality: 7, uniqueId: 422, ilvl: 85, stats: [{ id: 331, val: 10 }, { id: 335, val: 10 }, { id: 85, val: 5 }, { id: 80, val: 35 }, { id: 79, val: 50 }] },
+  "jw-34-fire": { code: "cjw", simple: false, quality: 7, uniqueId: 423, ilvl: 85, stats: [{ id: 329, val: 10 }, { id: 333, val: 10 }, { id: 85, val: 5 }, { id: 80, val: 35 }, { id: 79, val: 50 }] },
+  "jw-34-phys": { code: "cjw", simple: false, quality: 7, uniqueId: 424, ilvl: 85, stats: [{ id: 17, val: 50 }, { id: 85, val: 5 }, { id: 80, val: 35 }, { id: 79, val: 50 }] },
+  "jw-34-mag": { code: "cjw", simple: false, quality: 7, uniqueId: 425, ilvl: 85, stats: [{ id: 85, val: 5 }, { id: 80, val: 35 }, { id: 79, val: 50 }] },
+  "jw-40-15": { code: "jew", simple: false, quality: 4, ilvl: 85, stats: [{ id: 17, val: 40 }, { id: 93, val: 15 }] },
+  "jw-15-30fr": { code: "jew", simple: false, quality: 4, ilvl: 85, stats: [{ id: 39, val: 30 }, { id: 93, val: 15 }] },
+  "jw-15-15ar": { code: "jew", simple: false, quality: 4, ilvl: 85, stats: [{ id: 39, val: 15 }, { id: 41, val: 15 }, { id: 43, val: 15 }, { id: 45, val: 15 }, { id: 93, val: 15 }] },
+  "jw-15-3ek": { code: "jew", simple: false, quality: 4, ilvl: 85, stats: [{ id: 93, val: 15 }, { id: 138, val: 3 }] },
+  "jw-7fhr-rare": { code: "jew", simple: false, quality: 4, ilvl: 85, stats: [{ id: 0, val: 9 }, { id: 2, val: 9 }, { id: 39, val: 10 }, { id: 41, val: 10 }, { id: 43, val: 10 }, { id: 45, val: 10 }, { id: 99, val: 7 }] }
+};
+
+function buildSocketItemsFromIds(sockIds) {
+  if (!Array.isArray(sockIds) || sockIds.length === 0) return [];
+  const out = [];
+  for (const rawId of sockIds) {
+    const sid = String(rawId || "").trim().toLowerCase();
+    if (!sid) continue;
+    if (D2S_JEWEL_SOCKET_SPECS[sid]) {
+      const spec = D2S_JEWEL_SOCKET_SPECS[sid];
+      out.push({ ...spec, stats: spec.stats.map(s => ({ ...s })) });
+    } else if (/^(?:r\d\d|g[cfglps][vybgrw]|sk[cfulz])$/.test(sid)) {
+      out.push({ code: sid, simple: true });
+    }
+  }
+  return out.slice(0, 6);
+}
+
+function encodePaperdollSlotToD2sItem(mod, slotId, eq, equipKey, actorLvl, isChar, classCode) {
+  if (!eq) return null;
+  const info = resolveEquippedItemInfo(eq, { actorLvl, isChar });
+  if (!info) return null;
+  const bRule = info.bRule || null;
+  const code = (bRule && bRule.code) || (slotId === "amulet" ? "amu" : (slotId === "ring1" || slotId === "ring2") ? "rin" : "");
+  if (!code || code.length < 3) return null;
+
+  const isWeapon = Boolean(bRule && bRule.slot === "weapon");
+  const isArmor = Boolean(bRule && bRule.slot !== "weapon");
+  const stackable = Boolean(bRule && ["jave", "ajav", "tkni", "taxe", "tpot"].includes(bRule.type));
+  const noDur = Boolean(bRule && (["bow", "xbow", "abow"].includes(bRule.type) || code === "7cr"));
+  const maxDur = (isWeapon || isArmor) ? (noDur ? 0 : 40) : 0;
+  const defense = isArmor ? Math.max(10, Number(bRule.maxDef || bRule.minDef || 50)) : 0;
+
+  // For non-runeword socketed gear (Uniques, Sets, Rares, etc.), encode child runes/gems/jewels separately
+  // and exclude socket lines from the parent item's own stat list so D2R does not double-count socketed bonuses.
+  const socketItems = eq.cat !== "rw" ? buildSocketItemsFromIds(eq.sockets) : [];
+  const socketCount = eq.cat !== "rw" && socketItems.length > 0
+    ? Math.min(6, Math.max(socketItems.length, Array.isArray(eq.sockets) ? eq.sockets.filter(Boolean).length : 0))
+    : 0;
+  const eqForParentStats = socketItems.length > 0 ? { ...eq, sockets: [] } : eq;
+
+  const singleTot = aggregateLoadoutStats({ [slotId]: eqForParentStats }, isChar, actorLvl, []);
+  const stats = convertTotToD2sStats(singleTot, classCode, isWeapon, mod);
+  const equippedId = mod.SLOT_TO_EQUIPPED_ID[equipKey] || 0;
+  if (!equippedId) return null;
+
+  if (eq.cat === "rw") {
+    const rwObj = (typeof rwList !== "undefined" && Array.isArray(rwList)) ? rwList.find(x => x.id === eq.id) : null;
+    const rwId = typeof mod.lookupRunewordId === "function" ? mod.lookupRunewordId(eq.id) : mod.KNOWN_RUNEWORD_IDS[eq.id];
+    const runeCodes = ((rwObj && rwObj.runes) || []).map(r => mod.RUNE_NAME_TO_CODE[r]).filter(Boolean);
+    if (rwId !== undefined && runeCodes.length > 0) {
+      return {
+        code,
+        location: 1,
+        equippedId,
+        ethereal: Boolean(eq.eth),
+        quality: 2,
+        runewordId: rwId,
+        socketRuneCodes: runeCodes,
+        isArmor,
+        isWeapon,
+        stackable,
+        defense,
+        maxDur,
+        ilvl: 85,
+        runewordStats: stats
+      };
+    }
+  }
+
+  if (eq.cat === "unique") {
+    const uId = typeof mod.lookupUniqueId === "function" ? mod.lookupUniqueId(eq.id) : mod.KNOWN_UNIQUE_IDS[eq.id];
+    if (uId !== undefined) {
+      return {
+        code,
+        location: 1,
+        equippedId,
+        ethereal: Boolean(eq.eth),
+        quality: 7,
+        uniqueId: uId,
+        isArmor,
+        isWeapon,
+        stackable,
+        defense,
+        maxDur,
+        ilvl: 85,
+        socketItems,
+        socketCount,
+        stats
+      };
+    }
+  }
+
+  if (eq.cat === "set") {
+    const sId = typeof mod.lookupSetId === "function" ? mod.lookupSetId(eq.id) : (mod.KNOWN_SET_IDS && mod.KNOWN_SET_IDS[eq.id]);
+    if (sId !== undefined) {
+      return {
+        code,
+        location: 1,
+        equippedId,
+        ethereal: Boolean(eq.eth),
+        quality: 5,
+        setId: sId,
+        isArmor,
+        isWeapon,
+        stackable,
+        defense,
+        maxDur,
+        ilvl: 85,
+        socketItems,
+        socketCount,
+        stats
+      };
+    }
+  }
+
+  return {
+    code,
+    location: 1,
+    equippedId,
+    ethereal: Boolean(eq.eth),
+    quality: 4,
+    isArmor,
+    isWeapon,
+    stackable,
+    defense,
+    maxDur,
+    ilvl: 85,
+    socketItems,
+    socketCount,
+    stats
+  };
+}
+
+function buildD2sExportItems(mod, cid, charLvl) {
+  const items = [];
+  const classCode = mod.CLASS_ID_TO_CODE[cid] !== undefined ? mod.CLASS_ID_TO_CODE[cid] : 1;
+  const slotPairs = [
+    ["head", pdCharLoadout && pdCharLoadout.head, "head"],
+    ["amulet", pdCharLoadout && pdCharLoadout.amulet, "amulet"],
+    ["torso", pdCharLoadout && pdCharLoadout.torso, "torso"],
+    ["weapon", pdCharLoadout && pdCharLoadout.weapon, "weapon"],
+    ["offhand", pdCharLoadout && pdCharLoadout.offhand, "offhand"],
+    ["ring1", pdCharLoadout && pdCharLoadout.ring1, "ring1"],
+    ["ring2", pdCharLoadout && pdCharLoadout.ring2, "ring2"],
+    ["belt", pdCharLoadout && pdCharLoadout.belt, "belt"],
+    ["boots", pdCharLoadout && pdCharLoadout.boots, "boots"],
+    ["gloves", pdCharLoadout && pdCharLoadout.gloves, "gloves"],
+    ["weapon", pdCharSwapLoadout && pdCharSwapLoadout.weapon, "swapWeapon"],
+    ["offhand", pdCharSwapLoadout && pdCharSwapLoadout.offhand, "swapOffhand"]
+  ];
+
+  for (const [slotId, eq, equipKey] of slotPairs) {
+    const encoded = encodePaperdollSlotToD2sItem(mod, slotId, eq, equipKey, charLvl, true, classCode);
+    if (encoded) items.push(encoded);
+  }
+
+  // Inventory charms & Horadric Cube (10x4 grid, storePage = 1)
+  if (Array.isArray(pdCharBag) && pdCharBag.length > 0 && typeof layoutInventoryBag === "function") {
+    const layout = layoutInventoryBag(pdCharBag);
+    const charmUniqueMap = (mod && mod.D2S_CHARM_UNIQUE_IDS) || { anni: 381, torch: 400, gheed: 359 };
+    for (const p of layout.placed || []) {
+      const bItem = p.item;
+      if (!bItem) continue;
+      if (bItem.charmId === "util-cube") {
+        items.push({
+          code: "box",
+          location: 0,
+          storePage: 1,
+          x: p.x,
+          y: p.y,
+          quality: 2,
+          ilvl: 85,
+          stats: []
+        });
+        continue;
+      }
+      const charmCode = p.h === 1 ? "cm1" : (p.h === 2 ? "cm2" : "cm3");
+      const bagTot = aggregateLoadoutStats({}, true, charLvl, [bItem]);
+      const stats = convertTotToD2sStats(bagTot, classCode, false, mod);
+      const uCharmId = charmUniqueMap[bItem.charmId];
+      const quality = uCharmId !== undefined ? 7 : 4;
+      const uniqueId = uCharmId !== undefined ? uCharmId : null;
+      items.push({
+        code: charmCode,
+        location: 0,
+        storePage: 1,
+        x: p.x,
+        y: p.y,
+        quality,
+        uniqueId,
+        ilvl: 85,
+        stats
+      });
+    }
+  }
+  return items;
+}
+
+function buildD2sExportMercItems(mod, mercLvl) {
+  const items = [];
+  const mercPairs = [
+    ["head", pdMercLoadout && pdMercLoadout.head, "head"],
+    ["torso", pdMercLoadout && pdMercLoadout.torso, "torso"],
+    ["weapon", pdMercLoadout && pdMercLoadout.weapon, "weapon"],
+    ["offhand", pdMercLoadout && pdMercLoadout.offhand, "offhand"]
+  ];
+  for (const [slotId, eq, equipKey] of mercPairs) {
+    const encoded = encodePaperdollSlotToD2sItem(mod, slotId, eq, equipKey, mercLvl, false, 0);
+    if (encoded) items.push(encoded);
+  }
+  return items;
+}
+
 async function exportCurrentBuildAsD2s() {
   try {
-    const mod = await import("/assets/d2s-exporter.js");
+    if (!pdData && typeof initMercenarySimulator === "function") {
+      await initMercenarySimulator();
+    }
+    const mod = await import("/assets/d2s-exporter.js?v=7276ddeb64");
     const cid = skActiveClassId || "sor";
     const clsObj = typeof getActiveClassObj === "function" ? getActiveClassObj() : null;
     const lvlInp = document.getElementById("pd-char-lvl");
@@ -8006,23 +8698,66 @@ async function exportCurrentBuildAsD2s() {
     const baseStats = (pdData && pdData.charBaseStats && pdData.charBaseStats[cid]) || {
       str: 20, dex: 20, vit: 20, enr: 20, hp: 50, mana: 25, hpPerLvl: 2, manaPerLvl: 1.5, hpPerVit: 2, manaPerEnr: 2
     };
+    let exportStatAlloc = {
+      str: Math.max(0, Math.round(Number(pdStatAlloc && pdStatAlloc.str) || 0)),
+      dex: Math.max(0, Math.round(Number(pdStatAlloc && pdStatAlloc.dex) || 0)),
+      vit: Math.max(0, Math.round(Number(pdStatAlloc && pdStatAlloc.vit) || 0)),
+      enr: Math.max(0, Math.round(Number(pdStatAlloc && pdStatAlloc.enr) || 0))
+    };
+    const spentPts = exportStatAlloc.str + exportStatAlloc.dex + exportStatAlloc.vit + exportStatAlloc.enr;
+    if (spentPts === 0 && charLvl > 1) {
+      const budget = (charLvl - 1) * 5 + 15;
+      const autoStr = Math.min(budget, Math.max(0, 156 - (Number(baseStats.str) || 20)));
+      const autoVit = Math.max(0, budget - autoStr);
+      exportStatAlloc = { str: autoStr, dex: 0, vit: autoVit, enr: 0 };
+    }
     const mercSel = document.getElementById("merc-variant-select");
     const mercEnCb = document.getElementById("pd-merc-enabled");
-    const defaultName = "D2R_" + cid.toUpperCase() + "_" + charLvl;
-    const rawName = window.prompt("请输入要导出的单机存档角色名（2–15 位英文字母/数字/下划线，导出内容包含角色等级、裸四维、30 项技能硬点、地狱全通与全小站）：", defaultName);
-    if (rawName === null) return;
+    const dAuraEl = document.getElementById("pd-warlock-demon-aura");
+    const demonAuraVal = cid === "war" ? normalizeDemonAuraId(dAuraEl ? dAuraEl.value : "none") : "none";
+    const defaultName = "Sanctuary" + cid.charAt(0).toUpperCase() + cid.slice(1);
+    const validD2sNameRe = /^[A-Za-z](?:[A-Za-z]*[-_]?[A-Za-z]+)$/;
+    let chosenName = "";
+    let promptInput = defaultName;
+    let promptMsg = "请输入要导出的单机存档角色名（2–15 位纯英文字母，中间最多 1 个 - 或 _，暗黑2不支持中文/数字；请勿在导出后手工重命名 .d2s 文件）：";
+    while (true) {
+      const rawName = window.prompt(promptMsg, promptInput);
+      if (rawName === null) return;
+      const trimmed = String(rawName).trim();
+      if (trimmed.length >= 2 && trimmed.length <= 15 && validD2sNameRe.test(trimmed)) {
+        chosenName = trimmed;
+        break;
+      }
+      promptInput = trimmed || defaultName;
+      promptMsg = "⚠️ 「" + (trimmed || "(空)") + "」不符合暗黑 2 角色名规则！\n仅支持 2–15 位纯英文字母（中间最多 1 个 - 或 _），不支持中文、数字或空格，请重新输入：";
+    }
 
+    const exportItems = buildD2sExportItems(mod, cid, charLvl);
+    const mercLvlInp = document.getElementById("merc-lvl-input");
+    const mercLvl = Math.min(98, Math.max(1, Number(mercLvlInp ? mercLvlInp.value : charLvl) || charLvl));
+    const mercEnabled = mercEnCb ? mercEnCb.checked : true;
+    const exportMercItems = mercEnabled ? buildD2sExportMercItems(mod, mercLvl) : [];
+    let exportStashItems = [];
+    if (Array.isArray(pdCustomStashItems) && pdCustomStashItems.length > 0) {
+      const d2iMod = await import("/assets/d2i-stash.js?v=bde4bdf9fe");
+      exportStashItems = buildD2sExportStashItems(mod, d2iMod, cid, charLvl).placed;
+    }
     const result = mod.buildD2sBuffer({
-      name: rawName || defaultName,
+      name: chosenName,
       classId: cid,
       level: charLvl,
       activeWeaponSet: pdActiveWeaponSet || 1,
-      statAlloc: pdStatAlloc || { str: 0, dex: 0, vit: 0, enr: 0 },
+      statAlloc: exportStatAlloc,
       charBaseStats: baseStats,
       skills: getClassBuild(cid),
       classSkills: clsObj ? clsObj.skills : [],
-      mercEnabled: mercEnCb ? mercEnCb.checked : true,
-      mercVariant: mercSel ? mercSel.value : "a2-might"
+      mercEnabled,
+      mercVariant: mercSel ? mercSel.value : "a2-might",
+      mercLevel: mercLvl,
+      demonAura: demonAuraVal,
+      items: exportItems,
+      stashItems: exportStashItems,
+      mercItems: exportMercItems
     });
 
     const blob = new Blob([result.bytes], { type: "application/octet-stream" });
@@ -8034,7 +8769,13 @@ async function exportCurrentBuildAsD2s() {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    showAuthToast("💾 已导出单机存档 " + result.filename + "（Lv." + result.meta.level + " · 技能 " + result.meta.usedSkillPts + " 点 · 校验和已签名）");
+    const demonTag = result.meta.demonAura && result.meta.demonAura !== "none"
+      ? (" · 束缚恶魔(" + result.meta.demonAura + ")")
+      : "";
+    const itemTag = result.meta.itemCount > 0 ? (" · 角色装备与背包 " + (result.meta.itemCount - (result.meta.stashItemCount || 0)) + " 件") : "";
+    const stashTag = result.meta.stashItemCount > 0 ? (" · 个人仓库 " + result.meta.stashItemCount + " 件") : "";
+    const mercTag = result.meta.mercItemCount > 0 ? (" · 佣兵装备 " + result.meta.mercItemCount + " 件") : "";
+    showAuthToast("💾 已导出单机存档 " + result.filename + "（Lv." + result.meta.level + " · 技能 " + result.meta.usedSkillPts + " 点" + itemTag + stashTag + mercTag + demonTag + " · 校验和已签名）");
   } catch (err) {
     showAuthToast("导出 .d2s 存档失败：" + (err && err.message ? err.message : "未知错误"), true);
   }
@@ -8261,6 +9002,569 @@ async function setupMetaPresetsUi() {
 }
 
 
+const PD_CUSTOM_STASH_STORAGE_KEY = "d2r-custom-stash-v1";
+let pdCustomStashItems = (() => {
+  try {
+    const raw = localStorage.getItem(PD_CUSTOM_STASH_STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+})();
+
+function saveCustomStashItems() {
+  try {
+    localStorage.setItem(PD_CUSTOM_STASH_STORAGE_KEY, JSON.stringify(pdCustomStashItems));
+  } catch {}
+}
+
+function resolveStashSlotFromCode(code, cat, id) {
+  if (code === "amu") return "amulet";
+  if (code === "rin") return "ring1";
+  const bRule = pdData && pdData.baseRules && code ? pdData.baseRules[code] : null;
+  if (bRule && bRule.slot) return bRule.slot;
+  if (cat === "unique" && itData && Array.isArray(itData.uniqueItems)) {
+    const u = itData.uniqueItems.find(x => x.nameEn === id);
+    if (u && u.baseCode && pdData && pdData.baseRules && pdData.baseRules[u.baseCode]) {
+      return pdData.baseRules[u.baseCode].slot || "head";
+    }
+    if (u && /ring|戒指/i.test(String(u.slot || u.type || ""))) return "ring1";
+    if (u && /amulet|项链/i.test(String(u.slot || u.type || ""))) return "amulet";
+  }
+  return "head";
+}
+
+function encodeCustomStashEntryToD2sItem(mod, entry, charLvl, classCode) {
+  if (!entry) return null;
+  if (entry.cat === "stack") {
+    const clean = String(entry.code || entry.id || "").trim().toLowerCase();
+    const meta = mod && mod.D2S_ADV_STACKABLE_META && mod.D2S_ADV_STACKABLE_META[clean];
+    if (!meta) return null;
+    if (!meta.complex) {
+      return { code: clean, simple: true, location: 0, equippedId: 0, storePage: 5 };
+    }
+    return { code: clean, simple: false, quality: 2, ilvl: 85, stats: [], location: 0, equippedId: 0, storePage: 5 };
+  }
+  if (entry.cat === "base") {
+    const code = String(entry.code || entry.baseCode || "").trim().toLowerCase();
+    const bRule = pdData && pdData.baseRules ? pdData.baseRules[code] : null;
+    if (!bRule) return null;
+    const isWeapon = bRule.slot === "weapon";
+    const isArmor = !isWeapon;
+    const stackable = ["jave", "ajav", "tkni", "taxe", "tpot"].includes(bRule.type);
+    const noDur = ["bow", "xbow", "abow"].includes(bRule.type) || code === "7cr";
+    return {
+      code,
+      location: 0,
+      equippedId: 0,
+      storePage: 5,
+      ethereal: Boolean(entry.eth),
+      quality: 2,
+      isArmor,
+      isWeapon,
+      stackable,
+      defense: isArmor ? Math.max(10, Number(bRule.maxDef || bRule.minDef || 50)) : 0,
+      maxDur: noDur ? 0 : 40,
+      socketCount: Math.min(6, Math.max(0, Number(bRule.maxSockets) || 0)),
+      ilvl: 85,
+      stats: []
+    };
+  }
+  const slotId = resolveStashSlotFromCode(entry.baseCode || entry.code, entry.cat, entry.id);
+  const eq = {
+    cat: entry.cat,
+    id: entry.id,
+    baseCode: entry.baseCode || entry.code || "",
+    eth: Boolean(entry.eth),
+    rolls: entry.rolls || {},
+    sockets: entry.sockets || []
+  };
+  const encoded = encodePaperdollSlotToD2sItem(mod, slotId, eq, "head", charLvl, true, classCode);
+  if (!encoded) return null;
+  return { ...encoded, location: 0, equippedId: 0, storePage: 5 };
+}
+
+function buildD2sExportStashItems(mod, d2iMod, cid, charLvl) {
+  const classCode = mod.CLASS_ID_TO_CODE[cid] !== undefined ? mod.CLASS_ID_TO_CODE[cid] : 1;
+  const rawSpecs = [];
+  for (const entry of pdCustomStashItems || []) {
+    const spec = encodeCustomStashEntryToD2sItem(mod, entry, charLvl, classCode);
+    if (spec) rawSpecs.push(spec);
+  }
+  return d2iMod.packItemsInto10x10(rawSpecs);
+}
+
+function setupStashExportUi() {
+  const dlg = document.getElementById("pd-stash-dialog");
+  if (!dlg) return;
+  const closeBtn = document.getElementById("pd-stash-close-btn");
+  const tabBtns = Array.from(dlg.querySelectorAll("[data-stash-tab]"));
+  const panePersonal = document.getElementById("stash-pane-personal");
+  const paneShared = document.getElementById("stash-pane-shared");
+
+  const catSel = document.getElementById("stash-add-cat");
+  const searchInp = document.getElementById("stash-add-search");
+  const itemSel = document.getElementById("stash-add-item");
+  const baseSel = document.getElementById("stash-add-base");
+  const ethWrap = document.getElementById("stash-add-eth-wrap");
+  const ethCb = document.getElementById("stash-add-eth");
+  const addBtn = document.getElementById("stash-add-btn");
+  const quickCharBtn = document.getElementById("stash-quick-char-btn");
+  const quickMercBtn = document.getElementById("stash-quick-merc-btn");
+  const clearPersonalBtn = document.getElementById("stash-clear-personal-btn");
+  const personalListEl = document.getElementById("stash-personal-list");
+  const personalUsageEl = document.getElementById("stash-personal-usage");
+  const exportD2sNowBtn = document.getElementById("stash-export-d2s-now-btn");
+
+  const baseFileInp = document.getElementById("d2i-base-input");
+  const pickBaseBtn = document.getElementById("d2i-pick-base-btn");
+  const clearBaseBtn = document.getElementById("d2i-clear-base-btn");
+  const baseStatusEl = document.getElementById("d2i-base-status");
+  const d2iErrEl = document.getElementById("d2i-error-msg");
+  const stackSummaryEl = document.getElementById("d2i-stack-summary");
+  const catPillsEl = document.getElementById("d2i-cat-pills");
+  const stackSearchInp = document.getElementById("d2i-stack-search");
+  const stackGridEl = document.getElementById("d2i-stack-grid");
+  const includeGearCb = document.getElementById("d2i-include-gear");
+  const gearCountEl = document.getElementById("d2i-gear-count");
+  const targetTabSel = document.getElementById("d2i-target-tab");
+  const modeSel = document.getElementById("d2i-mode-select");
+  const d2iExportBtn = document.getElementById("d2i-export-btn");
+
+  let d2sMod = null;
+  let d2iMod = null;
+  let d2iBaseBytes = null;
+  let d2iBaseMeta = null;
+  let d2iStackMap = {};
+  let d2iActiveCat = "all";
+
+  const PERFECT_GEM_CODES = new Set(["gpv", "gpy", "gpb", "gpg", "gpr", "gpw", "skz"]);
+
+  const ensureModules = async () => {
+    if (!pdData && typeof initMercenarySimulator === "function") {
+      await initMercenarySimulator();
+    }
+    if (!d2sMod) d2sMod = await import("/assets/d2s-exporter.js?v=7276ddeb64");
+    if (!d2iMod) d2iMod = await import("/assets/d2i-stash.js?v=bde4bdf9fe");
+  };
+
+  const switchTab = (tabName) => {
+    const isPersonal = tabName === "personal";
+    tabBtns.forEach(b => {
+      const on = b.dataset.stashTab === tabName;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    if (panePersonal) panePersonal.style.display = isPersonal ? "flex" : "none";
+    if (paneShared) paneShared.style.display = isPersonal ? "none" : "flex";
+    if (!isPersonal) renderD2iStackGrid();
+  };
+
+  const getCompatibleBasesForRw = (rwId) => {
+    const rwObj = (typeof rwList !== "undefined" && Array.isArray(rwList)) ? rwList.find(x => x.id === rwId) : null;
+    const allBases = Object.entries((pdData && pdData.baseRules) || {}).map(([code, r]) => ({ code, ...r }));
+    if (!rwObj) return allBases.slice(0, 40);
+    const reqSock = (rwObj.runes || []).length;
+    const matched = allBases.filter(b => {
+      if ((b.maxSockets || 0) < reqSock) return false;
+      if (typeof isBaseEligibleForRuneword === "function") return isBaseEligibleForRuneword(b, rwObj);
+      return true;
+    });
+    return (matched.length ? matched : allBases).sort((a, b) => (b.tier === "elite" ? 1 : 0) - (a.tier === "elite" ? 1 : 0) || (a.nameZh || a.code).localeCompare(b.nameZh || b.code));
+  };
+
+  const populateBaseSelectForRw = () => {
+    if (!baseSel || !catSel || !itemSel) return;
+    if (catSel.value !== "rw") {
+      baseSel.style.display = "none";
+      return;
+    }
+    baseSel.style.display = "";
+    const rwId = itemSel.value;
+    const bases = getCompatibleBasesForRw(rwId);
+    baseSel.innerHTML = bases.map(b =>
+      '<option value="' + escapeHtml(b.code) + '">' + escapeHtml((b.nameZh || b.nameEn || b.code) + " (" + b.code + ")") + "</option>"
+    ).join("");
+  };
+
+  const populateItemSelect = () => {
+    if (!catSel || !itemSel) return;
+    const cat = catSel.value;
+    const q = String(searchInp ? searchInp.value : "").trim().toLowerCase();
+    let rows = [];
+    if (cat === "unique") {
+      rows = ((itData && itData.uniqueItems) || []).map(u => ({
+        val: u.nameEn,
+        code: u.baseCode || "",
+        label: (u.nameZh || u.nameEn) + " · " + u.nameEn
+      }));
+    } else if (cat === "rw") {
+      rows = ((typeof rwList !== "undefined" && Array.isArray(rwList)) ? rwList : []).map(r => ({
+        val: r.id,
+        code: "",
+        label: (r.nameZh || r.name) + " · " + r.name + " (" + (r.runes || []).join("+") + ")"
+      }));
+    } else if (cat === "set") {
+      const bundle = getD2sCatalogBundle();
+      rows = (bundle.setPieces || []).map(p => ({
+        val: p.nameEn,
+        code: p.baseCode || "",
+        label: (p.nameZh || p.nameEn) + " · " + p.nameEn
+      }));
+    } else if (cat === "base") {
+      rows = Object.entries((pdData && pdData.baseRules) || {}).map(([code, b]) => ({
+        val: code,
+        code,
+        label: (b.nameZh || b.nameEn || code) + " · " + (b.nameEn || code) + " [" + (b.maxSockets || 0) + "孔]"
+      }));
+    } else if (cat === "stack" && d2sMod && d2sMod.D2S_ADV_STACKABLE_META) {
+      rows = Object.entries(d2sMod.D2S_ADV_STACKABLE_META).map(([code, m]) => ({
+        val: code,
+        code,
+        label: m.nameZh + " · " + m.nameEn
+      }));
+    }
+    if (q) {
+      rows = rows.filter(r => r.label.toLowerCase().includes(q) || r.val.toLowerCase().includes(q));
+    }
+    itemSel.innerHTML = rows.slice(0, 1000).map(r =>
+      '<option value="' + escapeHtml(r.val) + '" data-code="' + escapeHtml(r.code) + '">' + escapeHtml(r.label) + "</option>"
+    ).join("") || '<option value="">无匹配物品</option>';
+    if (ethWrap) ethWrap.style.display = cat === "stack" ? "none" : "inline-flex";
+    populateBaseSelectForRw();
+  };
+
+  const renderPersonalList = () => {
+    if (!personalListEl || !d2iMod) return;
+    const packed = d2iMod.packItemsInto10x10(pdCustomStashItems.map(x => ({ ...x, code: x.code || x.baseCode || "amu" })));
+    if (personalUsageEl) {
+      const ov = packed.overflow.length > 0 ? (" · ⚠️ 超出 " + packed.overflow.length + " 件") : "";
+      personalUsageEl.textContent = pdCustomStashItems.length + " 件 · 占 " + packed.usedCells + "/100 格" + ov;
+    }
+    if (gearCountEl) gearCountEl.textContent = String(pdCustomStashItems.length);
+    if (!pdCustomStashItems.length) {
+      personalListEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">仓库列表为空 — 可在上方挑选任意暗金/符文之语/套装/底材/材料，或一键导入当前角色装备</div>';
+      return;
+    }
+    const catNames = { unique: "暗金", rw: "符文之语", set: "套装", base: "底材", stack: "材料/符文/宝石" };
+    personalListEl.innerHTML = pdCustomStashItems.map((it, idx) => {
+      const [w, h] = d2iMod.getItemGridSize(it.code || it.baseCode || "amu");
+      const sub = [catNames[it.cat] || it.cat, it.eth ? "无形" : "", (it.code || it.baseCode || ""), w + "×" + h].filter(Boolean).join(" · ");
+      return '<div class="stash-item-card">' +
+        '<div class="stash-item-info">' +
+          '<div class="stash-item-name cat-' + escapeHtml(it.cat) + '">' + escapeHtml(it.labelZh || it.id) + "</div>" +
+          '<div class="stash-item-sub">' + escapeHtml(sub) + "</div>" +
+        "</div>" +
+        '<button type="button" class="stash-item-del" data-stash-del="' + idx + '" title="移出仓库">×</button>' +
+      "</div>";
+    }).join("");
+  };
+
+  const updateStackSummary = () => {
+    const entries = Object.entries(d2iStackMap).filter(([, v]) => v > 0);
+    const totalUnits = entries.reduce((s, [, v]) => s + v, 0);
+    if (stackSummaryEl) {
+      stackSummaryEl.textContent = "已配置 " + entries.length + " 种 · 共 " + totalUnits + " 个";
+    }
+  };
+
+  const renderD2iStackGrid = () => {
+    if (!stackGridEl || !d2sMod || !d2sMod.D2S_ADV_STACKABLE_META) return;
+    updateStackSummary();
+    const q = String(stackSearchInp ? stackSearchInp.value : "").trim().toLowerCase();
+    const entries = Object.entries(d2sMod.D2S_ADV_STACKABLE_META).filter(([code, m]) => {
+      const qty = Number(d2iStackMap[code] || 0);
+      if (d2iActiveCat === "rune" && m.cat !== "rune") return false;
+      if (d2iActiveCat === "pgem" && !PERFECT_GEM_CODES.has(code)) return false;
+      if (d2iActiveCat === "gem" && m.cat !== "gem") return false;
+      if (d2iActiveCat === "mat" && m.cat !== "mat") return false;
+      if (d2iActiveCat === "pot" && m.cat !== "pot") return false;
+      if (d2iActiveCat === "selected" && qty <= 0) return false;
+      if (q && !m.nameZh.toLowerCase().includes(q) && !m.nameEn.toLowerCase().includes(q) && !code.includes(q)) return false;
+      return true;
+    });
+    if (!entries.length) {
+      stackGridEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">当前筛选下无匹配项</div>';
+      return;
+    }
+    stackGridEl.innerHTML = entries.map(([code, m]) => {
+      const qty = Math.max(0, Math.min(99, Math.round(Number(d2iStackMap[code] || 0))));
+      return '<div class="d2i-stack-row' + (qty > 0 ? " has-qty" : "") + '" data-stack-code="' + escapeHtml(code) + '">' +
+        '<div class="d2i-stack-label">' +
+          '<span class="d2i-stack-name" title="' + escapeHtml(m.nameEn) + '">' + escapeHtml(m.nameZh) + "</span>" +
+          '<span class="d2i-stack-code">' + escapeHtml(m.nameEn + " · " + code) + "</span>" +
+        "</div>" +
+        '<div class="d2i-qty-ctrl">' +
+          '<button type="button" data-qty-act="dec" aria-label="减1">-</button>' +
+          '<input type="number" min="0" max="99" value="' + qty + '" data-qty-inp="' + escapeHtml(code) + '" />' +
+          '<button type="button" data-qty-act="inc" aria-label="加1">+</button>' +
+          '<button type="button" data-qty-act="max" title="拉满 99">99</button>' +
+        "</div>" +
+      "</div>";
+    }).join("");
+  };
+
+  const openStashDialog = async () => {
+    try {
+      await ensureModules();
+      populateItemSelect();
+      renderPersonalList();
+      renderD2iStackGrid();
+      if (!dlg.open) dlg.showModal();
+    } catch (err) {
+      showAuthToast("打开仓库配置失败：" + (err && err.message ? err.message : "未知错误"), true);
+    }
+  };
+
+  ["sk-stash-export-btn", "pd-stash-export-btn"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener("click", openStashDialog);
+  });
+  if (closeBtn) closeBtn.addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+  tabBtns.forEach(b => b.addEventListener("click", () => switchTab(b.dataset.stashTab)));
+
+  if (catSel) catSel.addEventListener("change", () => { if (searchInp) searchInp.value = ""; populateItemSelect(); });
+  if (searchInp) searchInp.addEventListener("input", populateItemSelect);
+  if (itemSel) itemSel.addEventListener("change", populateBaseSelectForRw);
+
+  if (addBtn) {
+    addBtn.addEventListener("click", () => {
+      if (!catSel || !itemSel || !itemSel.value) return;
+      const cat = catSel.value;
+      const val = itemSel.value;
+      const opt = itemSel.options[itemSel.selectedIndex];
+      const baseCode = cat === "rw"
+        ? (baseSel && baseSel.value ? baseSel.value : "")
+        : (cat === "base" || cat === "stack" ? val : (opt ? opt.dataset.code || "" : ""));
+      let code = baseCode;
+      if (!code && cat === "unique" && itData && Array.isArray(itData.uniqueItems)) {
+        const u = itData.uniqueItems.find(x => x.nameEn === val);
+        if (u) code = u.baseCode || (/ring|戒指/i.test(String(u.slot || u.type || "")) ? "rin" : (/amulet|项链/i.test(String(u.slot || u.type || "")) ? "amu" : ""));
+      }
+      const labelZh = (opt ? opt.textContent : val).split(" · ")[0].trim();
+      pdCustomStashItems.push({
+        uid: "st" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        cat,
+        id: val,
+        baseCode: code,
+        code: code || "amu",
+        eth: Boolean(ethCb && ethCb.checked && cat !== "stack"),
+        labelZh
+      });
+      saveCustomStashItems();
+      renderPersonalList();
+    });
+  }
+
+  const importLoadoutToStash = (loadoutObj, label) => {
+    if (!loadoutObj) return;
+    let added = 0;
+    for (const [slotId, eq] of Object.entries(loadoutObj)) {
+      if (!eq || !eq.cat || !eq.id) continue;
+      if (!["unique", "rw", "set"].includes(eq.cat)) continue;
+      const info = resolveEquippedItemInfo(eq, { actorLvl: 90, isChar: true });
+      const code = (info && info.bRule && info.bRule.code) || eq.baseCode || (slotId === "amulet" ? "amu" : (slotId === "ring1" || slotId === "ring2" ? "rin" : ""));
+      if (!code) continue;
+      pdCustomStashItems.push({
+        uid: "st" + Date.now() + "_" + added + "_" + Math.floor(Math.random() * 1000),
+        cat: eq.cat,
+        id: eq.id,
+        baseCode: code,
+        code,
+        eth: Boolean(eq.eth),
+        rolls: eq.rolls ? cloneJsonSafe(eq.rolls, {}) : {},
+        sockets: Array.isArray(eq.sockets) ? eq.sockets.slice() : [],
+        labelZh: (info && info.titleZh) || eq.id
+      });
+      added += 1;
+    }
+    saveCustomStashItems();
+    renderPersonalList();
+    showAuthToast("✓ 已将" + label + " " + added + " 件装备加入仓库列表");
+  };
+
+  if (quickCharBtn) quickCharBtn.addEventListener("click", () => importLoadoutToStash(pdCharLoadout, "当前角色全身"));
+  if (quickMercBtn) quickMercBtn.addEventListener("click", () => importLoadoutToStash(pdMercLoadout, "当前佣兵"));
+  if (clearPersonalBtn) {
+    clearPersonalBtn.addEventListener("click", () => {
+      pdCustomStashItems = [];
+      saveCustomStashItems();
+      renderPersonalList();
+    });
+  }
+  if (personalListEl) {
+    personalListEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-stash-del]");
+      if (!btn) return;
+      const idx = Number(btn.dataset.stashDel);
+      if (Number.isInteger(idx) && idx >= 0 && idx < pdCustomStashItems.length) {
+        pdCustomStashItems.splice(idx, 1);
+        saveCustomStashItems();
+        renderPersonalList();
+      }
+    });
+  }
+  if (exportD2sNowBtn) {
+    exportD2sNowBtn.addEventListener("click", () => {
+      dlg.close();
+      exportCurrentBuildAsD2s();
+    });
+  }
+
+  // Tab 2: .d2i base file import & presets
+  if (pickBaseBtn && baseFileInp) pickBaseBtn.addEventListener("click", () => baseFileInp.click());
+  if (baseFileInp) {
+    baseFileInp.addEventListener("change", async () => {
+      const f = baseFileInp.files && baseFileInp.files[0];
+      if (!f) return;
+      if (d2iErrEl) { d2iErrEl.textContent = ""; d2iErrEl.classList.remove("show"); }
+      try {
+        await ensureModules();
+        const bytes = new Uint8Array(await f.arrayBuffer());
+        const parsed = d2iMod.parseD2iBuffer(bytes);
+        d2iBaseBytes = bytes;
+        d2iBaseMeta = parsed;
+        d2iStackMap = { ...parsed.stackables };
+        if (modeSel && /hardcore/i.test(f.name)) modeSel.value = "hc";
+        else if (modeSel && /softcore/i.test(f.name)) modeSel.value = "sc";
+        if (baseStatusEl) {
+          baseStatusEl.textContent = "✓ 已载入 " + f.name + "（5页装备 " + parsed.totalNormalItems + " 件 · 原堆叠 " + parsed.totalStackTypes + " 种 · 编年史保留）";
+          baseStatusEl.style.color = "#8af49f";
+        }
+        if (clearBaseBtn) clearBaseBtn.style.display = "";
+        renderD2iStackGrid();
+      } catch (err) {
+        if (d2iErrEl) {
+          d2iErrEl.textContent = (err && err.message) || "解析 .d2i 共享仓库失败，请确认是 D2R 3.4 的 ModernSharedStash*.d2i 文件";
+          d2iErrEl.classList.add("show");
+        }
+      }
+    });
+  }
+  if (clearBaseBtn) {
+    clearBaseBtn.addEventListener("click", () => {
+      d2iBaseBytes = null;
+      d2iBaseMeta = null;
+      if (baseFileInp) baseFileInp.value = "";
+      if (baseStatusEl) {
+        baseStatusEl.textContent = "当前：生成全新共享仓库";
+        baseStatusEl.style.color = "";
+      }
+      clearBaseBtn.style.display = "none";
+    });
+  }
+
+  dlg.querySelectorAll("[data-d2i-preset]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      await ensureModules();
+      const preset = btn.dataset.d2iPreset;
+      const meta = d2sMod.D2S_ADV_STACKABLE_META || {};
+      if (preset === "clear") {
+        d2iStackMap = {};
+      } else if (preset === "runes-all") {
+        for (const [code, m] of Object.entries(meta)) if (m.cat === "rune") d2iStackMap[code] = 99;
+      } else if (preset === "runes-hr") {
+        for (let n = 20; n <= 33; n += 1) {
+          const c = "r" + String(n).padStart(2, "0");
+          if (meta[c]) d2iStackMap[c] = 99;
+        }
+      } else if (preset === "gems-perfect") {
+        for (const c of PERFECT_GEM_CODES) if (meta[c]) d2iStackMap[c] = 99;
+      } else if (preset === "mats-all") {
+        for (const [code, m] of Object.entries(meta)) if (m.cat === "mat" || code === "rvl") d2iStackMap[code] = 99;
+      } else if (preset === "all-99") {
+        for (const code of Object.keys(meta)) d2iStackMap[code] = 99;
+      }
+      renderD2iStackGrid();
+    });
+  });
+
+  if (catPillsEl) {
+    catPillsEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-d2i-cat]");
+      if (!btn) return;
+      d2iActiveCat = btn.dataset.d2iCat || "all";
+      catPillsEl.querySelectorAll("[data-d2i-cat]").forEach(b => b.classList.toggle("active", b === btn));
+      renderD2iStackGrid();
+    });
+  }
+  if (stackSearchInp) stackSearchInp.addEventListener("input", renderD2iStackGrid);
+
+  if (stackGridEl) {
+    stackGridEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-qty-act]");
+      if (!btn) return;
+      const row = btn.closest("[data-stack-code]");
+      if (!row) return;
+      const code = row.dataset.stackCode;
+      const cur = Math.max(0, Math.min(99, Math.round(Number(d2iStackMap[code] || 0))));
+      const act = btn.dataset.qtyAct;
+      const next = act === "max" ? 99 : act === "inc" ? Math.min(99, cur + 1) : Math.max(0, cur - 1);
+      if (next <= 0) delete d2iStackMap[code];
+      else d2iStackMap[code] = next;
+      const inp = row.querySelector("input");
+      if (inp) inp.value = String(next);
+      row.classList.toggle("has-qty", next > 0);
+      updateStackSummary();
+    });
+    stackGridEl.addEventListener("input", (e) => {
+      const inp = e.target.closest("[data-qty-inp]");
+      if (!inp) return;
+      const code = inp.dataset.qtyInp;
+      const next = Math.max(0, Math.min(99, Math.round(Number(inp.value) || 0)));
+      if (next <= 0) delete d2iStackMap[code];
+      else d2iStackMap[code] = next;
+      const row = inp.closest(".d2i-stack-row");
+      if (row) row.classList.toggle("has-qty", next > 0);
+      updateStackSummary();
+    });
+  }
+
+  if (d2iExportBtn) {
+    d2iExportBtn.addEventListener("click", async () => {
+      try {
+        await ensureModules();
+        const cid = skActiveClassId || "sor";
+        const lvlInp = document.getElementById("pd-char-lvl");
+        const charLvl = Math.min(99, Math.max(1, Number(lvlInp ? lvlInp.value : 90) || 90));
+        const classCode = d2sMod.CLASS_ID_TO_CODE[cid] !== undefined ? d2sMod.CLASS_ID_TO_CODE[cid] : 1;
+        const normalTabItems = [[], [], [], [], []];
+        if (includeGearCb && includeGearCb.checked && pdCustomStashItems.length > 0) {
+          const tabIdx = Math.max(0, Math.min(4, Number(targetTabSel ? targetTabSel.value : 0) || 0));
+          for (const entry of pdCustomStashItems) {
+            const spec = encodeCustomStashEntryToD2sItem(d2sMod, entry, charLvl, classCode);
+            if (spec) normalTabItems[tabIdx].push(spec);
+          }
+        }
+        const res = d2iMod.buildD2iBuffer({
+          baseD2iBytes: d2iBaseBytes,
+          normalTabItems,
+          stackables: d2iStackMap,
+          hardcore: Boolean(modeSel && modeSel.value === "hc"),
+          replaceStackables: Boolean(d2iBaseBytes)
+        });
+        const blob = new Blob([res.bytes], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = res.filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const modeTag = res.meta.mergedFromExisting ? "增量合并" : "全新生成";
+        const gearTag = res.meta.addedGearCount > 0 ? (" · 注入装备 " + res.meta.addedGearCount + " 件") : "";
+        const ovTag = res.meta.overflowGearCount > 0 ? ("（" + res.meta.overflowGearCount + " 件超出空格未放入）") : "";
+        showAuthToast("💾 已导出 " + res.filename + "（" + modeTag + " · 专页堆叠 " + res.meta.stackTypeCount + " 种 / 共 " + res.meta.totalStackUnits + " 个" + gearTag + ovTag + "）");
+      } catch (err) {
+        showAuthToast("导出 .d2i 共享仓库失败：" + (err && err.message ? err.message : "未知错误"), true);
+      }
+    });
+  }
+}
+
 let _skInited = false;
 export function init() {
   if (_skInited) return;
@@ -8268,6 +9572,7 @@ export function init() {
   setupSkillsEvents();
   setupSharedBuildUi();
   setupD2sImportUi();
+  setupStashExportUi();
   setupMetaPresetsUi();
 }
 export async function onActivate() {

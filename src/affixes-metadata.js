@@ -87,7 +87,7 @@ export const AFFIX_SLOTS = [
   { id: "charm_sc", label: "小型咒符(SC)", icon: "/images/items/misc/charm/charm_small.webp" },
   { id: "charm_lc", label: "大型咒符(LC)", icon: "/images/items/misc/charm/charm_medium.webp" },
   { id: "charm_gc", label: "巨型咒符(GC)", icon: "/images/items/misc/charm/charm_large.webp" },
-  { id: "jewel", label: "珠宝", icon: "/images/items/misc/body_part/fragment_fire.webp" }
+  { id: "jewel", label: "珠宝", icon: "/images/items/misc/gem/perfect_diamond1.webp" }
 ];
 
 // quality: "all" (蓝/黄/橙通用) | "rare" (黄/橙极限) | "magic" (仅蓝装专属/蓝装极限) | "crafted" (手工橙装固定属性)
@@ -101,16 +101,20 @@ export const AFFIX_RANGES = [
   { slot: "amulet", type: "prefix", quality: "magic", nameZh: "单系技能（蓝专属）", nameEn: "Skill Tree", range: "+3 单系技能树", alvl: 60, note: "如 +3 闪电/冰冷/火焰/战斗/陷阱/毒骨，黄/橙装最高仅 +2" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "更快速施法", nameEn: "of the Apprentice", range: "+10% FCR", alvl: 5, note: "单条词缀最高 10% FCR；只有「施法者橙链」才能与固定 5–10% FCR 叠加至 20% FCR" },
   { slot: "amulet", type: "prefix", quality: "all", nameZh: "全抗（棱镜）", nameEn: "Prismatic", range: "+16–20% 所有抗性", alvl: 42, note: "蓝装还可出 Chromatic（+21–30% 全抗，alvl 55 蓝专属）" },
-  { slot: "amulet", type: "prefix", quality: "all", nameZh: "单抗", nameEn: "Ruby / Sapphire / Amber / Emerald", range: "+31–40% 单项抗性", alvl: 25, note: "黄/橙装可与全抗前缀共存（最多 3 前缀）" },
+  { slot: "amulet", type: "prefix", quality: "all", nameZh: "火焰抗性（红宝石）", nameEn: "Ruby", range: "+31–40% 火焰抗性", alvl: 25, note: "黄/橙装可与全抗前缀共存（最多 3 前缀）" },
+  { slot: "amulet", type: "prefix", quality: "all", nameZh: "冰冷抗性（蓝宝石）", nameEn: "Sapphire", range: "+31–40% 冰冷抗性", alvl: 25, note: "黄/橙装可与全抗前缀共存" },
+  { slot: "amulet", type: "prefix", quality: "all", nameZh: "闪电抗性（琥珀）", nameEn: "Amber", range: "+31–40% 闪电抗性", alvl: 25, note: "黄/橙装可与全抗前缀共存" },
+  { slot: "amulet", type: "prefix", quality: "all", nameZh: "毒素抗性（翡翠）", nameEn: "Emerald", range: "+31–40% 毒素抗性", alvl: 25, note: "黄/橙装可与全抗前缀共存" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "力量（阿特拉斯）", nameEn: "of the Atlas", range: "+21–30 力量", alvl: 71, note: "蓝/黄/橙均可出到 30 力量" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "敏捷（完美）", nameEn: "of Perfection", range: "+16–20 敏捷", alvl: 59, note: "" },
-  { slot: "amulet", type: "suffix", quality: "all", nameZh: "精力（巫师）", nameEn: "of the Magi / Sorcerer", range: "+16–20 精力", alvl: 31, note: "ES 顶球法师高法力池实用属性" },
+  { slot: "amulet", type: "suffix", quality: "all", nameZh: "精力（巫师）", nameEn: "of the Magi", range: "+16–20 精力", alvl: 31, note: "ES 顶球法师高法力池实用属性" },
   { slot: "amulet", type: "suffix", quality: "magic", nameZh: "生命（巨鲸·蓝极限）", nameEn: "of the Whale", range: "+81–100 生命", alvl: 50, note: "蓝装专属上限；黄/橙装生命后缀最高 +41–60（巨像 of the Colossus）" },
   { slot: "amulet", type: "suffix", quality: "rare", nameZh: "生命（巨像·黄/橙极限）", nameEn: "of the Colossus", range: "+41–60 生命", alvl: 30, note: "黄/橙项链单条生命最高 60（吸血橙链叠加固定 +20 可达 80 生命）" },
   { slot: "amulet", type: "prefix", quality: "magic", nameZh: "法力（巴哈姆特·蓝极限）", nameEn: "Bahamut's", range: "+91–120 法力", alvl: 45, note: "黄/橙装最高为 Great Wyrm's (+61–90 法力，alvl 37)" },
   { slot: "amulet", type: "prefix", quality: "rare", nameZh: "法力（巨龙·黄/橙极限）", nameEn: "Great Wyrm's", range: "+61–90 法力", alvl: 37, note: "施法橙链叠加固定 +20 法力最高可达 110 法力" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "生命恢复", nameEn: "of Regeneration", range: "+6–10 生命恢复", alvl: 41, note: "" },
-  { slot: "amulet", type: "suffix", quality: "all", nameZh: "生命 / 法力偷取", nameEn: "of the Leech / Bat", range: "1–6% LL · 1–8% ML", alvl: 78, note: "双吸物理项链核心后缀" },
+  { slot: "amulet", type: "suffix", quality: "all", nameZh: "生命偷取（水蛭）", nameEn: "of the Lamprey", range: "+5–6% 击中偷取生命 (LL)", alvl: 78, note: "物理项链吸血核心后缀" },
+  { slot: "amulet", type: "suffix", quality: "all", nameZh: "法力偷取（怨灵）", nameEn: "of the Wraith", range: "+7–8% 击中偷取法力 (ML)", alvl: 78, note: "物理项链吸蓝核心后缀，可与生命偷取共存组成双吸链" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "毒素持续时间缩短", nameEn: "of Amelioration", range: "毒素持续时间缩短 75%", alvl: 18, note: "顶球 ES 法师极品防毒后缀" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "寻宝率 MF", nameEn: "of Luck", range: "+26–35% MF", alvl: 26, note: "蓝装叠加前缀 Fortuitous (+11–15%) 最高可达 50% MF" },
   { slot: "amulet", type: "suffix", quality: "all", nameZh: "额外金币 EG", nameEn: "of Greed", range: "+41–80% EG", alvl: 1, note: "打钱野蛮人 2/80 EG 项链" },
@@ -126,11 +130,15 @@ export const AFFIX_RANGES = [
   { slot: "ring", type: "suffix", quality: "all", nameZh: "生命（巨像）", nameEn: "of the Colossus", range: "+31–40 生命", alvl: 68, note: "吸血橙戒可叠加固定 +10–20 生命，最高达 60 生命" },
   { slot: "ring", type: "prefix", quality: "rare", nameZh: "法力（巨龙·黄/橙极限）", nameEn: "Great Wyrm's", range: "+61–90 法力", alvl: 37, note: "蓝戒指最高可达 Bahamut's +91–120 法力 (alvl 45)" },
   { slot: "ring", type: "prefix", quality: "all", nameZh: "全抗（微光）", nameEn: "Scintillating", range: "+8–11% 所有抗性", alvl: 56, note: "蓝戒指最高可达 Shimmering +12–15% 全抗 (alvl 45)" },
-  { slot: "ring", type: "prefix", quality: "all", nameZh: "单抗", nameEn: "Garnet / Cobalt / Coral / Jade", range: "+21–30% 单项抗性", alvl: 18, note: "双抗/三抗戒指的核心前缀" },
+  { slot: "ring", type: "prefix", quality: "all", nameZh: "火焰抗性（石榴）", nameEn: "Garnet", range: "+21–30% 火焰抗性", alvl: 18, note: "双抗/三抗戒指核心前缀" },
+  { slot: "ring", type: "prefix", quality: "all", nameZh: "冰冷抗性（钴蓝）", nameEn: "Cobalt", range: "+21–30% 冰冷抗性", alvl: 18, note: "双抗/三抗戒指核心前缀" },
+  { slot: "ring", type: "prefix", quality: "all", nameZh: "闪电抗性（珊瑚）", nameEn: "Coral", range: "+21–30% 闪电抗性", alvl: 18, note: "双抗/三抗戒指核心前缀" },
+  { slot: "ring", type: "prefix", quality: "all", nameZh: "毒素抗性（碧玉）", nameEn: "Jade", range: "+21–30% 毒素抗性", alvl: 18, note: "双抗/三抗戒指核心前缀" },
   { slot: "ring", type: "suffix", quality: "rare", nameZh: "生命偷取", nameEn: "of the Vampire", range: "+7–8% LL", alvl: 77, note: "蓝装最高 9% LL；吸血橙戒叠加固定 1–3% LL 最高可达 11% LL" },
   { slot: "ring", type: "suffix", quality: "all", nameZh: "法力偷取", nameEn: "of the Wraith", range: "+5–6% ML", alvl: 86, note: "双吸戒指高价值词缀" },
   { slot: "ring", type: "prefix", quality: "all", nameZh: "命中率 AR", nameEn: "Platinum", range: "+101–120 命中率", alvl: 22, note: "" },
-  { slot: "ring", type: "suffix", quality: "all", nameZh: "最小 / 最大伤害", nameEn: "of Performance / Maiming", range: "+6–9 最小伤害 · +3–4 最大伤害", alvl: 51, note: "物理戒指极品增伤词缀" },
+  { slot: "ring", type: "suffix", quality: "all", nameZh: "最小伤害（表现之）", nameEn: "of Performance", range: "+6–9 最小伤害", alvl: 51, note: "物理戒指极品最小伤增伤词缀" },
+  { slot: "ring", type: "suffix", quality: "all", nameZh: "最大伤害（毁伤之）", nameEn: "of Maiming", range: "+3–4 最大伤害", alvl: 42, note: "物理戒指最大伤增伤词缀" },
   { slot: "ring", type: "suffix", quality: "all", nameZh: "生命恢复", nameEn: "of Replenish", range: "+6–9 生命恢复", alvl: 41, note: "PVP 常用高回血词缀" },
   { slot: "ring", type: "suffix", quality: "all", nameZh: "寻宝率 MF", nameEn: "of Fortune", range: "+16–25% MF", alvl: 42, note: "蓝戒指叠加前缀 Fortuitous (+11–15%) 最高可达 40% MF" },
 
@@ -146,9 +154,13 @@ export const AFFIX_RANGES = [
   { slot: "circlet", type: "suffix", quality: "magic", nameZh: "生命（巨鲸·蓝极限）", nameEn: "of the Whale", range: "+81–100 生命", alvl: 50, note: "3 孔 100 血蓝权冠；黄头环生命后缀最高 +41–60" },
   { slot: "circlet", type: "suffix", quality: "rare", nameZh: "生命（巨像·黄装极限）", nameEn: "of the Colossus", range: "+41–60 生命", alvl: 30, note: "" },
   { slot: "circlet", type: "prefix", quality: "all", nameZh: "全抗（棱镜）", nameEn: "Prismatic", range: "+16–20% 所有抗性", alvl: 42, note: "蓝头环最高 Chromatic +21–30% 全抗" },
-  { slot: "circlet", type: "prefix", quality: "all", nameZh: "单抗", nameEn: "Ruby / Sapphire / Amber / Emerald", range: "+31–40% 单项抗性", alvl: 25, note: "" },
+  { slot: "circlet", type: "prefix", quality: "all", nameZh: "火焰抗性（红宝石）", nameEn: "Ruby", range: "+31–40% 火焰抗性", alvl: 25, note: "" },
+  { slot: "circlet", type: "prefix", quality: "all", nameZh: "冰冷抗性（蓝宝石）", nameEn: "Sapphire", range: "+31–40% 冰冷抗性", alvl: 25, note: "" },
+  { slot: "circlet", type: "prefix", quality: "all", nameZh: "闪电抗性（琥珀）", nameEn: "Amber", range: "+31–40% 闪电抗性", alvl: 25, note: "" },
+  { slot: "circlet", type: "prefix", quality: "all", nameZh: "毒素抗性（翡翠）", nameEn: "Emerald", range: "+31–40% 毒素抗性", alvl: 25, note: "" },
   { slot: "circlet", type: "prefix", quality: "all", nameZh: "强力视觉 (Visionary)", nameEn: "Visionary", range: "+(1% * 等级) 加成命中率", alvl: 25, note: "PVP 物理头环核心前缀" },
-  { slot: "circlet", type: "suffix", quality: "all", nameZh: "双吸（生命/法力偷取）", nameEn: "of the Lamprey / Wraith", range: "+6–8% LL · +6–8% ML", alvl: 78, note: "" },
+  { slot: "circlet", type: "suffix", quality: "all", nameZh: "生命偷取（水蛭）", nameEn: "of the Lamprey", range: "+6–8% 击中偷取生命 (LL)", alvl: 78, note: "" },
+  { slot: "circlet", type: "suffix", quality: "all", nameZh: "法力偷取（怨灵）", nameEn: "of the Wraith", range: "+6–8% 击中偷取法力 (ML)", alvl: 78, note: "" },
 
   // 🧤 手套
   { slot: "gloves", type: "crafted", quality: "crafted", nameZh: "吸血手套（#4 奈夫 + 完美红）", nameEn: "Blood Gloves (#4 Nef + Perfect Ruby)", range: "5–10% 压碎性打击 (CB) · 1–3% LL · +10–20 生命", alvl: 1, note: "与随机 2 技能 / 20 IAS 叠加，即为极品 2/20/10CB 吸血橙手" },
@@ -158,15 +170,22 @@ export const AFFIX_RANGES = [
   { slot: "gloves", type: "prefix", quality: "rare", nameZh: "单系技能（黄/橙极限）", nameEn: "Spearmaiden's / Fletcher's", range: "+2 标枪 / 弓 / 被动 / 武学", alvl: 40, note: "黄/橙手套最高 +2 技能" },
   { slot: "gloves", type: "suffix", quality: "all", nameZh: "力量（巨人）", nameEn: "of the Giant", range: "+10–15 力量", alvl: 59, note: "" },
   { slot: "gloves", type: "suffix", quality: "all", nameZh: "敏捷（精准）", nameEn: "of Precision", range: "+10–15 敏捷", alvl: 56, note: "" },
-  { slot: "gloves", type: "suffix", quality: "all", nameZh: "生命 / 法力偷取", nameEn: "of the Leech / Bat", range: "1–3% LL · 1–3% ML", alvl: 34, note: "吸血橙手可再与固定 1–3% LL 叠加至 6% LL" },
-  { slot: "gloves", type: "prefix", quality: "all", nameZh: "单抗", nameEn: "Garnet / Cobalt / Coral / Jade", range: "+21–30% 单项抗性", alvl: 18, note: "" },
+  { slot: "gloves", type: "suffix", quality: "all", nameZh: "生命偷取（水蛭）", nameEn: "of the Leech", range: "+1–3% 击中偷取生命 (LL)", alvl: 34, note: "吸血橙手可再与固定 1–3% LL 叠加至 6% LL" },
+  { slot: "gloves", type: "suffix", quality: "all", nameZh: "法力偷取（蝙蝠）", nameEn: "of the Bat", range: "+1–3% 击中偷取法力 (ML)", alvl: 34, note: "可与生命偷取共存组成双吸手套" },
+  { slot: "gloves", type: "prefix", quality: "all", nameZh: "火焰抗性（石榴）", nameEn: "Garnet", range: "+21–30% 火焰抗性", alvl: 18, note: "" },
+  { slot: "gloves", type: "prefix", quality: "all", nameZh: "冰冷抗性（钴蓝）", nameEn: "Cobalt", range: "+21–30% 冰冷抗性", alvl: 18, note: "" },
+  { slot: "gloves", type: "prefix", quality: "all", nameZh: "闪电抗性（珊瑚）", nameEn: "Coral", range: "+21–30% 闪电抗性", alvl: 18, note: "" },
+  { slot: "gloves", type: "prefix", quality: "all", nameZh: "毒素抗性（碧玉）", nameEn: "Jade", range: "+21–30% 毒素抗性", alvl: 18, note: "" },
   { slot: "gloves", type: "suffix", quality: "all", nameZh: "寻宝率 MF", nameEn: "of Fortune", range: "+16–25% MF", alvl: 16, note: "" },
 
   // 🥾 鞋子
   { slot: "boots", type: "crafted", quality: "crafted", nameZh: "施法者鞋子（#10 图尔 + 完美紫）", nameEn: "Caster Boots (#10 Thul + Perfect Amethyst)", range: "法力上限 +2–5% · +10–20 法力 · 4–10% 法力恢复", alvl: 1, note: "ES 顶球法师可再配三抗 + 30 FRW + 10 FHR" },
   { slot: "boots", type: "suffix", quality: "all", nameZh: "更快速跑步/步行", nameEn: "of Speed", range: "+30% FRW", alvl: 37, note: "" },
   { slot: "boots", type: "suffix", quality: "all", nameZh: "更快速打击回复", nameEn: "of Balance", range: "+10% FHR", alvl: 5, note: "" },
-  { slot: "boots", type: "prefix", quality: "all", nameZh: "单抗", nameEn: "Ruby / Sapphire / Amber / Emerald", range: "+31–40% 单项抗性", alvl: 25, note: "三抗鞋理论极限为火/冰/电各 +40%（总抗性 120%）" },
+  { slot: "boots", type: "prefix", quality: "all", nameZh: "火焰抗性（红宝石）", nameEn: "Ruby", range: "+31–40% 火焰抗性", alvl: 25, note: "三抗鞋理论极限为火/冰/电各 +40%（总抗性 120%）" },
+  { slot: "boots", type: "prefix", quality: "all", nameZh: "冰冷抗性（蓝宝石）", nameEn: "Sapphire", range: "+31–40% 冰冷抗性", alvl: 25, note: "三抗鞋核心抗性前缀" },
+  { slot: "boots", type: "prefix", quality: "all", nameZh: "闪电抗性（琥珀）", nameEn: "Amber", range: "+31–40% 闪电抗性", alvl: 25, note: "三抗鞋核心抗性前缀" },
+  { slot: "boots", type: "prefix", quality: "all", nameZh: "毒素抗性（翡翠）", nameEn: "Emerald", range: "+31–40% 毒素抗性", alvl: 25, note: "" },
   { slot: "boots", type: "suffix", quality: "all", nameZh: "敏捷", nameEn: "of Dexterity", range: "+6–9 敏捷", alvl: 46, note: "" },
   { slot: "boots", type: "prefix", quality: "all", nameZh: "法力", nameEn: "Dragon's", range: "+31–40 法力", alvl: 24, note: "" },
   { slot: "boots", type: "suffix", quality: "all", nameZh: "寻宝率 MF", nameEn: "of Fortune", range: "+16–25% MF", alvl: 16, note: "蓝鞋叠加前缀最高 35% MF" },
@@ -178,7 +197,10 @@ export const AFFIX_RANGES = [
   { slot: "belt", type: "suffix", quality: "all", nameZh: "更快速打击回复", nameEn: "of Stability", range: "+24% FHR", alvl: 18, note: "" },
   { slot: "belt", type: "suffix", quality: "all", nameZh: "力量（阿特拉斯）", nameEn: "of the Atlas", range: "+21–30 力量", alvl: 71, note: "" },
   { slot: "belt", type: "suffix", quality: "rare", nameZh: "生命（巨像·黄/橙极限）", nameEn: "of the Colossus", range: "+41–60 生命", alvl: 30, note: "蓝腰带最高 +81–100 生命" },
-  { slot: "belt", type: "prefix", quality: "all", nameZh: "单抗", nameEn: "Garnet / Cobalt / Coral / Jade", range: "+21–30% 单项抗性", alvl: 18, note: "" },
+  { slot: "belt", type: "prefix", quality: "all", nameZh: "火焰抗性（石榴）", nameEn: "Garnet", range: "+21–30% 火焰抗性", alvl: 18, note: "" },
+  { slot: "belt", type: "prefix", quality: "all", nameZh: "冰冷抗性（钴蓝）", nameEn: "Cobalt", range: "+21–30% 冰冷抗性", alvl: 18, note: "" },
+  { slot: "belt", type: "prefix", quality: "all", nameZh: "闪电抗性（珊瑚）", nameEn: "Coral", range: "+21–30% 闪电抗性", alvl: 18, note: "" },
+  { slot: "belt", type: "prefix", quality: "all", nameZh: "毒素抗性（碧玉）", nameEn: "Jade", range: "+21–30% 毒素抗性", alvl: 18, note: "" },
   { slot: "belt", type: "suffix", quality: "all", nameZh: "额外金币 EG", nameEn: "of Wealth", range: "+41–80% EG", alvl: 17, note: "" },
 
   // ⚔️ 武器
@@ -196,7 +218,8 @@ export const AFFIX_RANGES = [
   { slot: "armor_shield", type: "prefix", quality: "magic", nameZh: "珠宝匠 4 孔（蓝专属）", nameEn: "Jeweler's", range: "4 孔", alvl: 55, note: "仅限 4 孔轻甲（执政官/灰暮）或 4 孔盾（统治者大盾），黄装最多 2 孔" },
   { slot: "armor_shield", type: "suffix", quality: "magic", nameZh: "巨鲸生命（蓝极限）", nameEn: "of the Whale", range: "+81–100 生命", alvl: 50, note: "4 孔 100 血蓝甲核心；黄甲/黄盾最高 +41–60 生命" },
   { slot: "armor_shield", type: "suffix", quality: "all", nameZh: "偏向（盾牌 30/20）", nameEn: "of Deflecting", range: "+30% FBR · +20% 提高格挡几率", alvl: 11, note: "搭配 4 孔蓝统盾即为 JMOD（偏向盾）" },
-  { slot: "armor_shield", type: "suffix", quality: "all", nameZh: "更快速打击回复", nameEn: "of Stability / Equilibrium", range: "+24% FHR（甲）/ +17% FHR（盾）", alvl: 18, note: "" },
+  { slot: "armor_shield", type: "suffix", quality: "all", nameZh: "稳定之（盔甲 FHR）", nameEn: "of Stability", range: "+24% 快速打击恢复 (FHR，限盔甲)", alvl: 18, note: "盔甲 FHR 最高后缀" },
+  { slot: "armor_shield", type: "suffix", quality: "all", nameZh: "平衡之（盾牌 FHR）", nameEn: "of Equilibrium", range: "+17% 快速打击恢复 (FHR，限盾牌)", alvl: 9, note: "盾牌 FHR 最高后缀" },
   { slot: "armor_shield", type: "prefix", quality: "magic", nameZh: "彩色全抗（蓝盾专属）", nameEn: "Chromatic", range: "+21–30% 所有抗性", alvl: 55, note: "黄盾牌全抗最高 Prismatic (+16–20%)" },
   { slot: "armor_shield", type: "crafted", quality: "crafted", nameZh: "安全盾牌（#5 艾斯 + 完美绿）", nameEn: "Safety Shield (#5 Eth + Perfect Emerald)", range: "+5–10% 提高格挡几率 · 魔伤减少 1–2 · +10–30% 强化防御", alvl: 1, note: "" },
 
@@ -211,18 +234,22 @@ export const AFFIX_RANGES = [
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "毒蛇的 (法力)", nameEn: "Snake's (Small Charm)", range: "+8–12 法力", alvl: 32, note: "需求等级 24" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "蜥蜴 (法力)", nameEn: "Lizard's (Small Charm)", range: "+1–7 法力", alvl: 16, note: "需求等级 12" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "光彩 (5% 全抗)", nameEn: "Shimmering (Small Charm)", range: "+3–5% 所有抗性", alvl: 33, note: "需求等级 25；5 全抗 / 20 生命或 5 全抗 / 5 FHR 为全职业毕业小符" },
-  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "红宝石/蓝宝石/琥珀/翡翠 (11% 单抗)", nameEn: "Ruby / Sapphire / Amber / Emerald (SC)", range: "+10–11% 单项抗性（火/冰/电/毒）", alvl: 40, note: "需求等级 32；弥补破免板 -70% 抗性缺口的首选小符前缀" },
-  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "石榴/钴蓝/珊瑚/碧玉 (单抗)", nameEn: "Garnet / Cobalt / Coral / Jade (SC)", range: "+8–9% 单项抗性（火/冰/电/毒）", alvl: 27, note: "需求等级 20" },
-  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "赤红/琉璃/赭石/青玉 (单抗)", nameEn: "Russet / Lapis / Ocher / Viridian (SC)", range: "+6–7% 单项抗性（火/冰/电/毒）", alvl: 14, note: "需求等级 10" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "红宝石 (11% 火抗)", nameEn: "Ruby (Small Charm)", range: "+10–11% 火焰抗性", alvl: 40, note: "需求等级 32；弥补破火板 -70% 抗性缺口首选" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "蓝宝石 (11% 冰抗)", nameEn: "Sapphire (Small Charm)", range: "+10–11% 冰冷抗性", alvl: 40, note: "需求等级 32；弥补破冰板 -70% 抗性缺口首选" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "琥珀 (11% 电抗)", nameEn: "Amber (Small Charm)", range: "+10–11% 闪电抗性", alvl: 40, note: "需求等级 32；弥补破电板 -70% 抗性缺口首选" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "翡翠 (11% 毒抗)", nameEn: "Emerald (Small Charm)", range: "+10–11% 毒素抗性", alvl: 40, note: "需求等级 32；弥补破毒板 -70% 抗性缺口首选" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "敦实 (30 防御)", nameEn: "Stalwart (Small Charm)", range: "+20–30 防御", alvl: 48, note: "需求等级 40" },
-  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "厚实 / 壮实 (防御)", nameEn: "Burly / Stout (Small Charm)", range: "+1–20 防御", alvl: 1, note: "需求等级 1–28" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "厚实 (防御)", nameEn: "Burly (Small Charm)", range: "+15–20 防御", alvl: 36, note: "需求等级 28" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "壮实 (防御)", nameEn: "Stout (Small Charm)", range: "+1–12 防御", alvl: 1, note: "需求等级 1–16" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "耐磨 (耐力上限)", nameEn: "Rugged (Small Charm)", range: "+4–16 耐力上限", alvl: 1, note: "需求等级 1–15" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "凛冬 (冰冷伤害)", nameEn: "Hibernal (Small Charm)", range: "+8–10 至 15–20 冰冷伤害", alvl: 91, note: "需求等级 83；次级极寒 Boreal (+5–7 至 9–14，alvl 66)" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "烈焰 (火焰伤害)", nameEn: "Flaming (Small Charm)", range: "+10–19 至 20–29 火焰伤害", alvl: 89, note: "需求等级 81；次级熏燃 Smoking (+4–9 至 11–19，alvl 64)" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "雷光 (闪电伤害)", nameEn: "Shocking (Small Charm)", range: "+1 至 44–71 闪电伤害", alvl: 90, note: "需求等级 82；搭配雷暴之后缀最高可达 1–99 电伤 SC" },
-  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "弧光 / 辉光 (闪电伤害)", nameEn: "Arcing / Glowing (Small Charm)", range: "+1 至 12–43 闪电伤害", alvl: 41, note: "需求等级 33–57" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "弧光 (闪电伤害)", nameEn: "Arcing (Small Charm)", range: "+1 至 25–43 闪电伤害", alvl: 65, note: "需求等级 57" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "辉光 (闪电伤害)", nameEn: "Glowing (Small Charm)", range: "+1 至 12–24 闪电伤害", alvl: 41, note: "需求等级 33" },
   { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "疫毒 (毒素伤害)", nameEn: "Pestilent (Small Charm)", range: "+175 毒素伤害（持续 6 秒）", alvl: 88, note: "需求等级 80；搭配炭疽之后缀可达 451 毒伤 SC" },
-  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "毒素 / 污毒 (毒素伤害)", nameEn: "Toxic / Envenomed (Small Charm)", range: "+50–100 毒素伤害（持续 5 秒）", alvl: 39, note: "需求等级 31–55" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "毒素 (毒素伤害)", nameEn: "Toxic (Small Charm)", range: "+100 毒素伤害（持续 5 秒）", alvl: 63, note: "需求等级 55" },
+  { slot: "charm_sc", type: "prefix", quality: "magic", nameZh: "污毒 (毒素伤害)", nameEn: "Envenomed (Small Charm)", range: "+50 毒素伤害（持续 5 秒）", alvl: 39, note: "需求等级 31" },
   { slot: "charm_sc", type: "suffix", quality: "magic", nameZh: "生机之 (20 生命)", nameEn: "of Vita (Small Charm)", range: "+16–20 生命", alvl: 47, note: "需求等级 39；小型咒符生命最高档" },
   { slot: "charm_sc", type: "suffix", quality: "magic", nameZh: "续命之 (15 生命)", nameEn: "of Substinence (Small Charm)", range: "+11–15 生命", alvl: 23, note: "需求等级 17；30 级 LLD 低级决斗满血小符" },
   { slot: "charm_sc", type: "suffix", quality: "magic", nameZh: "生命之 (10 生命)", nameEn: "of Life (Small Charm)", range: "+5–10 生命", alvl: 1, note: "需求等级 14" },
@@ -243,13 +270,18 @@ export const AFFIX_RANGES = [
   { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "锋利 (最大伤 + 命中)", nameEn: "Sharp (Large Charm)", range: "+4–6 最大伤害 · +21–48 命中值 (AR)", alvl: 28, note: "需求等级 21；搭配 35 生命即为物理高性价比 6/48/35 中符" },
   { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "优良 (最大伤 + 命中)", nameEn: "Fine (Large Charm)", range: "+1–3 最大伤害 · +10–20 命中值 (AR)", alvl: 19, note: "需求等级 14" },
   { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "钢铁 (命中值 AR)", nameEn: "Steel (Large Charm)", range: "+52–77 命中值 (AR)", alvl: 43, note: "需求等级 36–44（65–77 AR 需 alvl 52）" },
-  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "黑铁 / 青铜 (命中值 AR)", nameEn: "Iron / Bronze (Large Charm)", range: "+4–51 命中值 (AR)", alvl: 1, note: "需求等级 1–26" },
+  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "黑铁 (命中值 AR)", nameEn: "Iron (Large Charm)", range: "+26–51 命中值 (AR)", alvl: 25, note: "需求等级 18–26" },
+  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "青铜 (命中值 AR)", nameEn: "Bronze (Large Charm)", range: "+4–25 命中值 (AR)", alvl: 1, note: "需求等级 1–13" },
   { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "巨蛇的 (34 法力)", nameEn: "Serpent's (Large Charm)", range: "+24–34 法力", alvl: 41, note: "需求等级 33–41" },
   { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "光彩 (8% 全抗)", nameEn: "Shimmering (Large Charm)", range: "+3–8% 所有抗性", alvl: 17, note: "需求等级 12–26（6–8% 全抗需 alvl 34）" },
-  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "红宝石/蓝宝石/琥珀/翡翠 (15% 单抗)", nameEn: "Ruby / Sapphire / Amber / Emerald (LC)", range: "+13–15% 单项抗性（火/冰/电/毒）", alvl: 35, note: "需求等级 27" },
+  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "红宝石 (15% 火抗)", nameEn: "Ruby (Large Charm)", range: "+13–15% 火焰抗性", alvl: 35, note: "需求等级 27" },
+  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "蓝宝石 (15% 冰抗)", nameEn: "Sapphire (Large Charm)", range: "+13–15% 冰冷抗性", alvl: 35, note: "需求等级 27" },
+  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "琥珀 (15% 电抗)", nameEn: "Amber (Large Charm)", range: "+13–15% 闪电抗性", alvl: 35, note: "需求等级 27" },
+  { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "翡翠 (15% 毒抗)", nameEn: "Emerald (Large Charm)", range: "+13–15% 毒素抗性", alvl: 35, note: "需求等级 27" },
   { slot: "charm_lc", type: "prefix", quality: "magic", nameZh: "敦实 (60 防御)", nameEn: "Stalwart (Large Charm)", range: "+30–60 防御", alvl: 38, note: "需求等级 30–37" },
   { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "生机之 (35 生命)", nameEn: "of Vita (Large Charm)", range: "+26–35 生命", alvl: 58, note: "需求等级 50–66（31–35 生命需 alvl 74）" },
-  { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "续命之 / 生命之 (生命)", nameEn: "of Substinence / Life (Large Charm)", range: "+6–25 生命", alvl: 1, note: "需求等级 9–34" },
+  { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "续命之 (25 生命)", nameEn: "of Substinence (Large Charm)", range: "+16–25 生命", alvl: 26, note: "需求等级 19–34" },
+  { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "生命之 (15 生命)", nameEn: "of Life (Large Charm)", range: "+6–15 生命", alvl: 1, note: "需求等级 9" },
   { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "平衡之 (8% 快速打击恢复 FHR)", nameEn: "of Balance (Large Charm)", range: "+8% 快速打击恢复 (FHR)", alvl: 19, note: "需求等级 14" },
   { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "惯性之 (5% 高跑 FRW)", nameEn: "of Inertia (Large Charm)", range: "+5% 高速跑步/行走 (FRW)", alvl: 24, note: "需求等级 18" },
   { slot: "charm_lc", type: "suffix", quality: "magic", nameZh: "力量之 (+5 力量)", nameEn: "of Strength (Large Charm)", range: "+2–5 力量", alvl: 3, note: "需求等级 2–13（+4–5 力量需 alvl 18）" },
@@ -262,10 +294,14 @@ export const AFFIX_RANGES = [
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "锋利 (10 最大伤 + 76 命中)", nameEn: "Sharp (Grand Charm)", range: "+7–10 最大伤害 · +49–76 命中值 (AR)", alvl: 29, note: "需求等级 21；搭配 45 生命即为物理毕业 10/76/45 肉搏大板" },
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "优良 (最大伤 + 命中)", nameEn: "Fine (Grand Charm)", range: "+4–6 最大伤害 · +21–48 命中值 (AR)", alvl: 16, note: "需求等级 11" },
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "钢铁 (132 命中值 AR)", nameEn: "Steel (Grand Charm)", range: "+103–132 命中值 (AR)", alvl: 41, note: "需求等级 35–41（118–132 AR 需 alvl 49）；搭配 45 生命为 K6Boss/AR 流极品大板" },
-  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "黑铁 / 青铜 (命中值 AR)", nameEn: "Iron / Bronze (Grand Charm)", range: "+6–102 命中值 (AR)", alvl: 1, note: "需求等级 1–29" },
+  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "黑铁 (命中值 AR)", nameEn: "Iron (Grand Charm)", range: "+58–102 命中值 (AR)", alvl: 23, note: "需求等级 18–29" },
+  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "青铜 (命中值 AR)", nameEn: "Bronze (Grand Charm)", range: "+6–57 命中值 (AR)", alvl: 1, note: "需求等级 1–12" },
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "巨蛇的 (59 法力)", nameEn: "Serpent's (Grand Charm)", range: "+47–59 法力", alvl: 41, note: "需求等级 35–41；顶球法师 45 生命 / 59 法力大板" },
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "光彩 (15% 全抗)", nameEn: "Shimmering (Grand Charm)", range: "+8–15% 所有抗性", alvl: 14, note: "需求等级 12–27（13–15% 全抗需 alvl 35）" },
-  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "红宝石/蓝宝石/琥珀/翡翠 (30% 单抗)", nameEn: "Ruby / Sapphire / Amber / Emerald (GC)", range: "+26–30% 单项抗性（火/冰/电/毒）", alvl: 30, note: "需求等级 22" },
+  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "红宝石 (30% 火抗)", nameEn: "Ruby (Grand Charm)", range: "+26–30% 火焰抗性", alvl: 30, note: "需求等级 22" },
+  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "蓝宝石 (30% 冰抗)", nameEn: "Sapphire (Grand Charm)", range: "+26–30% 冰冷抗性", alvl: 30, note: "需求等级 22" },
+  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "琥珀 (30% 电抗)", nameEn: "Amber (Grand Charm)", range: "+26–30% 闪电抗性", alvl: 30, note: "需求等级 22" },
+  { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "翡翠 (30% 毒抗)", nameEn: "Emerald (Grand Charm)", range: "+26–30% 毒素抗性", alvl: 30, note: "需求等级 22" },
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "敦实 (100 防御)", nameEn: "Stalwart (Grand Charm)", range: "+75–100 防御", alvl: 35, note: "需求等级 27–32" },
   { slot: "charm_gc", type: "prefix", quality: "magic", nameZh: "幸运 (寻宝率 MF 前缀)", nameEn: "Lucky (Grand Charm)", range: "+1–12% 更佳机会取得魔法装备 (MF)", alvl: 21, note: "" },
   { slot: "charm_gc", type: "suffix", quality: "magic", nameZh: "生机之 (41–45 生命 · 巴尔/TZ 板)", nameEn: "of Vita (41–45 Life Grand Charm)", range: "+41–45 生命", alvl: 91, note: "需求等级 83；仅 ilvl ≥ 91（地狱大菠萝/尼拉塞克/巴尔或 89+ 级角色恐怖地带）的 GC 可洗出" },
@@ -282,7 +318,8 @@ export const AFFIX_RANGES = [
   // 💎 珠宝 (Jewel · qlvl 1 · 蓝珠宝最多1前+1后，黄珠宝最多4词缀：前≤3/后≤3)
   { slot: "jewel", type: "prefix", quality: "magic", nameZh: "红宝石 (40% 增强伤害 · 蓝专属)", nameEn: "Ruby (Jewel)", range: "+31–40% 增强伤害 (ED)", alvl: 66, note: "需求等级 58；搭配 15% IAS 后缀即为 40/15 红白珠（注意：防具上 ED 与 Max/Min 同珠宝存在 Bug，武器无影响）" },
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "雄黄 (30% 增强伤害 · 黄珠极限)", nameEn: "Realgar (Jewel)", range: "+21–30% 增强伤害 (ED)", alvl: 45, note: "需求等级 37；黄珠宝最高 ED 前缀，可配 9 力 / 9 敏 / 7 FHR 或 -15% 需求" },
-  { slot: "jewel", type: "prefix", quality: "all", nameZh: "红锈 / 朱砂 (增强伤害)", nameEn: "Rusty / Cinnabar (Jewel)", range: "+5–20% 增强伤害 (ED)", alvl: 1, note: "需求等级 1–9" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "红锈 (20% 增强伤害)", nameEn: "Rusty (Jewel)", range: "+11–20% 增强伤害 (ED)", alvl: 13, note: "需求等级 9" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "朱砂 (10% 增强伤害)", nameEn: "Cinnabar (Jewel)", range: "+5–10% 增强伤害 (ED)", alvl: 1, note: "需求等级 1" },
   { slot: "jewel", type: "prefix", quality: "magic", nameZh: "朱红 (+15 最大伤害 · 蓝专属)", nameEn: "Vermillion (Jewel)", range: "+11–15 最大伤害", alvl: 58, note: "需求等级 50；搭配克害之 (+15 Max) 后缀可达 +30 最大伤害蓝珠宝" },
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "深红 (+9 最大伤害 · 黄珠极限)", nameEn: "Carmine (Jewel)", range: "+6–9 最大伤害", alvl: 35, note: "需求等级 27；30 级 LLD 低级决斗核心词缀" },
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "猩红 (+8 最小伤害)", nameEn: "Crimson (Jewel)", range: "+5–8 最小伤害", alvl: 38, note: "需求等级 30；蓝/黄通用" },
@@ -290,12 +327,16 @@ export const AFFIX_RANGES = [
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "白银 (+60 命中值 · 黄珠极限)", nameEn: "Silver (Jewel)", range: "+41–60 命中值 (AR)", alvl: 25, note: "需求等级 18" },
   { slot: "jewel", type: "prefix", quality: "magic", nameZh: "五彩 (15% 全抗 · 蓝专属)", nameEn: "Scintillating (Jewel)", range: "+11–15% 所有抗性", alvl: 34, note: "需求等级 26；搭配 15% IAS、7% FHR、20 生命或 -15% 需求均为顶级蓝珠" },
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "光彩 (10% 全抗 · 黄珠极限)", nameEn: "Shimmering (Jewel)", range: "+5–10% 所有抗性", alvl: 16, note: "需求等级 12；黄珠宝全抗上限" },
-  { slot: "jewel", type: "prefix", quality: "all", nameZh: "红宝石/蓝宝石/龙涎香/碧玉 (30% 单抗)", nameEn: "Ruby / Sapphire / Ambergris / Jade (Jewel)", range: "+16–30% 单项抗性（火/冰/电/毒）", alvl: 19, note: "需求等级 13–14；15% IAS / 30% 火抗珠为安达利尔的面容毕业镶嵌物" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "红宝石 (30% 火抗)", nameEn: "Ruby (Jewel)", range: "+16–30% 火焰抗性", alvl: 19, note: "需求等级 13；15% IAS / 30% 火抗珠为安达利尔的面容毕业镶嵌物" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "蓝宝石 (30% 冰抗)", nameEn: "Sapphire (Jewel)", range: "+16–30% 冰冷抗性", alvl: 19, note: "需求等级 14" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "龙涎香 (30% 电抗)", nameEn: "Ambergris (Jewel)", range: "+16–30% 闪电抗性", alvl: 19, note: "需求等级 14" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "碧玉 (30% 毒抗)", nameEn: "Jade (Jewel)", range: "+16–30% 毒素抗性", alvl: 19, note: "需求等级 14" },
   { slot: "jewel", type: "prefix", quality: "magic", nameZh: "绿松石 (+20 法力 · 蓝专属)", nameEn: "Turquoise (Jewel)", range: "+16–20 法力", alvl: 29, note: "需求等级 21；黄珠宝最高为赤锆 Jacinth (+11–15 法力)" },
   { slot: "jewel", type: "prefix", quality: "magic", nameZh: "象牙 (+64 防御 · 蓝专属)", nameEn: "Ivory (Jewel)", range: "+41–64 防御", alvl: 64, note: "需求等级 56；黄珠宝最高为白骨 Bone (+21–40 防御)" },
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "光轮 (+3 击杀回蓝 EK)", nameEn: "Aureolin (Jewel)", range: "+1–3 每杀一个敌人恢复法力 (MAEK)", alvl: 22, note: "需求等级 16；标马/电法续航极品前缀" },
   { slot: "jewel", type: "prefix", quality: "all", nameZh: "索债 (12% 受损转法力)", nameEn: "Dun (Jewel)", range: "7–12% 受到的伤害转化为法力", alvl: 7, note: "需求等级 5" },
-  { slot: "jewel", type: "prefix", quality: "all", nameZh: "钻石 / 珍珠 (对恶魔/不死增伤)", nameEn: "Diamond / Pearl (Jewel)", range: "+25–40% 对恶魔伤(或 25–50% 对不死) · +25–50 命中", alvl: 26, note: "需求等级 13–19" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "钻石 (对恶魔增伤与命中)", nameEn: "Diamond (Jewel)", range: "+25–40% 对恶魔伤害 · +25–50 对恶魔命中", alvl: 26, note: "需求等级 19；单条双属性原生词缀" },
+  { slot: "jewel", type: "prefix", quality: "all", nameZh: "珍珠 (对不死增伤与命中)", nameEn: "Pearl (Jewel)", range: "+25–50% 对不死伤害 · +25–50 对不死命中", alvl: 18, note: "需求等级 13；单条双属性原生词缀" },
   { slot: "jewel", type: "suffix", quality: "magic", nameZh: "狂热之 (15% 攻速 IAS · 蓝专属)", nameEn: "of Fervor (Jewel)", range: "+15% 提高攻击速度 (IAS)", alvl: 39, note: "需求等级 31；仅蓝珠宝可出攻速（如 15 IAS/40 ED、15 IAS/15 全抗、15 IAS/30 火抗、15 IAS/15 Max、15 IAS/3 EK）" },
   { slot: "jewel", type: "suffix", quality: "magic", nameZh: "克害之 (+15 最大伤害 · 蓝专属)", nameEn: "of Carnage (Jewel)", range: "+11–15 最大伤害", alvl: 25, note: "需求等级 18" },
   { slot: "jewel", type: "suffix", quality: "all", nameZh: "怒火之 (+9 最大伤害 · 黄珠极限)", nameEn: "of Wrath (Jewel)", range: "+6–9 最大伤害", alvl: 11, note: "需求等级 8" },
@@ -309,7 +350,190 @@ export const AFFIX_RANGES = [
   { slot: "jewel", type: "suffix", quality: "all", nameZh: "发达之 (10% 寻宝 MF)", nameEn: "of Prosperity (Jewel)", range: "+5–10% 更佳机会取得魔法装备 (MF)", alvl: 26, note: "需求等级 19；搭配翡翠前缀 (+7% MF) 可达 17% MF 蓝珠宝" },
   { slot: "jewel", type: "suffix", quality: "all", nameZh: "贪财之 (30% 额外金币 EG)", nameEn: "of Avarice (Jewel)", range: "+10–30% 额外金币 (EG)", alvl: 1, note: "需求等级 1" },
   { slot: "jewel", type: "suffix", quality: "all", nameZh: "嫉妒之 (1级小号 20 毒伤神器)", nameEn: "of Envy (Jewel)", range: "+20 毒素伤害（持续 2 秒，无等级需求）", alvl: 1, note: "需求等级 1；镶满 6 孔剑/3 孔头/4 孔甲为 1 级小号开荒秒怪神器" },
-  { slot: "jewel", type: "suffix", quality: "all", nameZh: "雷霆之 / 燃烧之 (元素点伤)", nameEn: "of Thunder / Burning (Jewel)", range: "+1–100 闪电伤害 或 +11–50 火焰伤害", alvl: 57, note: "需求等级 49" }
+  { slot: "jewel", type: "suffix", quality: "all", nameZh: "雷霆之 (闪电点伤)", nameEn: "of Thunder (Jewel)", range: "+1 至 61–100 闪电伤害", alvl: 57, note: "需求等级 49" },
+  { slot: "jewel", type: "suffix", quality: "all", nameZh: "燃烧之 (火焰点伤)", nameEn: "of Burning (Jewel)", range: "+11–25 至 36–50 火焰伤害", alvl: 57, note: "需求等级 49" }
+];
+
+// 暗金珠宝列表（含 D2R 3.4 术士君临新增 6 颗巨型暗金珠宝 cjw + 4 颗经典彩虹刻面）
+export const UNIQUE_JEWELS = [
+  {
+    id: "defenders-fire",
+    patch: "3.4",
+    code: "cjw",
+    nameZh: "防御者之火",
+    nameEn: "Defender's Fire",
+    reqLvl: 75,
+    icon: "/images/items/misc/body_part/fragment_fire.webp",
+    lines: [
+      "被击中时 1–25% 几率施放 1 级火焰风暴",
+      "+5–10% 火焰技能伤害",
+      "-5–10% 敌人火焰抗性",
+      "+20–60 火焰伤害",
+      "+3–5% 获得经验值",
+      "+15–35% 更佳机会取得魔法装备 (MF)",
+      "+25–50% 额外金币 (EG)"
+    ],
+    note: "D2R 3.4 术士君临新增巨型暗金珠宝（火焰系）"
+  },
+  {
+    id: "protectors-frost",
+    patch: "3.4",
+    code: "cjw",
+    nameZh: "保卫者之霜",
+    nameEn: "Protector's Frost",
+    reqLvl: 75,
+    icon: "/images/items/misc/body_part/fragment_cold.webp",
+    lines: [
+      "被击中时 1–25% 几率施放 1 级冰封装甲",
+      "+5–10% 冰冷技能伤害",
+      "-5–10% 敌人冰冷抗性",
+      "+10–30 冰冷伤害",
+      "+3–5% 获得经验值",
+      "+15–35% 更佳机会取得魔法装备 (MF)",
+      "+25–50% 额外金币 (EG)"
+    ],
+    note: "D2R 3.4 术士君临新增巨型暗金珠宝（冰冷系）"
+  },
+  {
+    id: "guardians-thunder",
+    patch: "3.4",
+    code: "cjw",
+    nameZh: "守护者之雷",
+    nameEn: "Guardian's Thunder",
+    reqLvl: 75,
+    icon: "/images/items/misc/body_part/fragment_lightning.webp",
+    lines: [
+      "被击中时 1–25% 几率施放 1 级飓风装甲",
+      "+5–10% 闪电技能伤害",
+      "-5–10% 敌人闪电抗性",
+      "+1–75 闪电伤害",
+      "+3–5% 获得经验值",
+      "+15–35% 更佳机会取得魔法装备 (MF)",
+      "+25–50% 额外金币 (EG)"
+    ],
+    note: "D2R 3.4 术士君临新增巨型暗金珠宝（闪电系）"
+  },
+  {
+    id: "defenders-bile",
+    patch: "3.4",
+    code: "cjw",
+    nameZh: "防御者之怒",
+    nameEn: "Defender's Bile",
+    reqLvl: 75,
+    icon: "/images/items/misc/body_part/fragment_poison.webp",
+    lines: [
+      "被击中时 1–25% 几率施放 1 级白骨装甲",
+      "+5–10% 毒素技能伤害",
+      "-5–10% 敌人毒素抗性",
+      "+975 毒素伤害（持续 1 秒）",
+      "+3–5% 获得经验值",
+      "+15–35% 更佳机会取得魔法装备 (MF)",
+      "+25–50% 额外金币 (EG)"
+    ],
+    note: "D2R 3.4 术士君临新增巨型暗金珠宝（毒素系）"
+  },
+  {
+    id: "protectors-stone",
+    patch: "3.4",
+    code: "cjw",
+    nameZh: "保卫者之石",
+    nameEn: "Protector's Stone",
+    reqLvl: 75,
+    icon: "/images/items/misc/body_part/fragment_physical.webp",
+    lines: [
+      "被击中时 1–15% 几率施放 1 级能量消解",
+      "+30–50% 增强伤害 (ED)",
+      "+10–30 伤害",
+      "-5–10% 敌人物理抗性",
+      "+3–5% 获得经验值",
+      "+15–35% 更佳机会取得魔法装备 (MF)",
+      "+25–50% 额外金币 (EG)"
+    ],
+    note: "D2R 3.4 术士君临新增巨型暗金珠宝（物理破抗系）"
+  },
+  {
+    id: "guardians-light",
+    patch: "3.4",
+    code: "cjw",
+    nameZh: "守护者之光",
+    nameEn: "Guardian's Light",
+    reqLvl: 75,
+    icon: "/images/items/misc/body_part/fragment_magic.webp",
+    lines: [
+      "被击中时 1–25% 几率施放 1 级邪咒护盾",
+      "+5–10% 魔法技能伤害",
+      "-5–10% 敌人魔法抗性",
+      "+15–35 魔法伤害",
+      "+3–5% 获得经验值",
+      "+15–35% 更佳机会取得魔法装备 (MF)",
+      "+25–50% 额外金币 (EG)"
+    ],
+    note: "D2R 3.4 术士君临新增巨型暗金珠宝（魔法系 · 祝福之锤/白骨/混沌术士毕业）"
+  },
+  {
+    id: "facet-lightning",
+    patch: "1.10",
+    code: "jew",
+    nameZh: "彩虹刻面（闪电）",
+    nameEn: "Rainbow Facet (Lightning)",
+    reqLvl: 49,
+    icon: "/images/items/misc/gem/perfect_diamond5.webp",
+    lines: [
+      "死亡/升级时 100% 几率施放 47 级连锁闪电 / 41 级新星",
+      "+1–74 闪电伤害",
+      "+3–5% 闪电技能伤害",
+      "-3–5% 敌人闪电抗性"
+    ],
+    note: "经典暗金珠宝（俗称 5/5 电珠）"
+  },
+  {
+    id: "facet-cold",
+    patch: "1.10",
+    code: "jew",
+    nameZh: "彩虹刻面（冰冷）",
+    nameEn: "Rainbow Facet (Cold)",
+    reqLvl: 49,
+    icon: "/images/items/misc/gem/perfect_diamond3.webp",
+    lines: [
+      "死亡/升级时 100% 几率施放 37 级暴风雪 / 43 级霜之新星",
+      "+24–38 冰冷伤害",
+      "+3–5% 冰冷技能伤害",
+      "-3–5% 敌人冰冷抗性"
+    ],
+    note: "经典暗金珠宝（俗称 5/5 冰珠）"
+  },
+  {
+    id: "facet-fire",
+    patch: "1.10",
+    code: "jew",
+    nameZh: "彩虹刻面（火焰）",
+    nameEn: "Rainbow Facet (Fire)",
+    reqLvl: 49,
+    icon: "/images/items/misc/gem/perfect_diamond2.webp",
+    lines: [
+      "死亡/升级时 100% 几率施放 31 级陨石 / 29 级烈焰之径",
+      "+17–45 火焰伤害",
+      "+3–5% 火焰技能伤害",
+      "-3–5% 敌人火焰抗性"
+    ],
+    note: "经典暗金珠宝（俗称 5/5 火珠）"
+  },
+  {
+    id: "facet-poison",
+    patch: "1.10",
+    code: "jew",
+    nameZh: "彩虹刻面（毒素）",
+    nameEn: "Rainbow Facet (Poison)",
+    reqLvl: 49,
+    icon: "/images/items/misc/gem/perfect_diamond4.webp",
+    lines: [
+      "死亡/升级时 100% 几率施放 51 级剧毒新星 / 23 级淬毒",
+      "+37 毒素伤害（持续 2 秒）",
+      "+3–5% 毒素技能伤害",
+      "-3–5% 敌人毒素抗性"
+    ],
+    note: "经典暗金珠宝（俗称 5/5 毒珠）"
+  }
 ];
 
 export const SIMULATOR_BASES = [
@@ -327,7 +551,7 @@ export const SIMULATOR_BASES = [
   { id: "charm_sc", slot: "charm_sc", label: "小型咒符 (Small Charm, SC · qlvl 28)", icon: "/images/items/misc/charm/charm_small.webp", qlvl: 28, magicLvl: 0, supportsCraft: false, magicOnly: true },
   { id: "charm_lc", slot: "charm_lc", label: "大型咒符 (Large Charm, LC · qlvl 14)", icon: "/images/items/misc/charm/charm_medium.webp", qlvl: 14, magicLvl: 0, supportsCraft: false, magicOnly: true },
   { id: "charm_gc", slot: "charm_gc", label: "巨型咒符 (Grand Charm, GC · qlvl 1)", icon: "/images/items/misc/charm/charm_large.webp", qlvl: 1, magicLvl: 0, supportsCraft: false, magicOnly: true },
-  { id: "jewel", slot: "jewel", label: "珠宝 (Jewel · qlvl 1)", icon: "/images/items/misc/body_part/fragment_fire.webp", qlvl: 1, magicLvl: 0, supportsCraft: false, rareMaxAffixes: 4 }
+  { id: "jewel", slot: "jewel", label: "珠宝 (Jewel · 含蓝/黄/暗金3.4新珠宝)", icon: "/images/items/misc/gem/perfect_diamond1.webp", qlvl: 1, magicLvl: 0, supportsCraft: false, supportsUnique: true, rareMaxAffixes: 4 }
 ];
 
 export function calculateItemAlvl(ilvl, qlvl = 1, magicLvl = 0) {
@@ -350,6 +574,7 @@ export function getAffixesCatalog() {
     craftRecipes: CRAFT_RECIPES,
     slots: AFFIX_SLOTS,
     simulatorBases: SIMULATOR_BASES,
+    uniqueJewels: UNIQUE_JEWELS,
     affixes: AFFIX_RANGES,
     totalAffixes: AFFIX_RANGES.length
   };

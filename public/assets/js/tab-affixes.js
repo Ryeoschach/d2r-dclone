@@ -200,6 +200,8 @@ let simIlvl = 85;
 let simClvl = 93;
 let simCraftBaseIlvl = 88;
 let simCraftRecipeIdx = 0;
+let simUniqueJewelId = "defenders-fire";
+let simUniqueRolledLines = null;
 let simSelectedPrefixes = [];
 let simSelectedSuffixes = [];
 let simRolledLines = null;
@@ -298,12 +300,37 @@ function populateSimCraftRecipes() {
   select.value = String(simCraftRecipeIdx);
 }
 
+function getUniqueJewelsList() {
+  return Array.isArray(afData?.uniqueJewels) ? afData.uniqueJewels : [];
+}
+
+function getActiveUniqueJewel() {
+  const list = getUniqueJewelsList();
+  return list.find(j => j.id === simUniqueJewelId) || list[0] || null;
+}
+
+function populateSimUniqueSelect() {
+  const sel = document.getElementById("sim-unique-select");
+  if (!sel) return;
+  const list = getUniqueJewelsList();
+  sel.innerHTML = list.map(j => {
+    const tag = j.patch === "3.4" ? "[3.4新增] " : "[经典] ";
+    return '<option value="' + escapeHtml(j.id) + '">' + tag + escapeHtml(j.nameZh) + ' · ' + escapeHtml(j.nameEn) + ' (需 Lv.' + j.reqLvl + ')</option>';
+  }).join("");
+  const active = getActiveUniqueJewel();
+  if (active) {
+    simUniqueJewelId = active.id;
+    sel.value = active.id;
+  }
+}
+
 function updateSimStateAndRender() {
   if (!afData) return;
   const base = getSimBase();
 
   const rareBtn = document.querySelector('#sim-quality-chips [data-sim-quality="rare"]');
   const craftBtn = document.querySelector('#sim-quality-chips [data-sim-quality="crafted"]');
+  const uniqBtn = document.querySelector('#sim-quality-chips [data-sim-quality="unique"]');
   if (rareBtn) {
     rareBtn.disabled = Boolean(base.magicOnly);
     rareBtn.style.opacity = base.magicOnly ? ".4" : "1";
@@ -311,6 +338,10 @@ function updateSimStateAndRender() {
   if (craftBtn) {
     craftBtn.disabled = !base.supportsCraft;
     craftBtn.style.opacity = base.supportsCraft ? "1" : ".4";
+  }
+  if (uniqBtn) {
+    uniqBtn.style.display = base.supportsUnique ? "" : "none";
+    uniqBtn.disabled = !base.supportsUnique;
   }
   if (base.magicOnly && simQuality !== "magic") {
     simQuality = "magic";
@@ -322,14 +353,34 @@ function updateSimStateAndRender() {
     document.querySelectorAll("#sim-quality-chips button").forEach(b => {
       b.classList.toggle("active", b.dataset.simQuality === "rare");
     });
+  } else if (!base.supportsUnique && simQuality === "unique") {
+    simQuality = "rare";
+    document.querySelectorAll("#sim-quality-chips button").forEach(b => {
+      b.classList.toggle("active", b.dataset.simQuality === "rare");
+    });
   }
 
-  document.getElementById("sim-standard-lvls").style.display = simQuality === "crafted" ? "none" : "flex";
+  const isUniqueMode = simQuality === "unique" && Boolean(base.supportsUnique);
+  document.getElementById("sim-standard-lvls").style.display = (simQuality === "crafted" || isUniqueMode) ? "none" : "flex";
   document.getElementById("sim-craft-opts").style.display = simQuality === "crafted" ? "flex" : "none";
+  const uniqOpts = document.getElementById("sim-unique-opts");
+  if (uniqOpts) uniqOpts.style.display = isUniqueMode ? "flex" : "none";
 
   const outIlvl = getSimOutIlvl();
   const alvl = computeSimAlvl(outIlvl, base.qlvl, base.magicLvl);
-  const limits = getSimLimits(outIlvl);
+  const limits = isUniqueMode
+    ? { maxPrefix: 0, maxSuffix: 0, maxTotal: 0, label: "暗金固定词缀（点击随机 Roll 生成实际变量）" }
+    : getSimLimits(outIlvl);
+
+  if (isUniqueMode) {
+    const uj = getActiveUniqueJewel();
+    document.getElementById("sim-out-ilvl").textContent = uj ? (uj.patch === "3.4" ? "85+ (TZ/3.4)" : "85") : "85";
+    document.getElementById("sim-out-alvl").textContent = uj ? ("需 Lv." + uj.reqLvl) : "—";
+    document.getElementById("sim-out-limit").textContent = limits.label;
+    renderSimUniquePools();
+    renderSimUniquePreview(uj);
+    return;
+  }
 
   document.getElementById("sim-out-ilvl").textContent = outIlvl;
   document.getElementById("sim-out-alvl").textContent = alvl;
@@ -348,6 +399,61 @@ function updateSimStateAndRender() {
 
   renderSimPools(pool, alvl, limits);
   renderSimPreview(base, pool, outIlvl, alvl, limits);
+}
+
+function renderSimUniquePools() {
+  const prefixContainer = document.getElementById("sim-prefix-list");
+  const suffixContainer = document.getElementById("sim-suffix-list");
+  const list = getUniqueJewelsList();
+  const col34 = list.filter(j => j.patch === "3.4");
+  const colClassic = list.filter(j => j.patch !== "3.4");
+  document.getElementById("sim-prefix-count").textContent = "3.4 新增 " + col34.length + " 颗";
+  document.getElementById("sim-suffix-count").textContent = "经典刻面 " + colClassic.length + " 颗";
+
+  const renderJewelCards = (items) => items.map(j => {
+    const isSel = j.id === simUniqueJewelId;
+    return '<button type="button" class="sim-affix-btn' + (isSel ? " selected" : "") + '" data-sim-uniq-id="' + escapeHtml(j.id) + '">' +
+      '<div class="sim-affix-top">' +
+        '<span style="display:inline-flex;align-items:center;gap:6px"><img src="' + escapeHtml(j.icon) + '" alt="" style="width:18px;height:18px;object-fit:contain">' + escapeHtml(j.nameZh) + '</span>' +
+        '<span class="sim-affix-req">需 Lv.' + j.reqLvl + '</span>' +
+      '</div>' +
+      '<div class="sim-affix-range">' + escapeHtml(j.nameEn) + ' · ' + escapeHtml(j.lines[1] || j.lines[0] || "") + '</div>' +
+    '</button>';
+  }).join("");
+
+  prefixContainer.innerHTML = renderJewelCards(col34);
+  suffixContainer.innerHTML = renderJewelCards(colClassic);
+
+  const bind = (container) => {
+    container.querySelectorAll("[data-sim-uniq-id]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        simUniqueJewelId = btn.dataset.simUniqId;
+        simUniqueRolledLines = null;
+        const sel = document.getElementById("sim-unique-select");
+        if (sel) sel.value = simUniqueJewelId;
+        updateSimStateAndRender();
+      });
+    });
+  };
+  bind(prefixContainer);
+  bind(suffixContainer);
+}
+
+function renderSimUniquePreview(uj) {
+  const card = document.getElementById("sim-preview-card");
+  card.className = "sim-preview-card q-unique";
+  if (!uj) return;
+  document.getElementById("sim-preview-title").textContent = uj.nameZh + " · " + uj.nameEn;
+  const iconEl = document.getElementById("sim-preview-icon");
+  if (iconEl) iconEl.src = uj.icon;
+  document.getElementById("sim-preview-sub").textContent =
+    (uj.patch === "3.4" ? "D2R 3.4 巨型暗金珠宝 (cjw)" : "经典暗金珠宝 (jew)") +
+    " · 需求等级 " + uj.reqLvl + (simUniqueRolledLines ? " · 已随机 Roll 变量" : " · 变量范围预览");
+  const lines = (simUniqueRolledLines || uj.lines).map(l => '<li>' + escapeHtml(l) + '</li>');
+  if (uj.note) {
+    lines.push('<li style="opacity:.75;font-size:11.5px">' + escapeHtml(uj.note) + '</li>');
+  }
+  document.getElementById("sim-preview-lines").innerHTML = lines.join("");
 }
 
 function renderSimPools(pool, alvl, limits) {
@@ -421,7 +527,7 @@ function renderSimPools(pool, alvl, limits) {
 }
 
 function rollNumberInRangeText(text) {
-  return String(text).replace(/(d+)s*[–-]s*(d+)/g, (_, a, b) => {
+  return String(text).replace(/(\d+)\s*[–-]\s*(\d+)/g, (_, a, b) => {
     const min = Number(a);
     const max = Number(b);
     return String(Math.floor(Math.random() * (max - min + 1)) + min);
@@ -431,6 +537,14 @@ function rollNumberInRangeText(text) {
 function rollSimulatedItem() {
   if (!afData) return;
   const base = getSimBase();
+  if (simQuality === "unique" && base.supportsUnique) {
+    const uj = getActiveUniqueJewel();
+    if (uj) {
+      simUniqueRolledLines = uj.lines.map(l => rollNumberInRangeText(l));
+      updateSimStateAndRender();
+    }
+    return;
+  }
   const outIlvl = getSimOutIlvl();
   const alvl = computeSimAlvl(outIlvl, base.qlvl, base.magicLvl);
   const limits = getSimLimits(outIlvl);
@@ -574,15 +688,26 @@ function initSimulator() {
     updateSimStateAndRender();
   });
 
+  const uniqSelect = document.getElementById("sim-unique-select");
+  if (uniqSelect) {
+    uniqSelect.addEventListener("change", () => {
+      simUniqueJewelId = uniqSelect.value;
+      simUniqueRolledLines = null;
+      updateSimStateAndRender();
+    });
+  }
+
   document.getElementById("sim-roll-btn").addEventListener("click", rollSimulatedItem);
   document.getElementById("sim-clear-btn").addEventListener("click", () => {
     simSelectedPrefixes = [];
     simSelectedSuffixes = [];
     simRolledLines = null;
+    simUniqueRolledLines = null;
     updateSimStateAndRender();
   });
 
   populateSimCraftRecipes();
+  populateSimUniqueSelect();
   updateSimStateAndRender();
 }
 

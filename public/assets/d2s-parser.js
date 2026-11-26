@@ -192,22 +192,23 @@ function mapMercTypeId(typeId) {
   // Standard D2 / D2R hireling.txt ID ranges across Normal / Nightmare / Hell
   if (id <= 5) return id % 2 === 0 ? "a1-fire" : "a1-cold";
   if (id >= 6 && id <= 14) {
+    if (id === 10) return "a2-hf";
+    if (id === 11) return "a2-might";
     const mod = (id - 6) % 3;
     if (mod === 0) return "a2-prayer";
     if (mod === 1) return "a2-defiance";
-    if (id >= 9 && id <= 11) {
-      // Nightmare Act 2: Might (off), Holy Freeze (def), Thorns (combat)
-      return mod === 1 ? "a2-hf" : "a2-might";
-    }
     return "a2-ba";
   }
   if (id >= 15 && id <= 23) {
     const mod = (id - 15) % 3;
     return mod === 0 ? "a3-fire" : (mod === 1 ? "a3-cold" : "a3-ltng");
   }
-  if (id >= 24 && id <= 35) {
-    return id >= 30 ? "a5-frenzy" : "a5-bash";
+  if (id >= 24 && id <= 29) return "a5-bash";
+  if (id >= 30 && id <= 35) {
+    const mod = (id - 30) % 3;
+    return mod === 0 ? "a2-prayer" : (mod === 1 ? "a2-defiance" : "a2-ba");
   }
+  if (id >= 36 && id <= 38) return "a5-frenzy";
   return "a2-might";
 }
 
@@ -458,8 +459,11 @@ export function parseD2sBuffer(buffer, fileName = "") {
   const fileSize = view.getUint32(8, true);
   const activeWeaponSet = view.getUint32(16, true) === 1 ? 2 : 1;
 
-  // Character name: offset 0x14 (classic & D2R v97/98), fallback 0x10B / 0x12B (D2R v99/3.4) or filename
-  let name = readNullTermUtf8(bytes, 0x14, 16);
+  const isV105Plus = version >= 105;
+  // Character name: offset 0x12B (D2R 3.4 v105+), or 0x14 (classic & D2R v97/98), fallback 0x10B / filename
+  let name = isV105Plus
+    ? readNullTermUtf8(bytes, 0x12b, 16)
+    : readNullTermUtf8(bytes, 0x14, 16);
   if (!name && bytes.length > 0x120) {
     name = readNullTermUtf8(bytes, 0x10b, 16) || readNullTermUtf8(bytes, 0x12b, 16);
   }
@@ -468,27 +472,28 @@ export function parseD2sBuffer(buffer, fileName = "") {
   }
   if (!name) name = "未命名角色";
 
-  const statusByte = bytes[0x24];
+  const statusByte = bytes[isV105Plus ? 0x14 : 0x24];
   const status = {
     hardcore: Boolean(statusByte & 0x04),
     died: Boolean(statusByte & 0x08),
-    expansion: Boolean(statusByte & 0x20),
+    expansion: isV105Plus ? true : Boolean(statusByte & 0x20),
     ladder: Boolean(statusByte & 0x40)
   };
 
-  const classCode = bytes[0x28];
+  const classCode = bytes[isV105Plus ? 0x18 : 0x28];
   const classId = D2S_CLASS_MAP[classCode];
   if (!classId) {
     throw new Error("无法识别的职业代码（class=" + classCode + "）");
   }
 
-  const headerLevel = Math.min(99, Math.max(1, bytes[0x2b] || 1));
+  const headerLevel = Math.min(99, Math.max(1, bytes[isV105Plus ? 0x1b : 0x2b] || 1));
 
-  // Mercenary header metadata
-  const mercDead = view.getUint16(0xb1, true) !== 0;
-  const mercSeed = view.getUint32(0xb3, true);
-  const mercTypeId = view.getUint16(0xb9, true);
-  const mercExp = view.getUint32(0xbb, true);
+  // Mercenary header metadata (shifted -0x10 in D2R 3.4 v105+)
+  const mercBase = isV105Plus ? 0xa1 : 0xb1;
+  const mercDead = view.getUint16(mercBase, true) !== 0;
+  const mercSeed = view.getUint32(mercBase + 2, true);
+  const mercTypeId = view.getUint16(mercBase + 8, true);
+  const mercExp = view.getUint32(mercBase + 10, true);
   const mercVariant = mapMercTypeId(mercTypeId);
 
   const sectionData = scanAttributesAndSkills(bytes);

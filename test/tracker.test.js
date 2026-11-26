@@ -390,8 +390,13 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /\/assets\/d2s-exporter\.js/);
   assert.match(html, /applyMappedD2sImport/);
   assert.match(html, /\/assets\/d2s-parser\.js/);
-  assert.equal((pageHtml.match(/class="auth-dlg-head"/g) || []).length, 4, "全部 4 个前台原生弹窗均应使用统一的 auth-dlg-head 顶栏布局");
-  assert.equal((pageHtml.match(/class="auth-dlg-body"/g) || []).length, 4, "全部 4 个前台原生弹窗均应使用统一的 auth-dlg-body 内边距容器");
+  assert.match(html, /sk-stash-export-btn/);
+  assert.match(html, /pd-stash-export-btn/);
+  assert.match(html, /pd-stash-dialog/);
+  assert.match(html, /\/assets\/d2i-stash\.js/);
+  assert.match(pageHtml, /class="app-version"[^>]*>v\d+\.\d+\.\d{12}</);
+  assert.equal((pageHtml.match(/class="auth-dlg-head"/g) || []).length, 5, "全部 5 个前台原生弹窗均应使用统一的 auth-dlg-head 顶栏布局");
+  assert.equal((pageHtml.match(/class="auth-dlg-body"/g) || []).length, 5, "全部 5 个前台原生弹窗均应使用统一的 auth-dlg-body 内边距容器");
   assert.doesNotMatch(pageHtml, /class="auth-dialog-(head|body|title|sub)"/, "不应存在失配的 auth-dialog-* 旧类名");
   const subtabsMatch = html.match(/id="sk-view-subtabs"[\s\S]*?<\/div>/);
   assert.ok(subtabsMatch, "应包含技能子标签页容器");
@@ -408,6 +413,10 @@ test("仪表盘包含完整分组和筛选入口", () => {
 
   assert.match(moduleSources["core.js"], /ensureTabModule/);
   assert.match(moduleSources["core.js"], /import\(url\)/);
+  assert.match(moduleSources["core.js"], /setupGlobalHudAndShortcuts/);
+  assert.match(moduleSources["core.js"], /hud-tz-pill/);
+  assert.match(moduleSources["core.js"], /hud-dc-pill/);
+  assert.doesNotMatch(moduleSources["tab-items.js"], /hud-tz-pill/);
   assert.match(html, /符文之语 100% 记事/);
   assert.match(html, /\/api\/runewords/);
   assert.match(html, /rw-rune-grid/);

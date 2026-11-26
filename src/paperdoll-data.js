@@ -1178,7 +1178,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "5/5 闪电彩虹刻面 (电珠)",
     "nameEn": "Rainbow Facet (5/5 Lightning)",
-    "icon": "/images/items/misc/body_part/fragment_lightning.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond5.webp",
     "weapon": "+5% 闪电技能伤害 · -5% 敌人闪电抗性",
     "helm": "+5% 闪电技能伤害 · -5% 敌人闪电抗性",
     "shield": "+5% 闪电技能伤害 · -5% 敌人闪电抗性"
@@ -1188,7 +1188,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "5/5 冰冷彩虹刻面 (冰珠)",
     "nameEn": "Rainbow Facet (5/5 Cold)",
-    "icon": "/images/items/misc/body_part/fragment_cold.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond3.webp",
     "weapon": "+5% 冰冷技能伤害 · -5% 敌人冰冷抗性",
     "helm": "+5% 冰冷技能伤害 · -5% 敌人冰冷抗性",
     "shield": "+5% 冰冷技能伤害 · -5% 敌人冰冷抗性"
@@ -1198,7 +1198,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "5/5 火焰彩虹刻面 (火珠)",
     "nameEn": "Rainbow Facet (5/5 Fire)",
-    "icon": "/images/items/misc/body_part/fragment_fire.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond2.webp",
     "weapon": "+5% 火焰技能伤害 · -5% 敌人火焰抗性",
     "helm": "+5% 火焰技能伤害 · -5% 敌人火焰抗性",
     "shield": "+5% 火焰技能伤害 · -5% 敌人火焰抗性"
@@ -1208,17 +1208,77 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "5/5 毒素彩虹刻面 (毒珠)",
     "nameEn": "Rainbow Facet (5/5 Poison)",
-    "icon": "/images/items/misc/body_part/fragment_poison.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond4.webp",
     "weapon": "+5% 毒素技能伤害 · -5% 敌人毒素抗性",
     "helm": "+5% 毒素技能伤害 · -5% 敌人毒素抗性",
     "shield": "+5% 毒素技能伤害 · -5% 敌人毒素抗性"
+  },
+  {
+    "id": "jw-34-fire",
+    "kind": "jewel",
+    "nameZh": "[3.4暗金] 防御者之火 (10/10 火巨珠)",
+    "nameEn": "Defender's Fire (Colossal Jewel)",
+    "icon": "/images/items/misc/body_part/fragment_fire.webp",
+    "weapon": "+10% 火焰技能伤害 · -10% 敌人火焰抗性 · +5% 经验 · +35% MF · +50% EG",
+    "helm": "+10% 火焰技能伤害 · -10% 敌人火焰抗性 · +5% 经验 · +35% MF · +50% EG",
+    "shield": "+10% 火焰技能伤害 · -10% 敌人火焰抗性 · +5% 经验 · +35% MF · +50% EG"
+  },
+  {
+    "id": "jw-34-cold",
+    "kind": "jewel",
+    "nameZh": "[3.4暗金] 保卫者之霜 (10/10 冰巨珠)",
+    "nameEn": "Protector's Frost (Colossal Jewel)",
+    "icon": "/images/items/misc/body_part/fragment_cold.webp",
+    "weapon": "+10% 冰冷技能伤害 · -10% 敌人冰冷抗性 · +5% 经验 · +35% MF · +50% EG",
+    "helm": "+10% 冰冷技能伤害 · -10% 敌人冰冷抗性 · +5% 经验 · +35% MF · +50% EG",
+    "shield": "+10% 冰冷技能伤害 · -10% 敌人冰冷抗性 · +5% 经验 · +35% MF · +50% EG"
+  },
+  {
+    "id": "jw-34-ltng",
+    "kind": "jewel",
+    "nameZh": "[3.4暗金] 守护者之雷 (10/10 电巨珠)",
+    "nameEn": "Guardian's Thunder (Colossal Jewel)",
+    "icon": "/images/items/misc/body_part/fragment_lightning.webp",
+    "weapon": "+10% 闪电技能伤害 · -10% 敌人闪电抗性 · +5% 经验 · +35% MF · +50% EG",
+    "helm": "+10% 闪电技能伤害 · -10% 敌人闪电抗性 · +5% 经验 · +35% MF · +50% EG",
+    "shield": "+10% 闪电技能伤害 · -10% 敌人闪电抗性 · +5% 经验 · +35% MF · +50% EG"
+  },
+  {
+    "id": "jw-34-pois",
+    "kind": "jewel",
+    "nameZh": "[3.4暗金] 防御者之怒 (10/10 毒巨珠)",
+    "nameEn": "Defender's Bile (Colossal Jewel)",
+    "icon": "/images/items/misc/body_part/fragment_poison.webp",
+    "weapon": "+10% 毒素技能伤害 · -10% 敌人毒素抗性 · +5% 经验 · +35% MF · +50% EG",
+    "helm": "+10% 毒素技能伤害 · -10% 敌人毒素抗性 · +5% 经验 · +35% MF · +50% EG",
+    "shield": "+10% 毒素技能伤害 · -10% 敌人毒素抗性 · +5% 经验 · +35% MF · +50% EG"
+  },
+  {
+    "id": "jw-34-phys",
+    "kind": "jewel",
+    "nameZh": "[3.4暗金] 保卫者之石 (50ED/-10物抗巨珠)",
+    "nameEn": "Protector's Stone (Colossal Jewel)",
+    "icon": "/images/items/misc/body_part/fragment_physical.webp",
+    "weapon": "+50% 增强伤害 (ED) · +30 伤害 · -10% 敌人物理抗性 · +5% 经验 · +35% MF",
+    "helm": "+50% 增强伤害 (ED) · +30 伤害 · -10% 敌人物理抗性 · +5% 经验 · +35% MF",
+    "shield": "+50% 增强伤害 (ED) · +30 伤害 · -10% 敌人物理抗性 · +5% 经验 · +35% MF"
+  },
+  {
+    "id": "jw-34-mag",
+    "kind": "jewel",
+    "nameZh": "[3.4暗金] 守护者之光 (10/10 魔伤巨珠)",
+    "nameEn": "Guardian's Light (Colossal Jewel)",
+    "icon": "/images/items/misc/body_part/fragment_magic.webp",
+    "weapon": "+10% 魔法技能伤害 · -10% 敌人魔法抗性 · +5% 经验 · +35% MF · +50% EG",
+    "helm": "+10% 魔法技能伤害 · -10% 敌人魔法抗性 · +5% 经验 · +35% MF · +50% EG",
+    "shield": "+10% 魔法技能伤害 · -10% 敌人魔法抗性 · +5% 经验 · +35% MF · +50% EG"
   },
   {
     "id": "jw-40-15",
     "kind": "jewel",
     "nameZh": "40% ED / 15% IAS 红白珠",
     "nameEn": "Ruby Jewel of Fervor (40/15)",
-    "icon": "/images/items/misc/body_part/fragment_fire.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond1.webp",
     "weapon": "+40% 增强伤害 (ED) · +15% 提高攻击速度 (IAS)",
     "helm": "+40% 增强伤害 (ED) · +15% 提高攻击速度 (IAS)",
     "shield": "+40% 增强伤害 (ED) · +15% 提高攻击速度 (IAS)"
@@ -1228,7 +1288,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "15% IAS / 30% 火抗安头珠",
     "nameEn": "Ruby Jewel of Fervor (15 IAS / 30 Fire Res)",
-    "icon": "/images/items/misc/body_part/fragment_fire.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond2.webp",
     "weapon": "+15% 提高攻击速度 (IAS) · 火焰抗性 +30%",
     "helm": "+15% 提高攻击速度 (IAS) · 火焰抗性 +30%",
     "shield": "+15% 提高攻击速度 (IAS) · 火焰抗性 +30%"
@@ -1238,7 +1298,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "15% IAS / 15% 全抗珠",
     "nameEn": "Scintillating Jewel of Fervor (15/15)",
-    "icon": "/images/items/misc/body_part/fragment_magic.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond6.webp",
     "weapon": "+15% 提高攻击速度 (IAS) · +15% 所有抗性",
     "helm": "+15% 提高攻击速度 (IAS) · +15% 所有抗性",
     "shield": "+15% 提高攻击速度 (IAS) · +15% 所有抗性"
@@ -1248,7 +1308,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "15% IAS / +3 杀回蓝 (MAEK) 珠",
     "nameEn": "Aureolin Jewel of Fervor (15 IAS / 3 MAEK)",
-    "icon": "/images/items/misc/body_part/fragment_lightning.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond3.webp",
     "weapon": "+15% 提高攻击速度 (IAS) · +3 每杀一个敌人恢复法力",
     "helm": "+15% 提高攻击速度 (IAS) · +3 每杀一个敌人恢复法力",
     "shield": "+15% 提高攻击速度 (IAS) · +3 每杀一个敌人恢复法力"
@@ -1258,7 +1318,7 @@ export const SOCKETABLES = [
     "kind": "jewel",
     "nameZh": "7% FHR / 9 力 / 9 敏 / 10 全抗黄珠",
     "nameEn": "Rare Jewel (7 FHR / 9 Str / 9 Dex / 10 All Res)",
-    "icon": "/images/items/misc/body_part/fragment_physical.webp",
+    "icon": "/images/items/misc/gem/perfect_diamond5.webp",
     "weapon": "+7% 快速打击恢复 · +9 力量 · +9 敏捷 · +10% 所有抗性",
     "helm": "+7% 快速打击恢复 · +9 力量 · +9 敏捷 · +10% 所有抗性",
     "shield": "+7% 快速打击恢复 · +9 力量 · +9 敏捷 · +10% 所有抗性"

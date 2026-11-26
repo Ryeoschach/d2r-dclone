@@ -86,7 +86,7 @@ export const PRESET_BUILDS = [
       statAlloc: { str: 65, dex: 25, vit: 375, enr: 0 },
       ctaOn: true,
       charAura: "none",
-      demonAura: "conv",
+      demonAura: "vigor",
       demonMlvl: 96,
       warlockHex: "none",
       enemyDebuff: "none"

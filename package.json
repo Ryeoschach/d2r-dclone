@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
+    "build": "node scripts/sync-asset-versions.mjs",
     "dev": "wrangler dev --test-scheduled",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run sync:assets && wrangler deploy",
     "init-admin": "node scripts/init-admin.mjs",
     "sync:assets": "node scripts/sync-asset-versions.mjs",
     "start:linux": "node scripts/linux-server.mjs"

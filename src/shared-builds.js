@@ -5,6 +5,7 @@ import { getItemsCatalog } from "./items-metadata.js";
 import { getRunewordsCatalog } from "./runewords-metadata.js";
 import { getPaperdollCatalog } from "./paperdoll-data.js";
 import { DASHBOARD_THEME_VERSION } from "./dashboard.js";
+import { APP_VERSION, APP_BUILD_TIME, APP_COMMIT } from "./build-info.js";
 
 const KEY_SHARE_BUILD_PREFIX = "share:build:";
 const KEY_SHARE_RL_PREFIX = "share:rl:";
@@ -419,6 +420,21 @@ function sanitizeEquippedItem(raw) {
   if (raw.customStats && typeof raw.customStats === "string") {
     item.customStats = sanitizeText(raw.customStats, 240);
   }
+  if (raw.autoTabLvl !== undefined) {
+    const lv = sanitizeInt(raw.autoTabLvl, 0, 3, 0);
+    if (lv > 0) item.autoTabLvl = lv;
+  }
+  if (Array.isArray(raw.baseStaffmods) && raw.baseStaffmods.length) {
+    const cleanSm = raw.baseStaffmods
+      .slice(0, 3)
+      .filter((sm) => sm && typeof sm === "object" && typeof sm.key === "string")
+      .map((sm) => ({
+        key: sanitizeText(sm.key, 48),
+        lvl: sanitizeInt(sm.lvl, 1, 3, 1)
+      }))
+      .filter((sm) => sm.key);
+    if (cleanSm.length) item.baseStaffmods = cleanSm;
+  }
   return item;
 }
 
@@ -444,6 +460,8 @@ function sanitizeBag(raw) {
       tabPage: sanitizeInt(b.tabPage, 0, 3, 0),
       rolls: sanitizeRollsMap(b.rolls)
     };
+    const skinNum = sanitizeInt(b.skin, 0, 3, 0);
+    if (skinNum >= 1 && skinNum <= 3) entry.skin = skinNum;
     if (b.affixes && typeof b.affixes === "object" && !Array.isArray(b.affixes)) {
       const cleanAff = {};
       if (typeof b.affixes.pre === "string") cleanAff.pre = sanitizeText(b.affixes.pre, 48);
@@ -548,9 +566,34 @@ function sanitizeMercSummary(raw) {
   };
 }
 
+function sanitizeSkillBonuses(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const byTabRaw = raw.byTab && typeof raw.byTab === "object" ? raw.byTab : {};
+  const bySkillRaw = raw.bySkill && typeof raw.bySkill === "object" ? raw.bySkill : {};
+  const bySkill = {};
+  for (const [k, v] of Object.entries(bySkillRaw).slice(0, 24)) {
+    const key = sanitizeText(k, 48);
+    const n = sanitizeInt(v, 0, 25, 0);
+    if (key && n > 0) bySkill[key] = n;
+  }
+  return {
+    all: sanitizeInt(raw.all, 0, 60, 0),
+    gearAll: sanitizeInt(raw.gearAll, 0, 60, 0),
+    cta: sanitizeInt(raw.cta, 0, 5, 0),
+    byTab: {
+      1: sanitizeInt(byTabRaw[1] ?? byTabRaw["1"], 0, 40, 0),
+      2: sanitizeInt(byTabRaw[2] ?? byTabRaw["2"], 0, 40, 0),
+      3: sanitizeInt(byTabRaw[3] ?? byTabRaw["3"], 0, 40, 0)
+    },
+    bySkill,
+    fire: sanitizeInt(raw.fire, 0, 30, 0)
+  };
+}
+
 function sanitizeSummary(raw) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   const merc = sanitizeMercSummary(raw.merc);
+  const skillBonuses = sanitizeSkillBonuses(raw.skillBonuses);
   return {
     hp: sanitizeInt(raw.hp, 0, 999999, 0),
     mana: sanitizeInt(raw.mana, 0, 999999, 0),
@@ -571,6 +614,7 @@ function sanitizeSummary(raw) {
     resL: sanitizeInt(raw.resL, -100, 95, 0),
     resP: sanitizeInt(raw.resP, -100, 95, 0),
     allSkillBonus: sanitizeInt(raw.allSkillBonus, 0, 60, 0),
+    ...(skillBonuses ? { skillBonuses } : {}),
     totalStr: sanitizeInt(raw.totalStr, 0, 1500, 0),
     totalDex: sanitizeInt(raw.totalDex, 0, 1500, 0),
     totalVit: sanitizeInt(raw.totalVit, 0, 1500, 0),
@@ -1037,6 +1081,21 @@ function resolveDisplayItem(eq, idx, slotId = "", setCounts = null) {
   if (eq.palModType === "dmg" && (eq.palEd > 0 || eq.palAr > 0)) {
     statLines.push(`+${eq.palEd || 0}% 强化伤害 / +${eq.palAr || 0} 攻击准确率（圣骑士盾底材）`);
   }
+  if (bRule && eq.autoTabLvl > 0) {
+    const autoName = bRule.type === "abow" ? "弓与弩技能" : (bRule.type === "aspe" || bRule.type === "ajav") ? "标枪与长矛技能" : "单系技能";
+    tags.push(`底材 +${eq.autoTabLvl} ${autoName}`);
+    statLines.push(`+${eq.autoTabLvl} ${autoName}（底材自带）`);
+  }
+  if (Array.isArray(eq.baseStaffmods) && eq.baseStaffmods.length) {
+    const allSkills = (idx.classes || []).flatMap((c) => c.skills || []);
+    for (const sm of eq.baseStaffmods.slice(0, 3)) {
+      if (!sm || !sm.key || !(sm.lvl > 0)) continue;
+      const skObj = allSkills.find((s) => s.key === sm.key);
+      const skName = skObj ? skObj.nameZh : sm.key;
+      tags.push(`底材 +${sm.lvl} ${skName}`);
+      statLines.push(`+${sm.lvl} ${skName}（底材自带）`);
+    }
+  }
 
   const socketDetails = (Array.isArray(eq.sockets) ? eq.sockets : [])
     .map((s) => describeSocketDetail(s, idx, bRule, slotId))
@@ -1063,6 +1122,23 @@ function resolveDisplayItem(eq, idx, slotId = "", setCounts = null) {
   };
 }
 
+function resolveSharedCharmIcon(b, def) {
+  const skin = Number(b?.skin || 0);
+  if (
+    def &&
+    skin >= 1 &&
+    skin <= 3 &&
+    def.cat !== "util" &&
+    def.id !== "anni" &&
+    def.id !== "torch" &&
+    (def.size === "SC" || def.size === "LC" || def.size === "GC")
+  ) {
+    const sizeKey = def.size === "SC" ? "small" : def.size === "LC" ? "medium" : "large";
+    return `/images/items/misc/charm/charm_${sizeKey}${Math.floor(skin)}.webp`;
+  }
+  return def?.icon || "/images/items/misc/charm/charm_small.webp";
+}
+
 function layoutSharedInventoryBag(bagRaw, idx, cls) {
   const occupied = Array.from({ length: 4 }, () => Array(10).fill(false));
   const placed = [];
@@ -1081,7 +1157,7 @@ function layoutSharedInventoryBag(bagRaw, idx, cls) {
         shortTag = tabLabel.slice(0, 2) + "+1";
       }
     }
-    const kind = def?.unique ? "is-unique" : (def?.util ? "is-util" : "");
+    const kind = (def?.unique || def?.cat === "unique") ? "is-unique" : ((def?.util || def?.cat === "util") ? "is-util" : "");
     return {
       b,
       def,
@@ -1091,7 +1167,7 @@ function layoutSharedInventoryBag(bagRaw, idx, cls) {
       tabLabel,
       shortTag,
       kind,
-      icon: def?.icon || "/images/items/misc/charm/charm_small.webp"
+      icon: resolveSharedCharmIcon(b, def)
     };
   });
   // Place taller items first for tidy D2R 10x4 packing
@@ -1176,6 +1252,64 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
   const shareUrl = origin ? `${origin.replace(/\/$/, "")}${sharePath}` : sharePath;
   const importPath = `/?import_build=${encodeURIComponent(build.id)}#skills`;
 
+  // Resolve effective skill level bonuses (Gear + Class + CTA + Tab/Skiller + Fire + Single-skill)
+  const fallbackTabBonuses = { 1: 0, 2: 0, 3: 0 };
+  if (Array.isArray(pd?.charBag)) {
+    for (const b of pd.charBag) {
+      if (b && Number(b.tabPage) >= 1 && Number(b.tabPage) <= 3 && String(b.charmId || "").startsWith("gc-sk")) {
+        fallbackTabBonuses[b.tabPage] = (fallbackTabBonuses[b.tabPage] || 0) + 1;
+      }
+    }
+  }
+  const fallbackCta = pd?.ctaOn ? 1 : 0;
+  const fallbackAll = sum ? Math.max(0, Number(sum.allSkillBonus || 0)) : fallbackCta;
+  const skillBonuses = sum?.skillBonuses
+    ? {
+        all: sum.skillBonuses.all,
+        gearAll: sum.skillBonuses.gearAll,
+        cta: sum.skillBonuses.cta,
+        byTab: {
+          1: sum.skillBonuses.byTab?.[1] || 0,
+          2: sum.skillBonuses.byTab?.[2] || 0,
+          3: sum.skillBonuses.byTab?.[3] || 0
+        },
+        bySkill: sum.skillBonuses.bySkill || {},
+        fire: sum.skillBonuses.fire || 0
+      }
+    : {
+        all: fallbackAll,
+        gearAll: Math.max(0, fallbackAll - fallbackCta),
+        cta: fallbackCta,
+        byTab: fallbackTabBonuses,
+        bySkill: {},
+        fire: 0
+      };
+  const computeSkillBonus = (sk) => {
+    if (!sk) return skillBonuses.all;
+    let extra = (skillBonuses.byTab[sk.page] || 0) + (skillBonuses.bySkill[sk.key] || 0);
+    if (skillBonuses.fire > 0 && sk.dmg && sk.dmg.type === "fire" && !(build.classId === "sor" && sk.page === 1)) {
+      extra += skillBonuses.fire;
+    }
+    return skillBonuses.all + extra;
+  };
+  const skillBonusSummaryParts = [];
+  if (skillBonuses.all > 0) {
+    skillBonusSummaryParts.push(`全/职业 +${skillBonuses.all}${skillBonuses.cta > 0 ? `（含 CTA +${skillBonuses.cta}）` : ""}`);
+  }
+  if (cls && Array.isArray(cls.tabs)) {
+    for (const tab of cls.tabs) {
+      const tbv = skillBonuses.byTab[tab.page] || 0;
+      if (tbv > 0) skillBonusSummaryParts.push(`${(tab.zhCN || "").slice(0, 4)} +${tbv}`);
+    }
+  }
+  if (skillBonuses.fire > 0) skillBonusSummaryParts.push(`火系 +${skillBonuses.fire}`);
+  for (const [k, v] of Object.entries(skillBonuses.bySkill)) {
+    if (v > 0) {
+      const sObj = cls?.skills?.find((x) => x.key === k);
+      skillBonusSummaryParts.push(`${sObj ? sObj.nameZh : k} +${v}`);
+    }
+  }
+
   // Skills breakdown by 3 trees (both compact list & full 3x6 visual tree)
   const skillsMap = build.skills || {};
   let totalSkillPts = 0;
@@ -1188,27 +1322,41 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
       const tabSkills = pageAll.filter((sk) => Number(skillsMap[sk.key] || 0) > 0);
       const tabSum = tabSkills.reduce((acc, sk) => acc + Number(skillsMap[sk.key] || 0), 0);
       totalSkillPts += tabSum;
+      const tabBonusTotal = skillBonuses.all + (skillBonuses.byTab[tab.page] || 0);
       treeBlocks.push({
         page: tab.page,
         title: tab.zhCN || tab.enUS || `系别 ${tab.page}`,
         pts: tabSum,
-        items: tabSkills.map((sk) => ({
-          key: sk.key,
-          nameZh: sk.nameZh || sk.key,
-          nameEn: sk.nameEn || sk.key,
-          icon: sk.icon || "",
-          pts: Number(skillsMap[sk.key] || 0)
-        })),
-        allSkills: pageAll.map((sk) => ({
-          key: sk.key,
-          row: Number(sk.row) || 1,
-          col: Number(sk.col) || 1,
-          reqs: Array.isArray(sk.reqs) ? sk.reqs : [],
-          nameZh: sk.nameZh || sk.key,
-          nameEn: sk.nameEn || sk.key,
-          icon: sk.icon || "",
-          pts: Number(skillsMap[sk.key] || 0)
-        }))
+        tabBonusTotal,
+        items: tabSkills.map((sk) => {
+          const pts = Number(skillsMap[sk.key] || 0);
+          const bonus = computeSkillBonus(sk);
+          return {
+            key: sk.key,
+            nameZh: sk.nameZh || sk.key,
+            nameEn: sk.nameEn || sk.key,
+            icon: sk.icon || "",
+            pts,
+            bonus,
+            effLvl: pts + bonus
+          };
+        }),
+        allSkills: pageAll.map((sk) => {
+          const pts = Number(skillsMap[sk.key] || 0);
+          const bonus = pts > 0 ? computeSkillBonus(sk) : 0;
+          return {
+            key: sk.key,
+            row: Number(sk.row) || 1,
+            col: Number(sk.col) || 1,
+            reqs: Array.isArray(sk.reqs) ? sk.reqs : [],
+            nameZh: sk.nameZh || sk.key,
+            nameEn: sk.nameEn || sk.key,
+            icon: sk.icon || "",
+            pts,
+            bonus,
+            effLvl: pts > 0 ? (pts + bonus) : 0
+          };
+        })
       });
     }
   }
@@ -1245,11 +1393,14 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     }
     const nodes = tb.allSkills.map((sk) => {
       const invested = sk.pts > 0;
-      const tip = `${sk.nameZh} (${sk.nameEn}) · ${sk.pts} / 20 点`;
+      const boosted = invested && sk.bonus > 0;
+      const tip = boosted
+        ? `${sk.nameZh} (${sk.nameEn}) · 实际 Lv.${sk.effLvl}（基础 ${sk.pts} / 20 + 装备/CTA +${sk.bonus}）`
+        : `${sk.nameZh} (${sk.nameEn}) · ${sk.pts} / 20 点`;
       return `<div class="bd-sk-node${invested ? " is-invested" : ""}" style="grid-column:${sk.col};grid-row:${sk.row}" title="${escapeHtml(tip)}">
         <div class="bd-sk-node-ico-wrap">
           ${sk.icon ? `<img class="bd-sk-node-ico" src="${escapeHtml(sk.icon)}" alt="${escapeHtml(sk.nameZh)}" loading="lazy" />` : `<span class="bd-sk-node-ph"></span>`}
-          ${invested ? `<span class="bd-sk-node-badge">${sk.pts}</span>` : ""}
+          ${invested ? `<span class="bd-sk-node-badge${boosted ? " is-boosted" : ""}">${boosted ? sk.effLvl : sk.pts}</span>` : ""}
         </div>
         <span class="bd-sk-node-name">${escapeHtml(sk.nameZh)}</span>
       </div>`;
@@ -1301,10 +1452,11 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
       const tObj = cls.tabs.find((t) => t.page === b.tabPage);
       if (tObj) label += ` (${tObj.zhCN})`;
     }
-    const key = `${b.charmId}:${b.tabPage || 0}`;
+    const icon = resolveSharedCharmIcon(b, cDef);
+    const key = `${b.charmId}:${b.tabPage || 0}:${icon}`;
     const prev = bagGrouped.get(key);
     if (prev) prev.count += 1;
-    else bagGrouped.set(key, { label, icon: cDef?.icon || "/images/items/misc/charm/charm_small.webp", count: 1 });
+    else bagGrouped.set(key, { label, icon, count: 1 });
   }
   const bagList = [...bagGrouped.values()];
   const bagPlaced = layoutSharedInventoryBag(bagRaw, idx, cls);
@@ -2147,7 +2299,11 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     .sk-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.035); font-size: 12.5px; }
     .sk-row-l { display: flex; align-items: center; gap: 7px; min-width: 0; }
     .sk-icon { width: 24px; height: 24px; border-radius: 5px; object-fit: cover; flex-shrink: 0; }
-    .sk-pts { font-weight: 800; color: #f5cf7b; white-space: nowrap; }
+    .sk-pts { font-weight: 800; color: #f5cf7b; white-space: nowrap; display: inline-flex; align-items: baseline; gap: 5px; }
+    .sk-eff { color: #7cb8ff; font-weight: 900; font-size: 13px; }
+    .sk-base-sub { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .sk-bonus-pill { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: #9ad8ff; border: 1px solid rgba(110, 178, 255, 0.42); background: rgba(24, 48, 86, 0.52); }
+    .bd-sk-node-badge.is-boosted { background: linear-gradient(180deg, #74b8ff, #2665c4); color: #ffffff; }
     .bd-sk-head-r { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .bd-sk-view-tabs { display: inline-flex; gap: 4px; padding: 3px; border-radius: 9px; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(213, 167, 72, 0.28); }
     .bd-sk-tab { border: 0; border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; background: transparent; color: var(--muted); transition: all 140ms ease; }
@@ -2211,6 +2367,9 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
     :root[data-theme="light"] .tree-head,
     :root[data-theme="light"] .tree-head span,
     :root[data-theme="light"] .bag-chip strong { color: #7a4805 !important; }
+    :root[data-theme="light"] .sk-eff { color: #1548a8 !important; }
+    :root[data-theme="light"] .sk-base-sub { color: #665541 !important; }
+    :root[data-theme="light"] .sk-bonus-pill { color: #1548a8 !important; background: #eaf1fd; border-color: rgba(34, 88, 186, 0.42); }
     :root[data-theme="light"] .readonly-pill { color: #11692a; background: rgba(20, 128, 52, 0.12); border-color: rgba(20, 128, 52, 0.4); }
     :root[data-theme="light"] .buff-pill { background: #efe3c8; border-color: rgba(154, 114, 52, 0.38); color: #2b2016; }
     :root[data-theme="light"] .btn-secondary { background: #f3e8d0; color: #2b2016; border-color: rgba(154, 114, 52, 0.45); }
@@ -2383,6 +2542,7 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
         <span>✨ 技能树加点明细</span>
         <span class="bd-sk-head-r">
           <span style="font-size:12px;color:var(--muted)">已分配 ${totalSkillPts} / 110 点</span>
+          ${skillBonusSummaryParts.length ? `<span class="sk-bonus-pill">装备/CTA 技能加成：${escapeHtml(skillBonusSummaryParts.join(" · "))}</span>` : ""}
           <span class="bd-sk-view-tabs" role="tablist" aria-label="技能展示视图切换">
             <button type="button" class="bd-sk-tab active" data-bd-sk-view="list" aria-selected="true">📋 紧凑列表</button>
             <button type="button" class="bd-sk-tab" data-bd-sk-view="tree" aria-selected="false">🌳 技能树视图</button>
@@ -2391,15 +2551,15 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
       </h2>
       <div class="trees-grid" id="bd-sk-view-list">
         ${treeBlocks.map((tb) => `<div class="tree-col">
-          <div class="tree-head"><span>${escapeHtml(tb.title)}</span><span style="color:#f5cf7b">${tb.pts} 点</span></div>
+          <div class="tree-head"><span>${escapeHtml(tb.title)}</span><span style="color:#f5cf7b">基础 ${tb.pts} 点${tb.tabBonusTotal > 0 ? ` · +${tb.tabBonusTotal}` : ""}</span></div>
           ${tb.items.length
-            ? tb.items.map((sk) => `<div class="sk-row"><div class="sk-row-l">${sk.icon ? `<img class="sk-icon" src="${escapeHtml(sk.icon)}" alt="" loading="lazy" />` : ""}<span>${escapeHtml(sk.nameZh)}</span></div><span class="sk-pts">${sk.pts} / 20</span></div>`).join("")
+            ? tb.items.map((sk) => `<div class="sk-row"><div class="sk-row-l">${sk.icon ? `<img class="sk-icon" src="${escapeHtml(sk.icon)}" alt="" loading="lazy" />` : ""}<span>${escapeHtml(sk.nameZh)}</span></div><span class="sk-pts">${sk.bonus > 0 ? `<span class="sk-eff">Lv.${sk.effLvl}</span><span class="sk-base-sub">(${sk.pts}+${sk.bonus})</span>` : `${sk.pts} / 20`}</span></div>`).join("")
             : `<div style="font-size:12px;color:var(--muted)">本系未投入技能点</div>`}
         </div>`).join("")}
       </div>
       <div class="trees-grid" id="bd-sk-view-tree" style="display:none">
         ${treeBlocks.map((tb) => `<div class="tree-col">
-          <div class="tree-head"><span>${escapeHtml(tb.title)}</span><span style="color:#f5cf7b">${tb.pts} 点</span></div>
+          <div class="tree-head"><span>${escapeHtml(tb.title)}</span><span style="color:#f5cf7b">基础 ${tb.pts} 点${tb.tabBonusTotal > 0 ? ` · +${tb.tabBonusTotal}` : ""}</span></div>
           ${renderSharedSkillTreeStageHtml(tb)}
         </div>`).join("")}
       </div>
@@ -2423,6 +2583,7 @@ export function renderSharedBuildPage(build, { origin = "" } = {}) {
           </div>`
         : `<div style="font-size:13px;color:var(--muted)">该 BD 未携带佣兵</div>`}
     </section>
+    <footer style="margin-top:20px;text-align:center;font-size:12px;color:var(--muted)">庇护之地实时面板 · <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;opacity:0.88;cursor:help" title="版本 ${escapeHtml(APP_VERSION)} · 构建时间 ${escapeHtml(APP_BUILD_TIME)} · Commit ${escapeHtml(APP_COMMIT)}">${escapeHtml(APP_VERSION)}</span></footer>
   </main>
   <script>
     (function () {

@@ -82,8 +82,8 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
       charBag: [
         { uid: "b1", charmId: "torch", tabPage: 0, rolls: { L1: 18, L2: 19 } },
         { uid: "b2", charmId: "anni", tabPage: 0, rolls: { L1: 20, L2: 19, L3: 10 } },
-        { uid: "b3", charmId: "gc-sk-life", tabPage: 1, rolls: { L1: 42 } },
-        { uid: "b4", charmId: "gc-sk-life", tabPage: 1, rolls: {} }
+        { uid: "b3", charmId: "gc-sk-life", tabPage: 1, skin: 3, rolls: { L1: 42 } },
+        { uid: "b4", charmId: "gc-sk-life", tabPage: 1, skin: 2, rolls: {} }
       ],
       statAlloc: { str: 110, dex: 130, vit: 240, enr: 0 },
       mercVariant: "a2-might",
@@ -119,6 +119,14 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
       resL: 75,
       resP: 75,
       allSkillBonus: 7,
+      skillBonuses: {
+        all: 7,
+        gearAll: 6,
+        cta: 1,
+        byTab: { 1: 2, 2: 0, 3: 0 },
+        bySkill: {},
+        fire: 0
+      },
       totalStr: 185,
       totalDex: 158,
       totalVit: 320,
@@ -201,6 +209,8 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
   assert.equal(fetched.build.classId, "pal");
   assert.equal(fetched.build.skills["Holy Shield"], 20);
   assert.equal(fetched.build.paperdoll.charLoadout.offhand.palRes, 45);
+  assert.equal(fetched.build.paperdoll.charBag[2].skin, 3);
+  assert.equal(fetched.build.paperdoll.charBag[3].skin, 2);
   assert.equal(fetched.build.summary.hp, 3420);
 
   // 3. Fetch SSR /build/:id read-only HTML page
@@ -240,6 +250,8 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
   assert.match(html, /inventory_paperdoll_weapon\.webp/);
   assert.match(html, /bd-char-doll-swap/);
   assert.match(html, /bd-char-inspector/);
+  assert.match(html, /charm_large3\.webp/);
+  assert.match(html, /charm_large2\.webp/);
   assert.match(html, /bd-merc-inspector/);
   assert.match(html, /bd-bag-inspector/);
   assert.match(html, /data-bd-target="bag"/);
@@ -261,6 +273,10 @@ test("完整 BD 公开只读分享短链：创建、JSON 查询、SSR /build/:id
   assert.doesNotMatch(html, /gear-icon-ph/, "所有已穿戴装备均应有图标，不应退回空白占位");
   assert.match(html, /×2/); // 2x skiller GC grouped
   assert.match(html, /已分配 81 \/ 110 点/);
+  assert.match(html, /装备\/CTA 技能加成：全\/职业 \+7（含 CTA \+1）/);
+  assert.match(html, /Lv\.29<\/span><span class="sk-base-sub">\(20\+9\)<\/span>/);
+  assert.match(html, /Lv\.27<\/span><span class="sk-base-sub">\(20\+7\)<\/span>/);
+  assert.match(html, /class="bd-sk-node-badge is-boosted">29<\/span>/);
   assert.match(html, /id="bd-sk-view-list"/);
   assert.match(html, /id="bd-sk-view-tree"/);
   assert.match(html, /data-bd-sk-view="tree"/);

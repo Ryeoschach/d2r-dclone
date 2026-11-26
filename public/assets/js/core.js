@@ -2778,11 +2778,66 @@ function setupThemeSwitcher() {
   }
 }
 
+function setupGlobalHudAndShortcuts() {
+  const hudTzPill = document.getElementById("hud-tz-pill");
+  const hudDcPill = document.getElementById("hud-dc-pill");
+  if (hudTzPill) hudTzPill.addEventListener("click", () => switchMainTab("terror"));
+  if (hudDcPill) hudDcPill.addEventListener("click", () => switchMainTab("dclone"));
+
+  const backToTopBtn = document.getElementById("back-to-top-btn");
+  if (backToTopBtn) {
+    window.addEventListener("scroll", () => {
+      backToTopBtn.classList.toggle("visible", window.scrollY > 360);
+    }, { passive: true });
+    backToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (document.querySelector("dialog[open]")) return;
+    const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+    if (tag === "input" || tag === "textarea" || tag === "select" || (e.target && e.target.isContentEditable)) return;
+    if (e.key >= "1" && e.key <= "6") {
+      const idx = Number(e.key) - 1;
+      if (MAIN_TABS[idx]) {
+        e.preventDefault();
+        switchMainTab(MAIN_TABS[idx].id);
+      }
+      return;
+    }
+    if (e.key === "/") {
+      e.preventDefault();
+      const searchMap = {
+        terror: "tz-search-input",
+        runewords: "rw-search",
+        affixes: "af-search",
+        items: "it-search"
+      };
+      if (activeMainTab === "terror") {
+        const tzBody = document.getElementById("tz-directory-body");
+        const tzToggle = document.getElementById("tz-toggle-panel");
+        if (tzBody && tzBody.style.display === "none" && tzToggle) {
+          tzToggle.click();
+        }
+      }
+      const targetId = searchMap[activeMainTab];
+      const el = targetId ? document.getElementById(targetId) : null;
+      if (el) {
+        el.focus();
+        el.select();
+      }
+    }
+  });
+}
+
 setupThemeSwitcher();
 setupLangSwitcher();
 loadSystemConfig();
 setupTzDirectoryEvents();
 initMainTabs();
+setupGlobalHudAndShortcuts();
 setupPersonalAlerts();
 setupAuthAndCloudSync();
 load();
