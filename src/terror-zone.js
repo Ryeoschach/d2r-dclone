@@ -115,14 +115,105 @@ export function isTerrorZonePeriodStale(terrorZone, now = Date.now()) {
     halfHourBucket(now) > halfHourBucket(checkedAt);
 }
 
+/**
+ * Project stored Terror Zone state for real-time display across :00 / :30 boundaries.
+ * When the clock enters the immediately following half-hour bucket before upstream updates,
+ * promote previous `next` -> `current` immediately and mark `next` as pending.
+ */
+export function projectTerrorZoneForDisplay(terrorZone, now = Date.now()) {
+  if (!terrorZone) {
+    return terrorZone;
+  }
+  const enriched = enrichTerrorZone(terrorZone);
+  const checkedAt = Date.parse(enriched.checkedAt);
+  if (!Number.isFinite(checkedAt)) {
+    return { ...enriched, isRolledOver: false, awaitingNext: false };
+  }
+  const deltaBuckets = halfHourBucket(now) - halfHourBucket(checkedAt);
+  if (deltaBuckets <= 0) {
+    return { ...enriched, isRolledOver: false, awaitingNext: false };
+  }
+  if (deltaBuckets === 1 && enriched.next) {
+    return {
+      ...enriched,
+      current: enriched.next,
+      currentZh: enriched.nextZh ?? translateTerrorZone(enriched.next),
+      currentDetails: enriched.nextDetails ?? getTerrorZoneMetadata(enriched.next),
+      next: null,
+      nextZh: null,
+      nextDetails: null,
+      isRolledOver: true,
+      awaitingNext: true
+    };
+  }
+  return {
+    ...enriched,
+    next: null,
+    nextZh: null,
+    nextDetails: null,
+    isRolledOver: false,
+    awaitingNext: true,
+    isStale: true
+  };
+}
+
 export function isTerrorZonePullDue(terrorZone, now = Date.now()) {
-  if (!terrorZone?.checkedAt) {
+  if (!terrorZone?.checkedAt || isTerrorZonePeriodStale(terrorZone, now)) {
     return true;
   }
 
-  // The upstream can remain stale for several minutes after the boundary.
-  // Unchanged responses do not consume a KV put.
+  // Keep polling during the first 10 minutes after boundary for delayed corrections.
   return new Date(now).getUTCMinutes() % 30 < 10;
+}
+
+function hasTerrorZoneChanged(previous, current) {
+  return Boolean(current) && (
+    previous?.current !== current.current || previous?.next !== current.next
+  );
+}
+
+/**
+ * Fetch Terror Zone with short-interval retries on transient errors or
+ * when the current half-hour period is stale and upstream still returns old data.
+ */
+export async function fetchTerrorZoneWithRetry(env, options = {}) {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const previousTerrorZone = options.previousTerrorZone ?? null;
+  const maxAttempts = Math.max(1, Number(options.maxAttempts ?? 3));
+  const retryDelayMs = Math.max(0, Number(options.retryDelayMs ?? 8000));
+  const now = options.now ?? Date.now();
+  const sleepFn =
+    typeof options.sleepFn === "function"
+      ? options.sleepFn
+      : (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const retryOnUnchanged =
+    typeof options.retryOnUnchanged === "boolean"
+      ? options.retryOnUnchanged
+      : !previousTerrorZone?.checkedAt || isTerrorZonePeriodStale(previousTerrorZone, now);
+
+  let lastError = null;
+  let lastResult = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const fetched = await fetchTerrorZone(env, fetchImpl);
+      lastResult = fetched;
+      if (!retryOnUnchanged || hasTerrorZoneChanged(previousTerrorZone, fetched)) {
+        return fetched;
+      }
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (attempt < maxAttempts && retryDelayMs > 0) {
+      await sleepFn(retryDelayMs);
+    }
+  }
+
+  if (lastResult) {
+    return lastResult;
+  }
+  throw lastError ?? new Error("恐怖区域接口请求失败");
 }
 
 export function appendTerrorZoneHistory(history = [], terrorZone, checkedAt = new Date().toISOString()) {

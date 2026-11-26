@@ -41,18 +41,14 @@ export function createD1KvAdapter(db, options = {}) {
   async function ensureSchema() {
     if (!schemaReadyPromise) {
       schemaReadyPromise = (async () => {
-        if (typeof db.exec === "function") {
-          await db.exec(KV_STORE_SCHEMA_SQL);
-        } else {
-          await db
-            .prepare(
-              "CREATE TABLE IF NOT EXISTS kv_store (key TEXT PRIMARY KEY, value TEXT NOT NULL, expires_at INTEGER)"
-            )
-            .run();
-          await db
-            .prepare("CREATE INDEX IF NOT EXISTS idx_kv_store_expires ON kv_store(expires_at)")
-            .run();
-        }
+        await db
+          .prepare(
+            "CREATE TABLE IF NOT EXISTS kv_store (key TEXT PRIMARY KEY, value TEXT NOT NULL, expires_at INTEGER)"
+          )
+          .run();
+        await db
+          .prepare("CREATE INDEX IF NOT EXISTS idx_kv_store_expires ON kv_store(expires_at)")
+          .run();
       })().catch((err) => {
         schemaReadyPromise = null;
         throw err;

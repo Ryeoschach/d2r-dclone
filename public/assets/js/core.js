@@ -56,6 +56,8 @@ const regions = ["Asia", "Americas", "Europe"];
 let minProgress = 1;
 let autoRefreshTimer = null;
 let terrorCountdownTimer = null;
+let lastTerrorRenderBucket = null;
+let lastTerrorBoundaryRefreshBucket = null;
 let syncAgeTimer = null;
 const storedAutoRefresh = localStorage.getItem("dclone-auto-refresh-enabled");
 let autoRefreshEnabled = storedAutoRefresh === null || storedAutoRefresh === "true";
@@ -277,7 +279,7 @@ function updateSanctuaryHud(data) {
   const dcPillEl = document.getElementById("hud-dc-pill");
   if (!tzNameEl || !dcHotEl) return;
 
-  const tz = data?.terrorZone;
+  const tz = resolveEffectiveTerrorZone(data?.terrorZone);
   if (tz && (tz.currentZh || tz.current)) {
     tzNameEl.textContent = currentLang === "enUS"
       ? (tz.current || tz.currentZh)
@@ -719,46 +721,116 @@ function updateSyncAge() {
     }) + "（" + ageText + "）";
 }
 
+const TZ_HALF_HOUR_MS = 30 * 60 * 1000;
+const TZ_PRE_SWITCH_ALERT_MS = 5 * 60 * 1000;
+
+function resolveEffectiveTerrorZone(terrorZone, now = Date.now()) {
+  if (!terrorZone) return null;
+  const checkedAt = new Date(terrorZone.checkedAt).getTime();
+  const deltaBuckets = Number.isFinite(checkedAt)
+    ? Math.floor(now / TZ_HALF_HOUR_MS) - Math.floor(checkedAt / TZ_HALF_HOUR_MS)
+    : 0;
+
+  if (deltaBuckets <= 0 && !terrorZone.awaitingNext) {
+    return {
+      ...terrorZone,
+      isRolledOver: false,
+      awaitingNext: false,
+      isStale: false
+    };
+  }
+  if (terrorZone.isRolledOver && deltaBuckets <= 1) {
+    return {
+      ...terrorZone,
+      next: null,
+      nextZh: null,
+      nextDetails: null,
+      isRolledOver: true,
+      awaitingNext: true,
+      isStale: false
+    };
+  }
+  if (deltaBuckets === 1 && terrorZone.next) {
+    return {
+      ...terrorZone,
+      current: terrorZone.next,
+      currentZh: terrorZone.nextZh || terrorZone.next,
+      currentDetails: terrorZone.nextDetails || null,
+      next: null,
+      nextZh: null,
+      nextDetails: null,
+      isRolledOver: true,
+      awaitingNext: true,
+      isStale: false
+    };
+  }
+  return {
+    ...terrorZone,
+    next: null,
+    nextZh: null,
+    nextDetails: null,
+    isRolledOver: false,
+    awaitingNext: true,
+    isStale: deltaBuckets >= 2
+  };
+}
+
 function renderTerrorZone(terrorZone) {
+  const now = Date.now();
+  lastTerrorRenderBucket = Math.floor(now / TZ_HALF_HOUR_MS);
+  const eff = resolveEffectiveTerrorZone(terrorZone, now);
   const pickTz = (zh, en) => currentLang === "enUS" ? (en || zh) : (currentLang === "zhTW" ? toZhTW(zh || en) : (zh || en));
-  const current = pickTz(terrorZone?.currentZh, terrorZone?.current);
-  const next = pickTz(terrorZone?.nextZh, terrorZone?.next);
-  const isConfirmed = !isAwaitingTerrorConfirmation(terrorZone);
+  const current = pickTz(eff?.currentZh, eff?.current);
+  const next = pickTz(eff?.nextZh, eff?.next);
+  const isConfirmed = Boolean(eff && !eff.awaitingNext);
+  const nextPendingTitle = currentLang === "enUS"
+    ? "Fetching next zone…"
+    : (currentLang === "zhTW" ? "正在獲取下一階段…" : "正在获取下一阶段…");
+  const nextPendingSub = currentLang === "enUS"
+    ? "Waiting for upstream announcement"
+    : (currentLang === "zhTW" ? "等待上游介面公布最新預告（約 1–2 分鐘）" : "等待上游接口公布最新预告（约 1–2 分钟）");
+  const nextPendingDetail = currentLang === "enUS"
+    ? "Syncing next period data…"
+    : (currentLang === "zhTW" ? "正在獲取下一階段數據…" : "正在获取下一阶段数据…");
+
   document.getElementById("terror-current").textContent = current || "等待数据…";
   document.getElementById("terror-current-original").textContent =
-    terrorZone?.current && terrorZone.current !== current ? terrorZone.current : "";
+    eff?.current && eff.current !== current ? eff.current : "";
   renderTerrorDetails(
     "terror-current-details",
-    terrorZone?.currentDetails,
+    eff?.currentDetails,
     "暂无资料"
   );
   document.getElementById("terror-updated").textContent =
-    terrorZone?.checkedAt
-      ? (isConfirmed ? "已确认 · " : "根据上一轮预测即时切换 · ") +
-        formatTime(new Date(terrorZone.checkedAt).getTime() / 1000)
+    eff?.checkedAt
+      ? (isConfirmed
+          ? "已确认 · " + formatTime(new Date(eff.checkedAt).getTime() / 1000)
+          : (eff.isRolledOver
+              ? "根据上一轮预测即时切换 · 等待下一阶段同步"
+              : "数据同步中 · 上次确认 " + formatTime(new Date(eff.checkedAt).getTime() / 1000)))
       : "";
   document.getElementById("terror-next").textContent = isConfirmed
     ? (next || "等待数据…")
-    : "正在获取下一阶段…";
-  document.getElementById("terror-next-original").textContent =
-    isConfirmed && terrorZone?.next && terrorZone.next !== next
-      ? terrorZone.next
-      : "";
+    : nextPendingTitle;
+  document.getElementById("terror-next-original").textContent = isConfirmed
+    ? (eff?.next && eff.next !== next ? eff.next : "")
+    : nextPendingSub;
   renderTerrorDetails(
     "terror-next-details",
-    isConfirmed ? terrorZone?.nextDetails : null,
-    isConfirmed ? "暂无资料" : "数据同步中"
+    isConfirmed ? eff?.nextDetails : null,
+    isConfirmed ? "暂无资料" : nextPendingDetail
   );
   updateTerrorCountdown();
   if (terrorCountdownTimer) clearInterval(terrorCountdownTimer);
   terrorCountdownTimer = setInterval(updateTerrorCountdown, 1000);
 }
 
-function isAwaitingTerrorConfirmation(terrorZone) {
-  const checkedAt = new Date(terrorZone?.checkedAt).getTime();
-  const halfHour = 30 * 60 * 1000;
+function isAwaitingTerrorConfirmation(terrorZone, now = Date.now()) {
+  if (!terrorZone) return false;
+  if (terrorZone.awaitingNext) return true;
+  const checkedAt = new Date(terrorZone.checkedAt).getTime();
   return Number.isFinite(checkedAt) &&
-    Math.floor(Date.now() / halfHour) > Math.floor(checkedAt / halfHour);
+    Math.floor(now / TZ_HALF_HOUR_MS) > Math.floor(checkedAt / TZ_HALF_HOUR_MS);
 }
 
 function renderTerrorDetails(elementId, details, fallback = "暂无资料") {
@@ -785,16 +857,42 @@ function renderTerrorDetails(elementId, details, fallback = "暂无资料") {
 
 function updateTerrorCountdown() {
   const now = Date.now();
-  const halfHour = 30 * 60 * 1000;
-  const nextBoundary = (Math.floor(now / halfHour) + 1) * halfHour;
+  const currentBucket = Math.floor(now / TZ_HALF_HOUR_MS);
+  const nextBoundary = (currentBucket + 1) * TZ_HALF_HOUR_MS;
   const remaining = Math.max(0, nextBoundary - now);
   const minutes = Math.floor(remaining / 60000);
   const seconds = Math.floor((remaining % 60000) / 1000);
   const countdownText =
     "距切换 " + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-  document.getElementById("terror-countdown").textContent = countdownText;
+  const countdownEl = document.getElementById("terror-countdown");
+  if (countdownEl) countdownEl.textContent = countdownText;
   const hudTimerEl = document.getElementById("hud-tz-timer");
   if (hudTimerEl) hudTimerEl.textContent = countdownText;
+
+  // 整点 / 半点一到，前端零延迟立刻切换「目前恐怖区域」并将下一阶段置为「正在获取」
+  if (window.dashboardData?.terrorZone && lastTerrorRenderBucket !== null && currentBucket !== lastTerrorRenderBucket) {
+    renderTerrorZone(window.dashboardData.terrorZone);
+    updateSanctuaryHud(window.dashboardData);
+    if (typeof evaluatePersonalAlerts === "function") {
+      evaluatePersonalAlerts(window.dashboardData);
+    }
+    if (lastTerrorBoundaryRefreshBucket !== currentBucket) {
+      lastTerrorBoundaryRefreshBucket = currentBucket;
+      if (autoRefreshTimer) clearTimeout(autoRefreshTimer);
+      autoRefreshTimer = setTimeout(load, 4000);
+    }
+    return;
+  }
+
+  // 距离切换不足 5 分钟时，触发第二阶段提醒（若下一阶段命中关注列表）
+  if (
+    window.dashboardData?.terrorZone &&
+    remaining > 0 &&
+    remaining <= TZ_PRE_SWITCH_ALERT_MS &&
+    typeof evaluatePersonalAlerts === "function"
+  ) {
+    evaluatePersonalAlerts(window.dashboardData);
+  }
 }
 
 async function load() {
@@ -820,7 +918,7 @@ function scheduleAutoRefresh() {
   if (autoRefreshEnabled) {
     const configuredDelay = autoRefreshMinutes * 60 * 1000;
     const delay = isAwaitingTerrorConfirmation(window.dashboardData?.terrorZone)
-      ? Math.min(configuredDelay, 15 * 1000)
+      ? Math.min(configuredDelay, 10 * 1000)
       : configuredDelay;
     autoRefreshTimer = setTimeout(load, delay);
   }
@@ -2455,36 +2553,68 @@ function evaluatePersonalAlerts(data, opts) {
   const triggered = [];
   if (!data) return triggered;
   const forceCheck = Boolean(opts && opts.forceCheck);
+  const now = Number(opts && opts.now) || Date.now();
   const isChannelOn = Boolean(alertPrefs.sound || alertPrefs.desktop);
 
   const currentKeys = [];
   const candidates = [];
 
-  const tz = data.terrorZone;
+  const bucket = Math.floor(now / TZ_HALF_HOUR_MS);
+  const nextBoundary = (bucket + 1) * TZ_HALF_HOUR_MS;
+  const remainingMs = Math.max(0, nextBoundary - now);
+  const nextBoundaryLabel = new Date(nextBoundary).toLocaleTimeString("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
+  const tz = resolveEffectiveTerrorZone(data.terrorZone, now);
+
   if (tz && tz.current) {
-    const curKey = "tz:cur:" + tz.current;
+    const curKey = "tz:cur:" + bucket + ":" + tz.current;
     currentKeys.push(curKey);
-    if (isAlertTzHit(tz.current, tz.currentDetails)) {
+    const alreadyAnnouncedPrev =
+      alertPrefs.tzNotifyNext &&
+      (alertSeenKeys.has("tz:next:" + (bucket - 1) + ":" + tz.current) ||
+        alertSeenKeys.has("tz:next5m:" + (bucket - 1) + ":" + tz.current));
+    if (!alreadyAnnouncedPrev && isAlertTzHit(tz.current, tz.currentDetails)) {
       candidates.push({
         key: curKey,
         kind: "tz",
         tab: "terror",
-        title: "🌀 恐怖地带命中：" + (tz.currentZh || tz.current),
+        title: "🌀 恐怖地带生效：" + (tz.currentZh || tz.current),
         body: "当前已轮换至你关注的恐怖地带（" + tz.current + "）"
       });
     }
   }
-  if (tz && tz.next) {
-    const nextKey = "tz:next:" + tz.next;
-    currentKeys.push(nextKey);
+  if (tz && !tz.awaitingNext && tz.next) {
+    const nextFetchKey = "tz:next:" + bucket + ":" + tz.next;
+    const next5mKey = "tz:next5m:" + bucket + ":" + tz.next;
+    currentKeys.push(nextFetchKey);
+    const inPreSwitchWindow = remainingMs > 0 && remainingMs <= TZ_PRE_SWITCH_ALERT_MS;
+    if (inPreSwitchWindow) {
+      currentKeys.push(next5mKey);
+    }
     if (alertPrefs.tzNotifyNext && isAlertTzHit(tz.next, tz.nextDetails)) {
+      // 第 1 次提醒：抓取到下一阶段恐怖地带时
       candidates.push({
-        key: nextKey,
+        key: nextFetchKey,
         kind: "tz",
         tab: "terror",
         title: "⏳ 下阶段恐怖地带预告：" + (tz.nextZh || tz.next),
-        body: "即将切换为你关注的恐怖地带（" + tz.next + "），可提前做好刷图准备"
+        body: "已抓取到下阶段预告（" + tz.next + "），将于 " + nextBoundaryLabel + " 切换，切换前 5 分钟将再次提醒"
       });
+      // 第 2 次提醒：距离切换剩余 ≤ 5 分钟时
+      if (inPreSwitchWindow) {
+        const remMin = Math.max(1, Math.ceil(remainingMs / 60000));
+        candidates.push({
+          key: next5mKey,
+          kind: "tz",
+          tab: "terror",
+          title: "⏰ 即将切换恐怖地带：" + (tz.nextZh || tz.next),
+          body: "距离切换仅剩约 " + remMin + " 分钟（" + nextBoundaryLabel + " 生效 · " + tz.next + "），请提前做好准备"
+        });
+      }
     }
   }
 

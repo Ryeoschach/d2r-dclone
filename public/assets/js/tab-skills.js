@@ -4297,6 +4297,18 @@ function renderAffixBuilder(itemObj, affixSlot, quality, clsObj, bRule) {
       : ("前缀 " + itemObj.prefixes.length + "/" + maxPre + (preFull ? " 🔒已锁" : "") +
         " · 后缀 " + itemObj.suffixes.length + "/" + maxSuf + (sufFull ? " 🔒已锁" : ""));
   }
+  const slotHintEl = document.getElementById("pd-affix-slot-hint");
+  if (slotHintEl) {
+    if (affixSlot === "helm") {
+      slotHintEl.style.display = "block";
+      slotHintEl.textContent = isCraft
+        ? "💡 按 D2R 原版规则，手工头盔配方底材为普通头盔，不可出 +全职业技能 与 FCR；如需 2/20 头部，请切至「黄装/蓝装」并选择头环类底材（权冠 / 三重冠 / 宝冠 / 头环）。"
+        : "💡 当前底材为普通头盔（按 D2R 原版规则不可出 +全职业技能 与 FCR）；如需 +2 技能 / +20% FCR / +30% FRW，请在上方底材中选择置顶的「权冠 / 三重冠 / 宝冠 / 头环」。";
+    } else {
+      slotHintEl.style.display = "none";
+      slotHintEl.textContent = "";
+    }
+  }
 
   const pool = getMagicRareAffixPool(affixSlot, isCraft ? "rare" : quality, clsObj, bRule);
   const chosenPreIds = new Set(itemObj.prefixes.map(x => x.id));
@@ -5194,17 +5206,28 @@ function renderSlotEditor() {
         }
         comboPlaceholder = "点击放入空白" + qLabel + "戒指（放入后自选词缀）";
       } else {
-        comboItems = allLegalBases.map(b => {
+        const orderedBases = (pdActiveSlot === "head")
+          ? allLegalBases.slice().sort((a, b) => {
+              const aCirc = a.type === "circ" ? 1 : 0;
+              const bCirc = b.type === "circ" ? 1 : 0;
+              if (bCirc !== aCirc) return bCirc - aCirc;
+              if (aCirc && bCirc) return (Number(b.reqLvl || 0) - Number(a.reqLvl || 0));
+              return 0;
+            })
+          : allLegalBases;
+        comboItems = orderedBases.map(b => {
           const tm = getBaseTierMeta(b);
           const shortType = (PD_BASE_TYPE_LABELS[b.type] || "").split(" ")[0] || "";
+          const isCirc = b.type === "circ";
+          const circNote = isCirc ? " · 可出+2技能/20FCR" : "";
           return {
             value: b.code,
             cat: pdActiveCat,
-            title: b.nameZh,
+            title: b.nameZh + (isCirc ? " ★可出+2技能/20FCR" : ""),
             displayLabel: "[" + tm.label + "] " + b.nameZh + " (" + b.nameEn + (b.maxSockets > 0 ? (" · 最多" + b.maxSockets + "孔") : "") + ")",
-            sub: tm.label + (shortType ? (" · " + shortType) : "") + " · " + b.nameEn + (b.maxSockets > 0 ? (" · 最多 " + b.maxSockets + "孔") : "") + " · 需力 " + b.reqStr,
-            tag: tm.label + (b.maxSockets > 0 ? ("·" + b.maxSockets + "孔") : ""),
-            searchText: getBaseSearchText(b) + " " + b.reqStr
+            sub: tm.label + (shortType ? (" · " + shortType) : "") + circNote + " · " + b.nameEn + (b.maxSockets > 0 ? (" · 最多 " + b.maxSockets + "孔") : "") + " · 需力 " + b.reqStr,
+            tag: isCirc ? ("头环·" + b.maxSockets + "孔") : (tm.label + (b.maxSockets > 0 ? ("·" + b.maxSockets + "孔") : "")),
+            searchText: getBaseSearchText(b) + " " + b.reqStr + (isCirc ? " 技能 FCR 2/20 220 头环" : "")
           };
         });
         if (curEq && curEq.cat === pdActiveCat) {

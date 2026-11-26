@@ -767,7 +767,7 @@ export function renderAdminDashboard(options = {}) {
                   <span>开启自动刷新</span>
                 </label>
               </div>
-              <p class="adm-card-sub">控制前台页面按设定间隔重新读取 KV；恐怖区域切换待确认时每 15 秒读取一次，确认后恢复设定间隔。不会直接请求 D2RuneWizard，也不会整页重载。</p>
+              <p class="adm-card-sub">控制前台页面按设定间隔重新读取 D1/KV；恐怖区域切换待确认时每 10 秒读取一次，确认后恢复设定间隔。不会直接请求 D2RuneWizard，也不会整页重载。</p>
               <div class="adm-row" id="adm-auto-chips">
                 <button class="adm-chip" type="button" data-auto-min="1">1 分</button>
                 <button class="adm-chip" type="button" data-auto-min="2">2 分</button>

@@ -1,16 +1,16 @@
 import { APP_VERSION, APP_BUILD_TIME, APP_COMMIT } from "./build-info.js";
 
 export const DASHBOARD_CSS_VERSION = "92154866f7";
-export const DASHBOARD_JS_VERSION = "7881e587dc";
+export const DASHBOARD_JS_VERSION = "49850e8e55";
 export const DASHBOARD_THEME_VERSION = "f096babd8b";
 export const DASHBOARD_ASSET_VERSIONS = {
   "shared.js": "09528eb701",
   "i18n-dict.js": "f3ee8aa070",
-  "core.js": "7881e587dc",
+  "core.js": "49850e8e55",
   "tab-runewords.js": "41b17b7067",
   "tab-affixes.js": "b44f2408f1",
   "tab-items.js": "7f0acfb51c",
-  "tab-skills.js": "2a9cd5ee4b"
+  "tab-skills.js": "ac59827790"
 };
 
 function escapeSsrHtml(str) {
@@ -1313,6 +1313,7 @@ export function renderDashboard(options = {}) {
                   <strong style="font-size:12.5px;color:#7cb6ff" id="pd-affix-builder-title">🔵 蓝装前后缀自选</strong>
                   <span style="font-size:11px;color:#ffd584;font-weight:700" id="pd-affix-lock-status">前缀 0/1 · 后缀 0/1</span>
                 </div>
+                <div id="pd-affix-slot-hint" style="display:none;font-size:11px;line-height:1.45;padding:5px 8px;border-radius:6px;background:rgba(245,207,123,0.1);border:1px solid rgba(245,207,123,0.34);color:var(--gold)"></div>
                 <input type="text" class="tz-search-input" id="pd-affix-filter" placeholder="🔍 筛选官方全词缀（如 命中、抗性、生命、法力、魔法伤害、FCR、力量...）" style="height:28px;font-size:11.5px" />
                 <div class="pd-affix-row">
                   <select class="sim-select" id="pd-affix-pre-select" style="flex:1;min-width:150px;height:30px;font-size:12px"></select>
@@ -1659,7 +1660,7 @@ export function renderDashboard(options = {}) {
           </label>
           <label for="alert-tz-next-toggle">
             <input type="checkbox" id="alert-tz-next-toggle" checked />
-            <span>下阶段预告命中时提前提醒</span>
+            <span>下阶段预告双提醒（抓取到时 + 切换前 5 分钟各提醒一次）</span>
           </label>
         </div>
         <div class="alert-zones-grid" id="alert-tz-zones-grid">正在加载 37 个恐怖地带…</div>

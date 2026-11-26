@@ -4,9 +4,11 @@ import test from "node:test";
 import {
   appendTerrorZoneHistory,
   enrichTerrorZone,
+  fetchTerrorZoneWithRetry,
   isTerrorZonePullDue,
   isTerrorZonePeriodStale,
   normalizeTerrorZone,
+  projectTerrorZoneForDisplay,
   translateTerrorZone
 } from "../src/terror-zone.js";
 
@@ -99,32 +101,41 @@ test("半小时边界后标记恐怖区域数据过期", () => {
   );
 });
 
-test("恐怖区域在边界后十分钟内重试", () => {
-  const terrorZone = { checkedAt: "2026-06-13T07:04:57.000Z" };
+test("恐怖区域在未确认或边界后十分钟内持续拉取", () => {
+  const staleZone = { checkedAt: "2026-06-13T07:04:57.000Z" };
   assert.equal(
     isTerrorZonePullDue(
-      terrorZone,
+      staleZone,
       Date.parse("2026-06-13T07:29:59.000Z")
     ),
     false
   );
   assert.equal(
     isTerrorZonePullDue(
-      terrorZone,
+      staleZone,
       Date.parse("2026-06-13T07:30:00.000Z")
     ),
     true
   );
   assert.equal(
     isTerrorZonePullDue(
-      terrorZone,
+      staleZone,
       Date.parse("2026-06-13T07:39:59.000Z")
     ),
     true
   );
+  // 即使超过 10 分钟，只要当前半小时仍未确认就继续拉取
   assert.equal(
     isTerrorZonePullDue(
-      terrorZone,
+      staleZone,
+      Date.parse("2026-06-13T07:40:00.000Z")
+    ),
+    true
+  );
+  // 本半小时已确认后，10 分钟窗口外不再拉取
+  assert.equal(
+    isTerrorZonePullDue(
+      { checkedAt: "2026-06-13T07:31:00.000Z" },
       Date.parse("2026-06-13T07:40:00.000Z")
     ),
     false
@@ -136,6 +147,49 @@ test("恐怖区域在边界后十分钟内重试", () => {
     ),
     true
   );
+});
+
+test("恐怖区域重试机制：失败或返回旧数据时按间隔重试直到拿到新数据", async () => {
+  let calls = 0;
+  const slept = [];
+  const previous = {
+    current: "The Pit",
+    next: "Tristram",
+    checkedAt: "2026-06-13T07:02:00.000Z"
+  };
+  const fakeFetch = async () => {
+    calls += 1;
+    if (calls === 1) {
+      return new Response("upstream error", { status: 502 });
+    }
+    if (calls === 2) {
+      return new Response(
+        JSON.stringify({ current: "The Pit", next: "Tristram" }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      );
+    }
+    return new Response(
+      JSON.stringify({ current: "Tristram", next: "Chaos Sanctuary" }),
+      { status: 200, headers: { "content-type": "application/json" } }
+    );
+  };
+
+  const result = await fetchTerrorZoneWithRetry(
+    {},
+    {
+      fetchImpl: fakeFetch,
+      previousTerrorZone: previous,
+      maxAttempts: 3,
+      retryDelayMs: 8000,
+      now: Date.parse("2026-06-13T07:30:05.000Z"),
+      sleepFn: async (ms) => slept.push(ms)
+    }
+  );
+
+  assert.equal(calls, 3);
+  assert.deepEqual(slept, [8000, 8000]);
+  assert.equal(result.current, "Tristram");
+  assert.equal(result.next, "Chaos Sanctuary");
 });
 
 test("追加并维护恐怖地带历史轮换队列", () => {
@@ -163,4 +217,35 @@ test("追加并维护恐怖地带历史轮换队列", () => {
   assert.equal(history.length, 2);
   assert.equal(history[0].zone, "Tristram");
   assert.equal(history[1].zone, "The Pit");
+});
+
+test("整点/半点即时晋升下一阶段为目前恐怖区域并将下一阶段置为待获取", () => {
+  const stored = normalizeTerrorZone(
+    { current: "The Pit", next: "Chaos Sanctuary" },
+    "2026-06-13T07:01:30.000Z"
+  );
+
+  // 边界前 1 秒：仍保持当前与下阶段预告
+  const before = projectTerrorZoneForDisplay(stored, Date.parse("2026-06-13T07:29:59.000Z"));
+  assert.equal(before.current, "The Pit");
+  assert.equal(before.next, "Chaos Sanctuary");
+  assert.equal(before.isRolledOver, false);
+  assert.equal(before.awaitingNext, false);
+
+  // 刚过半点（07:30:00）：立即将 Chaos Sanctuary 晋升为目前恐怖区域，next 置空待获取
+  const rolled = projectTerrorZoneForDisplay(stored, Date.parse("2026-06-13T07:30:00.000Z"));
+  assert.equal(rolled.current, "Chaos Sanctuary");
+  assert.equal(rolled.currentZh, "混沌避难所");
+  assert.equal(rolled.currentDetails?.rating, "S");
+  assert.equal(rolled.next, null);
+  assert.equal(rolled.nextZh, null);
+  assert.equal(rolled.isRolledOver, true);
+  assert.equal(rolled.awaitingNext, true);
+
+  // 超过 1 个周期未同步（08:00:00）：标记过期且不误晋升
+  const stale = projectTerrorZoneForDisplay(stored, Date.parse("2026-06-13T08:00:00.000Z"));
+  assert.equal(stale.next, null);
+  assert.equal(stale.awaitingNext, true);
+  assert.equal(stale.isStale, true);
+  assert.equal(stale.isRolledOver, false);
 });

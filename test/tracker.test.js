@@ -194,13 +194,13 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /\/api\/system-config/);
   assert.match(html, /展示数据最近变更/);
   assert.match(html, /isAwaitingTerrorConfirmation/);
-  assert.match(html, /15 \* 1000/);
+  assert.match(html, /10 \* 1000/);
 
   const adminHtml = renderAdminDashboard();
   assert.match(adminHtml, /页面数据自动刷新/);
   assert.match(adminHtml, /DC 后台接口拉取/);
   assert.match(adminHtml, /不会整页重载/);
-  assert.match(adminHtml, /切换待确认时每 15 秒读取一次/);
+  assert.match(adminHtml, /切换待确认时每 10 秒读取一次/);
   assert.match(adminHtml, /恐怖区域仍按整点、半点独立同步/);
   assert.match(adminHtml, /settings-module/);
   const adminScriptMatch = adminHtml.match(/<script>([\s\S]*?)<\/script>/);
@@ -213,6 +213,9 @@ test("仪表盘包含完整分组和筛选入口", () => {
   assert.match(html, /nextBoundary/);
   assert.match(html, /根据上一轮预测即时切换/);
   assert.match(html, /正在获取下一阶段/);
+  assert.match(html, /resolveEffectiveTerrorZone/);
+  assert.match(html, /TZ_PRE_SWITCH_ALERT_MS/);
+  assert.match(html, /tz:next5m:/);
   assert.match(html, /terror-current-details/);
   assert.match(html, /常见免疫/);
   assert.match(html, /mobile-region-grid/);

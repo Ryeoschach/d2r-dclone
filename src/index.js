@@ -9,7 +9,12 @@ import {
   setPullInterval,
   syncTerrorZone
 } from "./tracker.js";
-import { fetchTerrorZone, isTerrorZonePullDue } from "./terror-zone.js";
+import {
+  fetchTerrorZone,
+  fetchTerrorZoneWithRetry,
+  isTerrorZonePullDue,
+  projectTerrorZoneForDisplay
+} from "./terror-zone.js";
 import { getAllTerrorZones } from "./terror-zone-metadata.js";
 import { getRunewordsCatalog } from "./runewords-metadata.js";
 import { getAffixesCatalog } from "./affixes-metadata.js";
@@ -86,7 +91,9 @@ async function runScheduled(env) {
   let terrorZone;
   if (terrorZoneDue) {
     try {
-      terrorZone = await fetchTerrorZone(env);
+      terrorZone = await fetchTerrorZoneWithRetry(env, {
+        previousTerrorZone: state?.terrorZone
+      });
     } catch (error) {
       console.error("同步恐怖区域失败", error);
       result.terrorZoneError = error.message;
@@ -114,7 +121,11 @@ async function runScheduled(env) {
 async function runManualSync(env) {
   let terrorZone = null;
   try {
-    terrorZone = await fetchTerrorZone(env);
+    terrorZone = await fetchTerrorZoneWithRetry(env, {
+      maxAttempts: 2,
+      retryDelayMs: 2000,
+      retryOnUnchanged: false
+    });
   } catch (error) {
     console.error("手动同步恐怖区域失败", error);
   }
@@ -211,7 +222,10 @@ export default {
           503
         );
       }
-      return json(state);
+      return json({
+        ...state,
+        terrorZone: projectTerrorZoneForDisplay(state.terrorZone)
+      });
     }
 
     if (request.method === "GET" && url.pathname === "/api/system-config") {
